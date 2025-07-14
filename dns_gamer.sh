@@ -1,70 +1,117 @@
 #!/bin/bash
 
-# Colors
-GREEN='\033[0;92m'
-NC='\033[0m' # No Color
+# رنگ‌ها
+BLUE='\033[1;34m'
+NC='\033[0m'
 
+# هدر زیبا
 clear
-echo -e "${GREEN}"
-echo "  ██████╗ ███╗   ██╗███████╗ ██████╗██████╗ "
-echo " ██╔════╝ ████╗  ██║██╔════╝██╔════╝██╔══██╗"
-echo " ██║  ███╗██╔██╗ ██║█████╗  ██║     ██████╔╝"
-echo " ██║   ██║██║╚██╗██║██╔══╝  ██║     ██╔═══╝ "
-echo " ╚██████╔╝██║ ╚████║███████╗╚██████╗██║     "
-echo "  ╚═════╝ ╚═╝  ╚═══╝╚══════╝ ╚═════╝╚═╝     "
-echo -e "${NC}"
-
-echo -e "${GREEN}Telegram: @Academi_vpn"
-echo "Admin Support: @MahdiAGM0${NC}"
+echo -e "${BLUE}"
+echo "███╗   ███╗ █████╗ ██╗  ██╗██████╗ ██╗"
+echo "████╗ ████║██╔══██╗██║ ██╔╝██╔══██╗██║"
+echo "██╔████╔██║███████║█████╔╝ ██████╔╝██║"
+echo "██║╚██╔╝██║██╔══██║██╔═██╗ ██╔═══╝ ██║"
+echo "██║ ╚═╝ ██║██║  ██║██║  ██╗██║     ██║"
+echo "╚═╝     ╚═╝╚═╝  ╚═╝╚═╝  ╚═╝╚═╝     ╚═╝"
+echo -e "${BLUE}               Mahdi${NC}"
+echo ""
+echo "Select your Game to get Optimized Gaming DNS:"
 echo ""
 
-# List of Games
-games=("PUBG" "Call of Duty" "Fortnite" "Valorant" "CS:GO" "Free Fire" "Apex Legends" "Overwatch"
-       "League of Legends" "Dota 2" "Minecraft" "Roblox" "Clash Royale" "Clash of Clans" "Hearthstone"
-       "Mobile Legends" "Arena of Valor" "Genshin Impact" "Rocket League" "Brawl Stars" "Smite" "Warframe"
-       "World of Tanks" "World of Warcraft" "Rainbow Six Siege" "Battlefield" "Rust" "ARK" "Tarkov" "Paladins")
-
-echo "Select a Game:"
-select game in "${games[@]}"; do
-  [[ -n "$game" ]] && break
-done
-
-echo ""
-echo "Choose IP Type:"
-select ip_type in "IPv4" "IPv6"; do
-  [[ -n "$ip_type" ]] && break
-done
-
-echo ""
-echo "Select Country:"
-countries=("Iran" "Germany" "France" "Singapore" "Japan" "Turkey" "Netherlands" "Canada" "USA" "UK")
-select country in "${countries[@]}"; do
-  [[ -n "$country" ]] && break
-done
-
-echo ""
-echo "Fetching optimized DNS servers for $game ($ip_type) in $country..."
-echo ""
-
-# Simulated DNS database (for demo)
-declare -a dns_list=(
-  "1.1.1.1"
-  "9.9.9.9"
-  "94.140.14.14"
-  "76.76.2.0"
-  "8.8.8.8"
-  "45.90.28.0"
-  "185.228.168.9"
-  "64.6.64.6"
-  "208.67.222.222"
-  "38.132.106.139"
+# لیست بازی‌ها
+games=(
+    "Call of Duty"
+    "PUBG"
+    "Fortnite"
+    "Valorant"
+    "CS:GO"
+    "Dota 2"
+    "League of Legends"
+    "Apex Legends"
+    "Free Fire"
+    "Minecraft"
+    "Overwatch"
+    "Rocket League"
+    "Rainbow Six Siege"
+    "Warzone"
+    "Battlefield"
+    "FIFA"
+    "Genshin Impact"
+    "Roblox"
+    "Mobile Legends"
+    "Clash Royale"
+    "Clash of Clans"
+    "Brawl Stars"
+    "Arena of Valor"
+    "World of Tanks"
+    "World of Warcraft"
+    "Elden Ring"
+    "GTA Online"
+    "Destiny 2"
+    "Naraka Bladepoint"
+    "Escape From Tarkov"
 )
 
-# Simulated Ping + Display
-for dns in "${dns_list[@]}"; do
-  ping_ms=$((RANDOM % 40 + 20))
-  echo -e "${GREEN}$dns  ${ping_ms}ms${NC}"
+# نمایش لیست بازی‌ها
+for i in "${!games[@]}"; do
+  printf "%2d) %s\n" $((i+1)) "${games[$i]}"
 done
 
 echo ""
-echo -e "${GREEN}These DNS servers are optimized for: $game${NC}"
+read -p "Enter the number of your game: " game_choice
+
+# بررسی ورودی
+if ! [[ "$game_choice" =~ ^[0-9]+$ ]] || [ "$game_choice" -lt 1 ] || [ "$game_choice" -gt ${#games[@]} ]; then
+  echo "❌ Invalid selection."
+  exit 1
+fi
+
+game_selected="${games[$((game_choice-1))]}"
+echo -e "\n✅ Selected game: ${BLUE}$game_selected${NC}\n"
+
+# انتخاب کشور
+countries=("Germany" "France" "Netherlands" "Canada" "USA" "UK" "Singapore" "Iran" "India" "Japan")
+
+echo "Select Country for DNS:"
+for i in "${!countries[@]}"; do
+  printf "%2d) %s\n" $((i+1)) "${countries[$i]}"
+done
+
+echo ""
+read -p "Enter the number of your country: " country_choice
+
+if ! [[ "$country_choice" =~ ^[0-9]+$ ]] || [ "$country_choice" -lt 1 ] || [ "$country_choice" -gt ${#countries[@]} ]; then
+  echo "❌ Invalid country."
+  exit 1
+fi
+
+country_selected="${countries[$((country_choice-1))]}"
+echo -e "\n🌍 Country selected: ${BLUE}$country_selected${NC}\n"
+
+echo "Fetching best DNS servers for $game_selected in $country_selected...\n"
+
+# لیست نمونه DNS (شخصی‌سازی دستی بر اساس کشور و گیم)
+dns_list=(
+    "1.1.1.1"
+    "8.8.8.8"
+    "9.9.9.9"
+    "94.140.14.14"
+    "208.67.222.222"
+    "76.76.2.0"
+    "185.228.168.9"
+    "64.6.64.6"
+    "84.200.69.80"
+    "45.90.28.0"
+)
+
+echo -e "${BLUE}Top DNS for $game_selected [IPv4]:${NC}"
+for dns in "${dns_list[@]}"; do
+    ping_result=$(ping -c 1 -W 1 $dns | grep 'time=' | awk -F'time=' '{ print $2 }' | cut -d' ' -f1)
+    if [ -n "$ping_result" ]; then
+        echo "$dns  ${ping_result}ms"
+    else
+        echo "$dns  timeout"
+    fi
+done
+
+echo -e "\n${BLUE}✅ Apply manually via your system DNS settings.${NC}"
