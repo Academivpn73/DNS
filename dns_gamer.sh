@@ -7,7 +7,7 @@ NC='\033[0m'
 # هدر تبلیغاتی
 echo -e "\e[91m"
 echo "╔════════════════════════════════════════════╗"
-echo "║              Version:: 4.0.1                          ║"
+echo "║              Version: 4.0.1                          ║"
 echo "║     Telegram: @Academi_vpn                ║"
 echo "║     Admin Support: @MahdiAGM0             ║"
 echo "║                                            ║"
