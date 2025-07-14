@@ -2,52 +2,83 @@
 clear
 GREEN='\e[92m'; RESET='\e[0m'
 
-echo -e "${GREEN}🎮 Gaming DNS Script v2.1"
+echo -e "${GREEN}🎮 DNS Gaming Tool v2.2"
 echo "Telegram: @Academi_vpn  |  Admin: @MahdiAGM0"
 echo -e "═════════════════════════════════════════════${RESET}"
 
 # انتخاب نوع DNS
-echo -e "\nChoose DNS IP type:"
+echo -e "\nChoose DNS Type:"
 echo "1) IPv4"
 echo "2) IPv6"
-read -p "Select: " iptype
+read -p "Select (1 or 2): " iptype
 
-# انتخاب کشور
-countries=(🇮🇷Iran 🇩🇪Germany 🇺🇸USA 🇯🇵Japan 🇸🇬Singapore 🇳🇱Netherlands 🇫🇷France 🇹🇷Turkey 🇬🇧UK 🇨🇦Canada)
-echo -e "\nSelect country:"
+# انتخاب کشور (نمایشی، تاثیری در DNSها نداره)
+countries=(Iran Germany USA Japan Singapore Netherlands France Turkey UK Canada)
+echo -e "\nSelect Country:"
 select country in "${countries[@]}"; do
   [[ -n "$country" ]] && break
 done
 
-# دیتابیس DNS برای IPv4 و IPv6
-declare -A dns4=( ["Cloudflare"]="1.1.1.1" ["Google"]="8.8.8.8" ["Quad9"]="9.9.9.9" ["NextDNS"]="45.90.28.0" ["OpenDNS"]="208.67.222.222" ["AdGuard"]="94.140.14.14" ["CleanBrowsing"]="185.228.168.9" ["Yandex"]="77.88.8.8" ["ControlD"]="76.76.2.0" ["UncensoredDNS"]="89.233.43.71" )
-declare -A dns6=( ["Cloudflare"]="2606:4700:4700::1111" ["Google"]="2001:4860:4860::8888" ["Quad9"]="2620:fe::fe" ["NextDNS"]="2a0d:2a00:1::1" ["OpenDNS"]="2620:119:35::35" ["AdGuard"]="2a10:50c0::ad1:ff" ["CleanBrowsing"]="2a00:5a60::ad1:0ff" ["Yandex"]="2a00:5a60::ad2:0ff" ["ControlD"]="2606:4700:4700::1001" ["UncensoredDNS"]="2a10:50c0::ad2:ff" )
+# لیست DNSها (برای هر دو حالت)
+dns_list_ipv4=(
+"1.1.1.1|Cloudflare"
+"8.8.8.8|Google"
+"9.9.9.9|Quad9"
+"45.90.28.0|NextDNS"
+"208.67.222.222|OpenDNS"
+"94.140.14.14|AdGuard"
+"185.228.168.9|CleanBrowsing"
+"77.88.8.8|Yandex"
+"76.76.2.0|ControlD"
+"89.233.43.71|UncensoredDNS"
+)
 
-echo -e "\n${GREEN}Testing DNS for ${country} (IPv${iptype})...${RESET}\n"
+dns_list_ipv6=(
+"2606:4700:4700::1111|Cloudflare"
+"2001:4860:4860::8888|Google"
+"2620:fe::fe|Quad9"
+"2a0d:2a00:1::1|NextDNS"
+"2620:119:35::35|OpenDNS"
+"2a10:50c0::ad1:ff|AdGuard"
+"2a00:5a60::ad1:0ff|CleanBrowsing"
+"2a00:5a60::ad2:0ff|Yandex"
+"2606:4700:4700::1001|ControlD"
+"2a10:50c0::ad2:ff|UncensoredDNS"
+)
+
+echo -e "\n${GREEN}Testing DNS servers (IPv$iptype)...${RESET}"
 
 i=1
-for name in "${!dns${iptype}}"; do
-  ip="${dns${iptype}[$name]}"
-  ping_cmd="ping -c1 -W1 $ip"
-  if [[ "$iptype" == "2" ]]; then ping_cmd="ping6 -c1 -W1 $ip"; fi
-  ping_time=$($ping_cmd | grep 'time=' | sed -E 's/.*time=([0-9.]+).*/\1/') || ping_time=""
-  if [[ "$ping_time" =~ ^[0-9.]+$ ]] && (( $(echo "$ping_time < 40" | bc -l) )); then
-    printf "%2d) %-16s [%s]  %4sms\n" "$i" "$ip" "$name" "$ping_time"
-    ((i++))
-  fi
-  [[ $i -gt 10 ]] && break
-done
+count=0
 
-if (( i == 1 )); then
-  echo "⚠️ No DNS under 40 ms found. Showing closest:"
-  i=1
-  for name in "${!dns${iptype}}"; do
-    ip="${dns${iptype}[$name]}"
-    ping_time=$($ping_cmd | grep 'time=' | sed -E 's/.*time=([0-9.]+).*/\1/') || ping_time="Timeout"
-    printf "%2d) %-16s [%s]  %s ms\n" "$i" "$ip" "$name" "$ping_time"
-    ((i++))
-    [[ $i -gt 10 ]] && break
+if [[ "$iptype" == "1" ]]; then
+  for dns_entry in "${dns_list_ipv4[@]}"; do
+    ip="${dns_entry%%|*}"
+    name="${dns_entry##*|}"
+    ping_result=$(ping -c1 -W1 "$ip" 2>/dev/null | grep 'time=' | sed -E 's/.*time=([0-9.]+).*/\1/')
+    if [[ "$ping_result" != "" ]]; then
+      printf "%2d) %-15s [%-12s]  🟢 %sms\n" "$i" "$ip" "$name" "$ping_result"
+      ((i++))
+      ((count++))
+    fi
+    [[ $count -ge 10 ]] && break
+  done
+else
+  for dns_entry in "${dns_list_ipv6[@]}"; do
+    ip="${dns_entry%%|*}"
+    name="${dns_entry##*|}"
+    ping_result=$(ping6 -c1 -W1 "$ip" 2>/dev/null | grep 'time=' | sed -E 's/.*time=([0-9.]+).*/\1/')
+    if [[ "$ping_result" != "" ]]; then
+      printf "%2d) %-38s [%-12s]  🟢 %sms\n" "$i" "$ip" "$name" "$ping_result"
+      ((i++))
+      ((count++))
+    fi
+    [[ $count -ge 10 ]] && break
   done
 fi
 
-echo -e "\n${GREEN}All done! Use these DNS in your game settings.${RESET}"
+if [[ $count -eq 0 ]]; then
+  echo -e "${RED}❌ No DNS responded. Try again or check your internet.${RESET}"
+fi
+
+echo -e "\n${GREEN}✅ Done. Apply these DNS to your system/game manually.${RESET}"
