@@ -5,15 +5,15 @@ BLUE='\033[1;36m'
 NC='\033[0m'
 
 echo -e "\e[91m"
-echo "╔════════════════════════════════════════════╗"
-echo "║                                            ║"
-echo "║     Telegram: @Academi_vpn                ║"
-echo "║     Admin Support: @MahdiAGM0             ║"
-echo "║                                            ║"
-echo "╚════════════════════════════════════════════╝"
+echo "╔════════════════════════════════════════════════════════════╗"
+echo "║                                                            ║"
+echo "║   TELEGRAM   :   @ACADEMI_VPN                              ║"
+echo "║   ADMIN  Support   :   @MAHDIAGM0                                ║"
+echo "║                                                            ║"
+echo "╚════════════════════════════════════════════════════════════╝"
 echo -e "\e[0m"
 
-echo -e "${BLUE}Welcome to the Gaming DNS Selector!${NC}"
+echo -e "${BLUE}Welcome to the Academi VPN script. With this script you can find your DNS and get lower ping in the game.!${NC}"
 echo
 
 # لیست بازی‌ها
