@@ -4,15 +4,14 @@ RED='\033[1;31m'
 BLUE='\033[1;36m'
 NC='\033[0m'
 
-echo -e "${RED}"
-echo " __  __       _     _ _ "
-echo "|  \/  | __ _| |__ (_) | ___  ___ "
-echo "| |\/| |/ _\` | '_ \| | |/ _ \/ __|"
-echo "| |  | | (_| | | | | | |  __/\__ \\"
-echo "|_|  |_|\__,_|_| |_|_|_|\___||___/"
-echo "              Telegram:@Academi_vpn
-                      Admin:@MahdiAGM0"
-echo -e "${NC}"
+echo -e "\e[91m"
+echo "╔════════════════════════════════════════════╗"
+echo "║                                            ║"
+echo "║     Telegram: @Academi_vpn                ║"
+echo "║     Admin Support: @MahdiAGM0             ║"
+echo "║                                            ║"
+echo "╚════════════════════════════════════════════╝"
+echo -e "\e[0m"
 
 echo -e "${BLUE}Welcome to the Gaming DNS Selector!${NC}"
 echo
