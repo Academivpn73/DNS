@@ -11,7 +11,8 @@ echo "|  \/  | __ _| |__ (_) | ___"
 echo "| |\/| |/ _\` | '_ \| | |/ _ \\"
 echo "| |  | | (_| | | | | | |  __/"
 echo "|_|  |_|\__,_|_| |_|_|_|\___|"
-echo "          Mahdi"
+echo "          Telegram:@Academi_vpn
+Admin:@MahdiAGM0"
 echo -e "${NC}"
 
 echo -e "${BLUE}Welcome to the Gaming DNS Selector!${NC}"
