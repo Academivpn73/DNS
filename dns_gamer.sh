@@ -5,7 +5,7 @@ clear
 echo "═══════════════════════════════════════════════"
 echo " Telegram: @Academi_vpn"
 echo " Admin: Mahdi"
-echo " WARP Real DNS for Gamers"
+echo " DNS for Gamers"
 echo "═══════════════════════════════════════════════"
 echo ""
 sleep 1
