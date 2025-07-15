@@ -7,9 +7,9 @@ NC='\033[0m'
 VERSION="4.0.3"
 
 # هدر
-echo -e "\e[91m"
+echo -e "${BWHITE}"
 echo "╔════════════════════════════════════════════╗"
-echo "║             Version: $VERSION             ║"
+echo "║             Version: 4.0.4                ║"
 echo "║                                            ║"
 echo "║     Telegram: @Academi_vpn                ║"
 echo "║     Admin Support: @MahdiAGM0             ║"
