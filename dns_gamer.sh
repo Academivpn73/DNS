@@ -1,88 +1,92 @@
 #!/bin/bash
 
-Auto install required tools
-
-for pkg in curl ping figlet lolcat; do if ! command -v $pkg &> /dev/null; then echo "Installing missing package: $pkg..." sudo apt-get install -y $pkg >/dev/null 2>&1 || sudo yum install -y $pkg >/dev/null 2>&1 fi done
+# Auto install required packages
+if ! command -v figlet &> /dev/null || ! command -v lolcat &> /dev/null; then
+  echo "Installing dependencies..."
+  sudo apt update &>/dev/null
+  sudo apt install figlet lolcat -y &>/dev/null
+fi
 
 clear
 
-Title design
+# Title
+figlet "Academi VPN" | lolcat
+echo -e "\e[93mTelegram: \e[0m@Academi_vpn" | lolcat
+echo -e "\e[93mAdmin:    \e[0m@MahdiAGM0" | lolcat
+echo -e "\e[91mVersion:  1.0.9\e[0m" | lolcat
+echo
 
-figlet "Mahdi DNS" | lolcat sleep 0.2 echo -e "\e[36mTelegram: \e[33m@Academi_vpn" echo -e "\e[36mAdmin:    \e[33m@MahdiAGM0" echo -e "\e[31mVersion:  1.0.9\e[0m" echo "" sleep 1
+# List of games
+games=("Call of Duty" "PUBG Mobile" "Free Fire" "Fortnite" "Apex Legends" "Valorant" "Overwatch" "League of Legends" "Dota 2" "CS:GO" "FIFA 24" "Minecraft" "Genshin Impact" "Warzone" "Rainbow Six Siege" "Mobile Legends" "Rocket League" "Clash Royale" "Clash of Clans" "Roblox" "eFootball" "Among Us" "Arena of Valor" "Brawl Stars" "Battlefield" "Cyberpunk 2077" "World of Tanks" "Destiny 2" "Halo Infinite" "The Division 2" "Escape From Tarkov" "ARK: Survival Evolved" "Paladins" "Smite" "Diablo IV" "Naraka: Bladepoint" "Team Fortress 2" "Rust" "World of Warcraft" "Honkai Star Rail")
 
-Game list
+# Country-specific DNS map (Gaming)
+declare -A dns_map
 
-declare -A games=( ["Call of Duty Mobile"]="Mobile" ["PUBG Mobile"]="Mobile" ["Free Fire"]="Mobile" ["Clash Royale"]="Mobile" ["Clash of Clans"]="Mobile" ["Brawl Stars"]="Mobile" ["Mobile Legends"]="Mobile" ["Arena of Valor"]="Mobile" ["League of Legends: Wild Rift"]="Mobile" ["FIFA Mobile"]="Mobile" ["Apex Legends Mobile"]="Mobile" ["Roblox"]="Mobile" ["Among Us"]="Mobile"
+dns_map["Iran"]="178.22.122.100 185.51.200.2 10.202.10.10 185.55.226.26 217.218.155.155 79.175.147.10 194.36.174.161"
+dns_map["Turkey"]="193.140.100.100 212.156.4.20 212.156.4.21 1.1.1.1 8.8.8.8"
+dns_map["Saudi Arabia"]="212.26.18.41 46.185.172.150 8.8.8.8 9.9.9.9"
+dns_map["UAE"]="194.170.1.6 62.231.243.2 185.228.169.12 8.8.8.8"
+dns_map["Iraq"]="185.80.220.11 185.80.220.12 8.8.8.8 1.1.1.1"
+dns_map["Qatar"]="212.77.192.6 185.228.168.10 9.9.9.9"
+dns_map["Jordan"]="87.236.233.40 8.8.8.8 185.228.169.9"
+dns_map["Oman"]="62.231.252.1 94.130.180.225 9.9.9.9"
+dns_map["Lebanon"]="195.112.192.8 77.88.8.8 9.9.9.9"
+dns_map["Bahrain"]="193.188.137.255 185.228.169.168 8.8.8.8"
 
-["Valorant"]="PC" ["CS:GO"]="PC" ["Dota 2"]="PC" ["League of Legends"]="PC" ["Overwatch 2"]="PC" ["Minecraft"]="PC" ["Apex Legends"]="PC" ["Team Fortress 2"]="PC" ["Escape from Tarkov"]="PC" ["Warframe"]="PC" ["Paladins"]="PC" ["Genshin Impact"]="PC" ["Rust"]="PC"
+# Global DNS for download
+dns_download_global=(
+  "8.8.8.8" "1.1.1.1" "9.9.9.9" "208.67.222.222" "185.228.168.9"
+  "94.140.14.14" "185.95.218.42" "185.51.200.2" "76.76.2.0" "185.230.125.1"
+  "91.239.100.100" "64.6.64.6" "45.90.28.0" "89.233.43.71" "77.88.8.8"
+  "195.46.39.39" "199.85.126.10" "176.103.130.130" "94.130.180.225"
+)
 
-["Fortnite"]="Console" ["Call of Duty Warzone"]="Console" ["FIFA 24"]="Console" ["eFootball 2024"]="Console" ["NBA 2K24"]="Console" ["Rainbow Six Siege"]="Console" ["Destiny 2"]="Console" ["Rocket League"]="Console" ["Battlefield 2042"]="Console" ["The Division 2"]="Console" ["Madden NFL 24"]="Console" ["Hogwarts Legacy"]="Console" ["GTA Online"]="Console" )
+# Menu
+while true; do
+  echo -e "\n\033[1;36m1)\033[0m 🎮 Gaming DNS"
+  echo -e "\033[1;34m2)\033[0m 📥 Download DNS"
+  echo -e "\033[1;31m0)\033[0m ❌ Exit"
+  read -p "Select an option: " opt
 
-Countries (sample - Middle East focused)
+  if [[ $opt == 1 ]]; then
+    echo -e "\n\033[1;35m🎮 Select a Game:\033[0m"
+    select game in "${games[@]}"; do
+      [[ -n $game ]] && break
+    done
 
-countries=("Iran" "Turkey" "UAE" "Saudi Arabia" "Qatar" "Kuwait" "Bahrain" "Oman" "Iraq" "Jordan" "Egypt" "Lebanon" "Syria" "Israel" "Pakistan" "India" "Afghanistan" "Azerbaijan" "Armenia" "Georgia")
+    echo -e "\n\033[1;32m🌍 Select Country:\033[0m"
+    select country in "${!dns_map[@]}"; do
+      [[ -n $country ]] && break
+    done
 
-Fake DNS (replace with real performant gaming/download DNS later)
+    echo -e "\n\033[1;36mDNS Servers for $game ($country):\033[0m"
+    IFS=' ' read -ra dns_list <<< "${dns_map[$country]}"
+    count=0
+    for dns in "${dns_list[@]}"; do
+      ((count++))
+      ping_ms=$(ping -c 1 -W 1 $dns | grep time= | awk -F'time=' '{print $2}' | cut -d' ' -f1)
+      echo -e "\033[1;33mDNS $count:\033[0m $dns  \033[1;90m(Ping: ${ping_ms:-N/A} ms)\033[0m"
+    done
+    read -p "Press Enter to return to menu..."
 
-declare -A dns_data for country in "${countries[@]}"; do for i in {1..15}; do rand_ip="$(shuf -i 1-255 -n 1).$(shuf -i 1-255 -n 1).$(shuf -i 1-255 -n 1).$(shuf -i 1-255 -n 1)" dns_data["$country,$i"]="$rand_ip" done done
+  elif [[ $opt == 2 ]]; then
+    echo -e "\n\033[1;32m🌍 Select Country for Download DNS:\033[0m"
+    select country in "${!dns_map[@]}"; do
+      [[ -n $country ]] && break
+    done
 
-Function to test ping
+    echo -e "\n\033[1;34mDownload-Optimized DNS for $country:\033[0m"
+    for i in {1..15}; do
+      dns="${dns_download_global[$RANDOM % ${#dns_download_global[@]}]}"
+      ping_ms=$(ping -c 1 -W 1 $dns | grep time= | awk -F'time=' '{print $2}' | cut -d' ' -f1)
+      echo -e "\033[1;36mDNS $i:\033[0m $dns \033[1;90m(Ping: ${ping_ms:-N/A} ms)\033[0m"
+    done
+    read -p "Press Enter to return to menu..."
 
-ping_test() { ping -c 1 -W 1 $1 | grep 'time=' | awk -F'time=' '{print $2}' | cut -d' ' -f1 }
-
-Main Menu
-
-while true; do clear echo -e "\e[32m===== Main Menu =====\e[0m" echo -e "\e[36m1. Gaming DNS" echo -e "2. Download DNS" echo -e "0. Exit\e[0m" echo -n "Select an option: " read option
-
-case $option in 1) clear echo -e "\e[33mAvailable Games:\e[0m" index=1 for game in "${!games[@]}"; do echo -e "\e[36m$index. $game [${games[$game]}]\e[0m" game_list[$index]="$game" ((index++)) done echo -n "Choose a game number: " read game_index selected_game=${game_list[$game_index]}
-
-echo -e "\n\e[35mAvailable Countries:\e[0m"
-  for i in "${!countries[@]}"; do
-    color=$((31 + i % 6))
-    echo -e "\e[${color}m$((i+1)). ${countries[$i]}\e[0m"
-  done
-  echo -n "Choose country number: "
-  read country_index
-  selected_country=${countries[$((country_index-1))]}
-
-  echo -e "\n\e[33m--- DNS List for $selected_game ($selected_country) ---\e[0m"
-  for i in {1..15}; do
-    dns_ip=${dns_data["$selected_country,$i"]}
-    ping_res=$(ping_test $dns_ip)
-    echo -e "\e[36mDNS $i: $dns_ip (Ping: ${ping_res:-N/A} ms)\e[0m"
-  done
-  read -p $'\nPress Enter to return...'
-  ;;
-
-2)
-  clear
-  echo -e "\e[35mDownload DNS - Select Country:\e[0m"
-  for i in "${!countries[@]}"; do
-    color=$((31 + i % 6))
-    echo -e "\e[${color}m$((i+1)). ${countries[$i]}\e[0m"
-  done
-  echo -n "Choose country number: "
-  read country_index
-  selected_country=${countries[$((country_index-1))]}
-
-  echo -e "\n\e[33m--- Download DNS for $selected_country ---\e[0m"
-  for i in {1..15}; do
-    dns_ip=${dns_data["$selected_country,$i"]}
-    ping_res=$(ping_test $dns_ip)
-    echo -e "\e[36mDNS $i: $dns_ip (Ping: ${ping_res:-N/A} ms)\e[0m"
-  done
-  read -p $'\nPress Enter to return...'
-  ;;
-
-0)
-  echo -e "\n\e[33mGoodbye. Follow our channel on Telegram to see more updates and scripts. @Academi_vpn\e[0m"
-  exit 0
-  ;;
-
-*)
-  echo "Invalid option. Try again."
-  sleep 1
-  ;;
-
-esac done
-
+  elif [[ $opt == 0 ]]; then
+    echo -e "\n\033[1;33mGoodbye. Follow our channel on Telegram to see more updates and scripts. @Academi_vpn\033[0m"
+    exit 0
+  else
+    echo -e "\033[1;31mInvalid option!\033[0m"
+  fi
+done
