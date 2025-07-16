@@ -1,153 +1,88 @@
 #!/bin/bash
 
-# Auto-install required packages
-for pkg in curl; do
-  if ! command -v "$pkg" &>/dev/null; then
-    apt update && apt install "$pkg" -y
-  fi
-done
+Auto install required tools
 
-# Function to show loading animation
-loading() {
-  echo -ne "\e[1;36mLoading"
-  for i in {1..5}; do
-    echo -ne "."
-    sleep 0.2
-  done
-  echo -e "\e[0m"
-  sleep 0.3
-  clear
-}
+for pkg in curl ping figlet lolcat; do if ! command -v $pkg &> /dev/null; then echo "Installing missing package: $pkg..." sudo apt-get install -y $pkg >/dev/null 2>&1 || sudo yum install -y $pkg >/dev/null 2>&1 fi done
 
-# Fancy title with color and animation
-show_title() {
-  clear
-  echo -e "\e[1;36m╔═════════════════════════════════════════════╗"
-  echo -e "\e[1;33m║          ACADEMI VPN DNS TOOL               ║"
-  echo -e "\e[1;32m║        Fast, Gaming & Download DNSs         ║"
-  echo -e "\e[1;34m║          Coded by @MahdiAGM0                ║"
-  echo -e "\e[1;35m║          Channel: @Academi_vpn              ║"
-  echo -e "\e[1;31m║                Version: 1.0.9               ║"
-  echo -e "\e[1;36m╚═════════════════════════════════════════════╝\e[0m"
-  echo ""
-}
+clear
 
-# Define games (partial for demo)
-declare -A games=(
-  ["Call of Duty"]="Mobile"
-  ["PUBG"]="Mobile"
-  ["Free Fire"]="Mobile"
-  ["Valorant"]="PC"
-  ["Fortnite"]="Console"
-  ["CS:GO"]="PC"
-  ["Dota 2"]="PC"
-  ["Apex Legends"]="PC"
-  ["Clash Royale"]="Mobile"
-  ["Warzone"]="Console"
-  ["Rainbow Six"]="PC"
-  ["League of Legends"]="PC"
-  ["Minecraft"]="PC"
-  ["Overwatch"]="PC"
-  ["Roblox"]="Mobile"
-  ["Brawl Stars"]="Mobile"
-  ["eFootball"]="Console"
-  ["FIFA 24"]="Console"
-)
+Title design
 
-# Countries
-countries=("Iran" "Turkey" "Saudi Arabia" "UAE" "Qatar" "Iraq" "Jordan" "Oman" "Bahrain" "Kuwait")
+figlet "Mahdi DNS" | lolcat sleep 0.2 echo -e "\e[36mTelegram: \e[33m@Academi_vpn" echo -e "\e[36mAdmin:    \e[33m@MahdiAGM0" echo -e "\e[31mVersion:  1.0.9\e[0m" echo "" sleep 1
 
-# DNS data (partial, demo)
-declare -A dns_data
-dns_data["Iran"]="178.22.122.100 185.51.200.2 185.51.200.3 185.51.200.4 1.1.1.1 8.8.8.8 10.202.10.10 94.140.14.14 64.6.64.6 9.9.9.9 208.67.222.222 185.228.168.9 76.76.2.0 185.228.169.9 45.90.28.0"
-for c in "${countries[@]}"; do
-  [[ -z "${dns_data[$c]}" ]] && dns_data["$c"]="1.1.1.1 8.8.8.8 9.9.9.9 208.67.222.222 94.140.14.14 76.76.2.0 64.6.64.6 45.90.28.0 1.0.0.1 8.8.4.4 185.228.168.9 185.228.169.9 77.88.8.8 10.202.10.10 185.51.200.4"
-done
+Game list
 
-# Function to test DNS ping and return result
-get_ping() {
-  local dns=$1
-  # Ping once to get the response time (1 packet, quiet mode)
-  ping_result=$(ping -c 1 -W 1 "$dns" 2>/dev/null)
-  # Extract the time from the ping result
-  ping_time=$(echo "$ping_result" | grep 'time=' | awk -F 'time=' '{print $2}' | awk '{print $1}')
-  if [[ -z "$ping_time" ]]; then
-    echo "N/A"
-  else
-    echo "$ping_time ms"
-  fi
-}
+declare -A games=( ["Call of Duty Mobile"]="Mobile" ["PUBG Mobile"]="Mobile" ["Free Fire"]="Mobile" ["Clash Royale"]="Mobile" ["Clash of Clans"]="Mobile" ["Brawl Stars"]="Mobile" ["Mobile Legends"]="Mobile" ["Arena of Valor"]="Mobile" ["League of Legends: Wild Rift"]="Mobile" ["FIFA Mobile"]="Mobile" ["Apex Legends Mobile"]="Mobile" ["Roblox"]="Mobile" ["Among Us"]="Mobile"
 
-show_games() {
-  echo -e "\e[1;33m🎮 Select Game:\e[0m"
-  local i=1
-  for g in "${!games[@]}"; do
-    printf "[%2d] \e[1;36m%-20s\e[0m (%s)\n" $i "$g" "${games[$g]}"
-    ((i++))
-  done
-}
+["Valorant"]="PC" ["CS:GO"]="PC" ["Dota 2"]="PC" ["League of Legends"]="PC" ["Overwatch 2"]="PC" ["Minecraft"]="PC" ["Apex Legends"]="PC" ["Team Fortress 2"]="PC" ["Escape from Tarkov"]="PC" ["Warframe"]="PC" ["Paladins"]="PC" ["Genshin Impact"]="PC" ["Rust"]="PC"
 
-show_countries() {
-  echo -e "\n\e[1;34m🌍 Select Country:\e[0m"
+["Fortnite"]="Console" ["Call of Duty Warzone"]="Console" ["FIFA 24"]="Console" ["eFootball 2024"]="Console" ["NBA 2K24"]="Console" ["Rainbow Six Siege"]="Console" ["Destiny 2"]="Console" ["Rocket League"]="Console" ["Battlefield 2042"]="Console" ["The Division 2"]="Console" ["Madden NFL 24"]="Console" ["Hogwarts Legacy"]="Console" ["GTA Online"]="Console" )
+
+Countries (sample - Middle East focused)
+
+countries=("Iran" "Turkey" "UAE" "Saudi Arabia" "Qatar" "Kuwait" "Bahrain" "Oman" "Iraq" "Jordan" "Egypt" "Lebanon" "Syria" "Israel" "Pakistan" "India" "Afghanistan" "Azerbaijan" "Armenia" "Georgia")
+
+Fake DNS (replace with real performant gaming/download DNS later)
+
+declare -A dns_data for country in "${countries[@]}"; do for i in {1..15}; do rand_ip="$(shuf -i 1-255 -n 1).$(shuf -i 1-255 -n 1).$(shuf -i 1-255 -n 1).$(shuf -i 1-255 -n 1)" dns_data["$country,$i"]="$rand_ip" done done
+
+Function to test ping
+
+ping_test() { ping -c 1 -W 1 $1 | grep 'time=' | awk -F'time=' '{print $2}' | cut -d' ' -f1 }
+
+Main Menu
+
+while true; do clear echo -e "\e[32m===== Main Menu =====\e[0m" echo -e "\e[36m1. Gaming DNS" echo -e "2. Download DNS" echo -e "0. Exit\e[0m" echo -n "Select an option: " read option
+
+case $option in 1) clear echo -e "\e[33mAvailable Games:\e[0m" index=1 for game in "${!games[@]}"; do echo -e "\e[36m$index. $game [${games[$game]}]\e[0m" game_list[$index]="$game" ((index++)) done echo -n "Choose a game number: " read game_index selected_game=${game_list[$game_index]}
+
+echo -e "\n\e[35mAvailable Countries:\e[0m"
   for i in "${!countries[@]}"; do
-    printf "[%d] \e[1;35m%s\e[0m\n" "$i" "${countries[$i]}"
+    color=$((31 + i % 6))
+    echo -e "\e[${color}m$((i+1)). ${countries[$i]}\e[0m"
   done
-}
+  echo -n "Choose country number: "
+  read country_index
+  selected_country=${countries[$((country_index-1))]}
 
-show_dns_list() {
-  local country=$1
-  IFS=' ' read -ra dns_list <<< "${dns_data[$country]}"
-  echo -e "\n\e[1;36m🔧 Top 15 DNS for $country:\e[0m"
-  for i in "${!dns_list[@]}"; do
-    [[ $i -ge 15 ]] && break
-    ping_time=$(get_ping "${dns_list[$i]}")
-    echo -e "\e[1;33mDNS $((i+1)):\e[0m ${dns_list[$i]} \e[1;30m(Ping: $ping_time)\e[0m"
+  echo -e "\n\e[33m--- DNS List for $selected_game ($selected_country) ---\e[0m"
+  for i in {1..15}; do
+    dns_ip=${dns_data["$selected_country,$i"]}
+    ping_res=$(ping_test $dns_ip)
+    echo -e "\e[36mDNS $i: $dns_ip (Ping: ${ping_res:-N/A} ms)\e[0m"
   done
-}
+  read -p $'\nPress Enter to return...'
+  ;;
 
-# Menu loop
-while true; do
-  show_title
-  echo -e "\e[1;33m[1]\e[0m 🎮 Gaming DNS"
-  echo -e "\e[1;34m[2]\e[0m 🚀 Download DNS"
-  echo -e "\e[1;31m[0]\e[0m ❌ Exit"
-  read -p $'\nSelect an option: ' choice
+2)
+  clear
+  echo -e "\e[35mDownload DNS - Select Country:\e[0m"
+  for i in "${!countries[@]}"; do
+    color=$((31 + i % 6))
+    echo -e "\e[${color}m$((i+1)). ${countries[$i]}\e[0m"
+  done
+  echo -n "Choose country number: "
+  read country_index
+  selected_country=${countries[$((country_index-1))]}
 
-  case $choice in
-    1)
-      clear; show_title; show_games
-      read -p $'\nGame number: ' game_index
-      game_keys=("${!games[@]}")
-      selected_game="${game_keys[$((game_index-1))]}"
-      echo -e "\n🎯 Selected Game: \e[1;33m$selected_game\e[0m"
+  echo -e "\n\e[33m--- Download DNS for $selected_country ---\e[0m"
+  for i in {1..15}; do
+    dns_ip=${dns_data["$selected_country,$i"]}
+    ping_res=$(ping_test $dns_ip)
+    echo -e "\e[36mDNS $i: $dns_ip (Ping: ${ping_res:-N/A} ms)\e[0m"
+  done
+  read -p $'\nPress Enter to return...'
+  ;;
 
-      show_countries
-      read -p $'\nCountry number: ' country_index
-      selected_country="${countries[$country_index]}"
-      echo -e "\n🌍 Selected Country: \e[1;32m$selected_country\e[0m"
+0)
+  echo -e "\n\e[33mGoodbye. Follow our channel on Telegram to see more updates and scripts. @Academi_vpn\e[0m"
+  exit 0
+  ;;
 
-      loading
-      show_dns_list "$selected_country"
-      read -p $'\nPress Enter to return...' back
-      ;;
-    2)
-      clear; show_title
-      show_countries
-      read -p $'\nCountry number: ' country_index
-      selected_country="${countries[$country_index]}"
-      echo -e "\n🌍 Selected Country: \e[1;32m$selected_country\e[0m"
+*)
+  echo "Invalid option. Try again."
+  sleep 1
+  ;;
 
-      loading
-      show_dns_list "$selected_country"
-      read -p $'\nPress Enter to return...' back
-      ;;
-    0)
-      echo -e "\n\e[1;33mGoodbye. Follow our channel on Telegram to see more updates and scripts. @Academi_vpn\e[0m"
-      exit 0
-      ;;
-    *)
-      echo -e "\e[1;31mInvalid choice. Try again.\e[0m"
-      sleep 1
-      ;;
-  esac
-done
+esac done
+
