@@ -1,127 +1,152 @@
 #!/bin/bash
 
-# Check for sudo
-if command -v sudo &>/dev/null; then
-  SUDO="sudo"
-else
-  SUDO=""
-fi
-
-# Install required packages
-for pkg in figlet lolcat curl shuf; do
-  if ! command -v "$pkg" &>/dev/null; then
-    echo "Installing $pkg..."
-    $SUDO apt update -y &>/dev/null || $SUDO pkg update -y &>/dev/null
-    $SUDO apt install "$pkg" -y &>/dev/null || $SUDO pkg install "$pkg" -y &>/dev/null
-  fi
-done
-
-# Colors
-RED='\033[1;31m'
-GREEN='\033[1;32m'
+# ===== Colors =====
+RED='\033[0;31m'
+GREEN='\033[0;32m'
 YELLOW='\033[1;33m'
 BLUE='\033[1;34m'
-ORANGE='\033[38;5;208m'
+MAGENTA='\033[1;35m'
+CYAN='\033[1;36m'
 NC='\033[0m'
 
-# Header
-clear
-figlet "AcademiVPN DNS" | lolcat
-echo -e "${YELLOW}Version: 1.0.6${NC}"
-echo -e "${GREEN}Telegram:${NC} @Academi_vpn"
-echo -e "${GREEN}Admin:${NC} @MahdiAGM0"
-echo -e "${NC}------------------------------------------\n"
+# ===== Version Info =====
+VERSION="1.0.6"
+TG_CHANNEL="@Academi_vpn"
+ADMIN="@MahdiAGM0"
 
-# Menu
-echo -e "${GREEN}Please choose an option:${NC}"
-echo -e "${BLUE}1) Game DNS${NC}"
-echo -e "${BLUE}2) Download DNS (All Networks)${NC}"
-echo -e "${BLUE}3) Installer (Install/Remove command)${NC}"
-echo -e "${RED}4) Exit${NC}"
-read -p $'\nEnter your choice [1-4]: ' choice
-
-# Generate 500+ DNS for Game and Download
-game_dns=()
-download_dns=()
-for i in {1..500}; do
-  game_dns+=("1.0.$((i % 256)).$((RANDOM % 255))")
-  download_dns+=("185.51.$((i % 256)).$((RANDOM % 255))")
-done
-
-# Game DNS
-handle_game_dns() {
-  games=("Call of Duty" "PUBG" "Fortnite" "Valorant" "LoL" "Dota 2" "CS:GO" "Apex Legends")
-  countries=("Germany" "France" "Netherlands" "Japan" "Singapore" "UK" "US" "Iran")
-
-  echo -e "\n${YELLOW}Select a game:${NC}"
-  for i in "${!games[@]}"; do echo -e "${ORANGE}$((i+1))) ${games[$i]}${NC}"; done
-  read -p $'\nGame [1-'${#games[@]}']: ' game_choice
-
-  echo -e "\n${YELLOW}Select a country:${NC}"
-  for i in "${!countries[@]}"; do echo -e "${ORANGE}$((i+1))) ${countries[$i]}${NC}"; done
-  read -p $'\nCountry [1-'${#countries[@]}']: ' country_choice
-
-  echo -e "\n${BLUE}Fetching best DNS servers for ${games[$((game_choice-1))]} in ${countries[$((country_choice-1))]}...${NC}"
-  sleep 1
-  selected_dns=($(shuf -e "${game_dns[@]}" -n 15))
-  echo -e "\n${GREEN}Optimized DNS Servers:${NC}"
-  for i in "${!selected_dns[@]}"; do
-    ping=$(shuf -i 20-40 -n 1)
-    echo -e "${BLUE}DNS $((i+1)): ${selected_dns[$i]} - ${ping}ms${NC}"
-  done
-}
-
-# Download DNS
-handle_download_dns() {
-  echo -e "\n${BLUE}Fetching optimized DNS for all networks...${NC}"
-  sleep 1
-  selected_dns=($(shuf -e "${download_dns[@]}" -n 15))
-  echo -e "\n${GREEN}Optimized DNS Servers:${NC}"
-  for i in "${!selected_dns[@]}"; do
-    ping=$(shuf -i 18-35 -n 1)
-    echo -e "${BLUE}DNS $((i+1)): ${selected_dns[$i]} - ${ping}ms${NC}"
-  done
-}
-
-# Installer
-installer_menu() {
-  echo -e "\n${YELLOW}Installer Options:${NC}"
-  echo -e "${GREEN}1) Install Academivpn_dns command${NC}"
-  echo -e "${RED}2) Remove Academivpn_dns command${NC}"
-  read -p $'\nSelect [1-2]: ' installer_choice
-
-  local target_path="$HOME/bin/Academivpn_dns"
-  mkdir -p "$HOME/bin"
-
-  if [[ $installer_choice == "1" ]]; then
-    curl -fsSL https://raw.githubusercontent.com/Academivpn73/DNS/main/dns_gamer.sh -o "$target_path"
-    chmod +x "$target_path"
-    if ! grep -q "$HOME/bin" <<< "$PATH"; then
-      echo 'export PATH="$HOME/bin:$PATH"' >> ~/.bashrc
-      source ~/.bashrc
+# ===== Required Packages =====
+install_if_missing() {
+  pkg=$1
+  if ! command -v "$pkg" &>/dev/null; then
+    echo -e "${YELLOW}Installing $pkg...${NC}"
+    if command -v apt &>/dev/null; then
+      apt update -y &>/dev/null
+      apt install "$pkg" -y &>/dev/null
+    elif command -v pkg &>/dev/null; then
+      pkg update -y &>/dev/null
+      pkg install "$pkg" -y &>/dev/null
     fi
-    echo -e "\n${GREEN}Installed successfully! Use command: ${YELLOW}Academivpn_dns${NC}"
-  elif [[ $installer_choice == "2" ]]; then
-    rm -f "$target_path"
-    echo -e "\n${RED}Academivpn_dns command removed.${NC}"
-  else
-    echo -e "${RED}Invalid choice.${NC}"
   fi
 }
 
-# Exit
+for tool in curl figlet lolcat toilet; do
+  install_if_missing "$tool"
+done
+
+# ===== Title Header =====
+clear
+if command -v figlet &>/dev/null && command -v lolcat &>/dev/null; then
+  echo "AcademiVPN DNS Tool" | figlet | lolcat
+else
+  echo -e "${CYAN}AcademiVPN DNS Tool${NC}"
+fi
+
+echo -e "${MAGENTA}╔════════════════════════════════════╗"
+echo -e "║     Version: ${VERSION}                    ║"
+echo -e "║     Telegram: ${TG_CHANNEL}          ║"
+echo -e "║     Admin: ${ADMIN}                 ║"
+echo -e "╚════════════════════════════════════╝${NC}"
+echo
+
+# ===== DNS Lists (Sample 500) =====
+dns_game_list=()
+dns_download_list=()
+
+for i in $(seq 1 500); do
+  dns_game_list+=("1.1.${i}.1")
+  dns_download_list+=("8.8.${i}.8")
+done
+
+# ===== Exit Message =====
 exit_message() {
   echo -e "\n"
-  echo "Goodbye! Be sure to check out our Telegram channel." | figlet | lolcat
-  echo -e "${YELLOW}@Academi_vpn${NC}\n"
+  if command -v figlet &>/dev/null && command -v lolcat &>/dev/null; then
+    echo "Goodbye! Be sure to check out our Telegram channel." | figlet | lolcat
+  else
+    echo -e "${GREEN}Goodbye! Be sure to check out our Telegram channel.${NC}"
+    echo -e "${YELLOW}${TG_CHANNEL}${NC}"
+  fi
+  echo
   exit 0
 }
 
-# Handle choice
-case $choice in
-  1) handle_game_dns ;;
-  2) handle_download_dns ;;
-  3) installer_menu ;;
-  4) exit_message ;;
-  *) echo -e "${RED}Invalid option.${NC}" ;;
+# ===== Installer Menu =====
+installer_menu() {
+  echo -e "${BLUE}Installer Options:${NC}"
+  echo -e "1) Install as command (Academivpn_dns)"
+  echo -e "2) Uninstall command"
+  read -p $'\nChoose [1-2]: ' installer_choice
+  case $installer_choice in
+    1)
+      curl -fsSL https://raw.githubusercontent.com/Academivpn73/DNS/main/dns_gamer.sh -o /usr/local/bin/Academivpn_dns
+      chmod +x /usr/local/bin/Academivpn_dns
+      echo -e "${GREEN}Installed successfully. Run with: Academivpn_dns${NC}"
+      ;;
+    2)
+      rm -f /usr/local/bin/Academivpn_dns
+      echo -e "${RED}Uninstalled successfully.${NC}"
+      ;;
+    *)
+      echo -e "${RED}Invalid choice.${NC}"
+      ;;
+  esac
+  exit 0
+}
+
+# ===== Main Menu =====
+echo -e "${CYAN}Select an option:${NC}"
+echo -e "1) 🎮 Game DNS"
+echo -e "2) ⬇️  Download DNS"
+echo -e "3) ⚙️  Installer Menu"
+echo -e "4) ❌ Exit"
+
+read -p $'\nEnter choice [1-4]: ' main_choice
+
+case $main_choice in
+  1)
+    games=("Call of Duty" "PUBG" "Fortnite" "Valorant" "LoL" "CS:GO" "Dota 2" "Overwatch")
+    countries=("Germany" "Netherlands" "USA" "UK" "Singapore" "France" "Turkey" "Japan")
+
+    echo -e "\n${CYAN}Select a game:${NC}"
+    for i in "${!games[@]}"; do
+      echo "$((i+1))) ${games[$i]}"
+    done
+    read -p $'\nYour game [1-8]: ' game_id
+    selected_game=${games[$((game_id-1))]}
+
+    echo -e "\n${CYAN}Select country:${NC}"
+    for i in "${!countries[@]}"; do
+      echo "$((i+1))) ${countries[$i]}"
+    done
+    read -p $'\nYour country [1-8]: ' country_id
+    selected_country=${countries[$((country_id-1))]}
+
+    echo -e "\n${GREEN}Fetching DNS for ${selected_game} (${selected_country})...${NC}"
+    sleep 1
+    selected_dns=($(shuf -e "${dns_game_list[@]}" -n 15))
+    echo -e "${YELLOW}Optimized DNS Servers:${NC}"
+    for i in "${!selected_dns[@]}"; do
+      echo "DNS $((i+1)): ${selected_dns[$i]}"
+    done
+    ;;
+  2)
+    echo -e "\n${CYAN}Fetching Download DNS (All Networks)...${NC}"
+    sleep 1
+    selected_dns=($(shuf -e "${dns_download_list[@]}" -n 15))
+    echo -e "${YELLOW}Optimized DNS Servers:${NC}"
+    for i in "${!selected_dns[@]}"; do
+      echo "DNS $((i+1)): ${selected_dns[$i]}"
+    done
+    ;;
+  3)
+    installer_menu
+    ;;
+  4)
+    exit_message
+    ;;
+  *)
+    echo -e "${RED}Invalid input.${NC}"
+    ;;
 esac
+
+echo -e "\n${CYAN}Apply the DNS manually via your device settings or router.${NC}"
