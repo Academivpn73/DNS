@@ -1,18 +1,18 @@
 #!/bin/bash
 
-VERSION="1.2.1"
+VERSION="1.2.4"
 TG="@Academi_vpn"
 ADMIN="@MahdiAGM0"
 
-# Define colors
-GREEN='\e[32m'
-BLUE='\e[36m'
-NC='\e[0m'
+# Colors
+GREEN='\033[0;32m'
+BLUE='\033[1;36m'
+NC='\033[0m'
 
-# Type animation function
+# Typing animation
 type_anim() {
     text="$1"
-    delay=${2:-0.002}
+    delay=${2:-0.001}
     for ((i=0; i<${#text}; i++)); do
         echo -ne "${text:$i:1}"
         sleep "$delay"
@@ -20,166 +20,127 @@ type_anim() {
     echo
 }
 
-# Fast animation for game/country lists
-list_anim() {
-    for line in "$@"; do
-        echo -e "$line"
-        sleep 0.02
-    done
-}
-
-# Ping test
+# API ping function (fallback to system ping)
 get_ping() {
     ip=$1
-    ping_result=$(ping -c 1 -W 1 "$ip" 2>/dev/null | grep 'time=' | awk -F'time=' '{print $2}' | cut -d' ' -f1)
-    if [[ -n "$ping_result" ]]; then
-        echo "${ping_result}ms"
+    api_ping=$(curl -s -o /dev/null -w "%{time_total}" "https://$ip")
+    if [[ $? -eq 0 && $api_ping ]]; then
+        ms=$(awk "BEGIN {print int($api_ping * 1000)}")
+        echo "${ms}ms"
     else
-        echo "N/A"
+        fallback=$(ping -c 1 -W 1 "$ip" 2>/dev/null | grep 'time=' | awk -F'time=' '{print $2}' | cut -d' ' -f1)
+        echo "${fallback:-N/A}ms"
     fi
 }
 
-# DNS Database (truncated sample)
+# Copy to clipboard
+copy_to_clipboard() {
+    dns=$1
+    if command -v xclip &>/dev/null; then
+        echo -n "$dns" | xclip -selection clipboard
+        echo -e "${GREEN}✅ Copied to clipboard!${NC}"
+    else
+        echo -e "${BLUE}📋 Your selected DNS: ${GREEN}$dns${NC}"
+        echo -e "${BLUE}(Tip: Install xclip to enable clipboard copy)${NC}"
+    fi
+}
+
+# Game and download data
 declare -A DNS_DATA
 
-# Sample DNS for "Call of Duty - Iran"
-DNS_DATA["Call of Duty_Iran"]="1.1.1.1 8.8.8.8 185.51.200.2 178.22.122.100 9.9.9.9 94.140.14.14 185.51.200.4 208.67.222.222 176.103.130.130 1.0.0.1 94.130.180.225 45.90.28.0 89.32.248.2 91.239.100.100 37.156.28.10"
+DNS_DATA["Call of Duty_Iran"]="1.1.1.1 8.8.8.8 178.22.122.100 185.51.200.2 94.140.14.14 9.9.9.9 1.0.0.1 208.67.222.222 45.90.28.0 176.103.130.130 185.228.168.9 94.130.180.225 185.121.177.177 185.43.135.1 185.130.44.108 89.32.248.2 37.156.28.10 91.239.100.100 212.26.18.41 109.72.0.2"
 
-# Sample DNS for Download - Germany
-DNS_DATA["Download_Germany"]="1.1.1.1 8.8.8.8 9.9.9.9 94.140.14.14 185.51.200.2 208.67.222.222 185.228.168.9 176.103.130.130 45.90.28.0 185.228.168.10 185.121.177.177 94.130.180.225 37.156.28.10 89.32.248.2 91.239.100.100"
+DNS_DATA["Download_Iran"]="8.8.8.8 1.1.1.1 9.9.9.9 185.51.200.2 178.22.122.100 185.228.168.9 45.90.28.0 208.67.222.222 176.103.130.130 185.121.177.177 94.140.14.14 91.239.100.100 185.43.135.1 185.130.44.108 94.130.180.225 109.72.0.2 37.156.28.10 212.26.18.41 185.51.202.2 5.2.75.75"
 
-# Sample lists
-GAMES=(
-"Call of Duty"
-"PUBG"
-"Fortnite"
-"Valorant"
-"Apex Legends"
-"League of Legends"
-"Dota 2"
-"CS:GO"
-"Overwatch"
-"Battlefield"
-"Mobile Legends"
-"Free Fire"
-"Clash of Clans"
-"Clash Royale"
-"Among Us"
-"GTA Online"
-"World of Tanks"
-"Rocket League"
-"FIFA Online"
-"Minecraft"
-"Roblox"
-"Destiny 2"
-"Rainbow Six Siege"
-"Elden Ring"
-"Warzone"
-"Escape from Tarkov"
-"Team Fortress 2"
-"Paladins"
-"Smite"
-"Diablo IV"
-)
+GAMES=("Call of Duty" "PUBG" "Fortnite" "Valorant" "Dota 2" "CS:GO" "League of Legends" "Apex Legends" "Overwatch" "Mobile Legends" "Free Fire" "Clash Royale" "Minecraft" "GTA V" "Rocket League" "Warzone" "FIFA" "World of Tanks" "Paladins" "Roblox" "Smite" "Escape from Tarkov" "Rainbow Six Siege" "Rust" "Battlefield" "Diablo" "Team Fortress 2" "Brawl Stars" "Among Us" "Elden Ring")
 
-MIDDLE_EAST_COUNTRIES=("Iran" "Turkey" "UAE" "Saudi Arabia" "Qatar" "Iraq" "Kuwait" "Jordan" "Oman")
+MIDDLE_EAST=("Iran" "Turkey" "UAE" "Saudi Arabia")
+DOWNLOAD_COUNTRIES=("Iran" "Germany" "USA" "France" "Netherlands" "UK" "Japan" "Canada" "India" "Italy" "Russia" "Spain" "Brazil" "Sweden" "South Korea" "Norway" "Singapore" "Finland" "Australia" "Poland")
 
-WORLD_COUNTRIES=("Iran" "Germany" "Netherlands" "USA" "UK" "France" "Japan" "South Korea" "Russia" "India" "Italy" "Canada" "Australia" "Spain" "Brazil" "Sweden" "Poland" "Singapore" "Norway" "China")
-
-show_main_menu() {
+main_menu() {
     clear
-    echo -e "${BLUE}╔══════════════════════════════════════╗"
-    echo -e "${BLUE}║${GREEN}       DNS MANAGEMENT SCRIPT        ${BLUE}║"
-    echo -e "${BLUE}╠══════════════════════════════════════╣"
+    echo -e "${BLUE}╔═════════════════════════════════════════════╗"
+    echo -e "${BLUE}║${GREEN}         🎮 DNS MANAGEMENT SCRIPT         ${BLUE}║"
+    echo -e "${BLUE}╠═════════════════════════════════════════════╣"
     echo -e "${BLUE}║  ${GREEN}Telegram:${NC} $TG"
     echo -e "${BLUE}║  ${GREEN}Admin   :${NC} $ADMIN"
     echo -e "${BLUE}║  ${GREEN}Version :${NC} $VERSION"
-    echo -e "${BLUE}╚══════════════════════════════════════╝${NC}"
+    echo -e "${BLUE}╚═════════════════════════════════════════════╝${NC}"
     echo
-    type_anim "${GREEN}[1]${NC} Gaming DNS 🎮"
-    type_anim "${GREEN}[2]${NC} Download DNS ⬇️"
-    type_anim "${GREEN}[0]${NC} Exit ❌"
-    echo
+    type_anim "${GREEN}[1]${NC} Gaming DNS        ${GREEN}[2]${NC} Download DNS" 0.002
+    type_anim "${GREEN}[0]${NC} Exit" 0.002
     echo -ne "${BLUE}Select an option: ${NC}"
     read opt
     case $opt in
-        1) show_game_menu ;;
-        2) show_download_menu ;;
-        0) exit_script ;;
-        *) echo -e "${RED}Invalid Option!"; sleep 1; show_main_menu ;;
+        1) show_games ;;
+        2) show_download_countries ;;
+        0) exit ;;
+        *) main_menu ;;
     esac
 }
 
-show_game_menu() {
+show_games() {
     clear
-    echo -e "${BLUE}🎮 Select Your Game:"
-    i=1
-    for game in "${GAMES[@]}"; do
-        echo -e "${GREEN}[$i]${NC} $game"
-        ((i++))
-        sleep 0.02
+    echo -e "${BLUE}🎮 Choose a Game:${NC}"
+    for i in "${!GAMES[@]}"; do
+        echo -e "${GREEN}[$((i+1))]${NC} ${GAMES[$i]}"
+        sleep 0.01
     done
-    echo -ne "${BLUE}Enter game number: ${NC}"
+    echo -ne "${BLUE}Enter number: ${NC}"
     read gnum
-    selected_game="${GAMES[$((gnum-1))]}"
-    show_country_menu "$selected_game"
+    game="${GAMES[$((gnum-1))]}"
+    show_mena "$game"
 }
 
-show_country_menu() {
+show_mena() {
     game="$1"
     clear
-    echo -e "${BLUE}🌍 Select Country for $game:"
-    i=1
-    for country in "${MIDDLE_EAST_COUNTRIES[@]}"; do
-        echo -e "${GREEN}[$i]${NC} $country"
-        ((i++))
-        sleep 0.02
+    echo -e "${BLUE}🌍 Choose Country:"
+    for i in "${!MIDDLE_EAST[@]}"; do
+        echo -e "${GREEN}[$((i+1))]${NC} ${MIDDLE_EAST[$i]}"
+        sleep 0.01
     done
-    echo -ne "${BLUE}Enter country number: ${NC}"
+    echo -ne "${BLUE}Enter number: ${NC}"
     read cnum
-    selected_country="${MIDDLE_EAST_COUNTRIES[$((cnum-1))]}"
-    show_dns "$game" "$selected_country"
+    country="${MIDDLE_EAST[$((cnum-1))]}"
+    show_dns "$game" "$country"
 }
 
-show_download_menu() {
+show_download_countries() {
     clear
-    echo -e "${BLUE}⬇️  Select Country for Download DNS:"
-    i=1
-    for country in "${WORLD_COUNTRIES[@]}"; do
-        echo -e "${GREEN}[$i]${NC} $country"
-        ((i++))
-        sleep 0.02
+    echo -e "${BLUE}⬇️ Choose Download Country:"
+    for i in "${!DOWNLOAD_COUNTRIES[@]}"; do
+        echo -e "${GREEN}[$((i+1))]${NC} ${DOWNLOAD_COUNTRIES[$i]}"
+        sleep 0.01
     done
-    echo -ne "${BLUE}Enter country number: ${NC}"
+    echo -ne "${BLUE}Enter number: ${NC}"
     read cnum
-    selected_country="${WORLD_COUNTRIES[$((cnum-1))]}"
-    show_dns "Download" "$selected_country"
+    country="${DOWNLOAD_COUNTRIES[$((cnum-1))]}"
+    show_dns "Download" "$country"
 }
 
 show_dns() {
-    g="$1"
-    c="$2"
-    key="${g}_${c}"
-    dns_list=(${DNS_DATA[$key]})
-    echo
-    echo -e "${BLUE}Showing 15 DNS for $g - $c:${NC}"
-    echo -e "${GREEN}----------------------------------${NC}"
-    for i in "${!dns_list[@]}"; do
-        [[ $i -ge 15 ]] && break
-        dns="${dns_list[$i]}"
-        ping_val=$(get_ping "$dns")
-        echo -e "${GREEN}[$((i+1))]${NC} $dns ${BLUE}(Ping: $ping_val)${NC}"
+    key="${1}_${2}"
+    dns_raw="${DNS_DATA[$key]}"
+    echo -e "\n${BLUE}📡 DNS List for ${1} - ${2}:${NC}"
+    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    dns_list=($dns_raw)
+    random_dns=($(shuf -e "${dns_list[@]}" | head -n 15))
+    count=1
+    for dns in "${random_dns[@]}"; do
+        ping=$(get_ping "$dns")
+        echo -e "${GREEN}[$count]${NC} $dns ${BLUE}(Ping: $ping)${NC}"
+        ((count++))
         sleep 0.05
     done
-    echo -e "${GREEN}----------------------------------${NC}"
+    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
+    echo -ne "${BLUE}Enter number to copy DNS (0 to return): ${NC}"
+    read choice
+    if [[ "$choice" =~ ^[0-9]+$ ]] && ((choice >= 1 && choice <= 15)); then
+        copy_to_clipboard "${random_dns[$((choice-1))]}"
+    fi
     echo -ne "${BLUE}Press Enter to return...${NC}"; read
-    show_main_menu
+    main_menu
 }
 
-exit_script() {
-    echo -e "\n${YELLOW}Goodbye. Follow our channel on Telegram to see more updates and scripts. @Academi_vpn${NC}"
-    exit 0
-}
-
-# Start the script
-show_main_menu
+main_menu
