@@ -1,67 +1,161 @@
 #!/bin/bash
 
-Auto-install required packages
+# ========================
+# Mahdi Dns Script v1.0.9
+# ========================
 
-for pkg in curl bc; do if ! command -v $pkg &> /dev/null; then echo "Installing $pkg..." pkg install -y $pkg || apt install -y $pkg || echo "$pkg installation failed." fi done
-
-Title Display
-
-clear echo -e "\e[1;36m──────────────────────────────────────────────\e[0m" echo -e "\e[1;32m Telegram: @Academi_vpn\e[0m" echo -e "\e[1;34m Admin: @MahdiAGM0\e[0m" echo -e "\e[1;31m Version: 1.0.9\e[0m" echo -e "\e[1;36m──────────────────────────────────────────────\e[0m" echo
-
-Sample games list (partial)
-
-declare -A games=( ["PUBG Mobile (Mobile)"]=1 ["Call of Duty (Mobile)"]=1 ["Fortnite (PC)"]=1 ["FIFA 24 (Console)"]=1 ["Valorant (PC)"]=1 ["Free Fire (Mobile)"]=1 ["Warzone (PC)"]=1 )
-
-Sample country list (partial)
-
-countries=("Iran" "Germany" "USA" "France" "UAE" "Turkey" "India" "Brazil" "Japan" "Russia")
-
-Sample DNS pool
-
-get_dns_for_use() { local category="$1" country="$2" echo -e "\nShowing 15 DNS servers for \e[33m$category\e[0m in \e[36m$country\e[0m:"
-
-for i in {1..15}; do
-    ip1=$((RANDOM % 255))
-    ip2=$((RANDOM % 255))
-    echo -e "DNS $i: 1.$ip1.$ip2.1 (Ping: $(ping -c1 -W1 1.$ip1.$ip2.1 | grep time= | awk -F'time=' '{print $2}' | cut -d' ' -f1 || echo N/A) ms)"
+# Auto-install required packages silently
+for pkg in curl lolcat figlet; do
+  if ! command -v $pkg >/dev/null 2>&1; then
+    echo "Installing missing package: $pkg..."
+    pkgman=$(command -v apt-get || command -v pkg)
+    sudo $pkgman install $pkg -y >/dev/null 2>&1
+  fi
 done
-echo -e "\nPress Enter to return to menu..."
-read
 
+clear
+
+# Color functions
+cecho() {
+  local color=$1; shift
+  echo -e "\e[${color}m$*\e[0m"
 }
 
-Main Menu
+rainbow_echo() {
+  echo "$1" | lolcat
+}
 
-while true; do clear echo -e "\e[1;36m═════════ Select DNS Mode ═════════\e[0m" echo -e "\e[1;33m[1]\e[0m Gaming DNS" echo -e "\e[1;33m[2]\e[0m Download DNS" echo -e "\e[1;31m[0]\e[0m Exit" echo -n "Choose: " read opt
+# Title section
+rainbow_echo "=============================="
+rainbow_echo "Mahdi Dns 🔥"
+rainbow_echo "Telegram: @Academi_vpn"
+rainbow_echo "Admin: @MahdiAGM0"
+cecho 91 "Version: 1.0.9"
+rainbow_echo "=============================="
 
-case $opt in
+# List of games
+GAMES=(
+  "Call of Duty Mobile (Mobile)"
+  "PUBG Mobile (Mobile)"
+  "Free Fire (Mobile)"
+  "Mobile Legends (Mobile)"
+  "Clash Royale (Mobile)"
+  "Brawl Stars (Mobile)"
+  "Apex Legends Mobile (Mobile)"
+  "Fortnite (Mobile)"
+  "League of Legends: Wild Rift (Mobile)"
+  "Valorant (PC)"
+  "Fortnite (PC)"
+  "CS: GO (PC)"
+  "Dota 2 (PC)"
+  "Overwatch (PC)"
+  "Rainbow Six Siege (PC)"
+  "World of Warcraft (PC)"
+  "FIFA 24 (PC)"
+  "Rocket League (PC)"
+  "Genshin Impact (PC)"
+  "League of Legends (PC)"
+  "Call of Duty: Warzone (PC)"
+  "Minecraft (PC)"
+  "Cyberpunk 2077 (PC)"
+  "Hogwarts Legacy (PC)"
+  "FIFA 24 (Console)"
+  "Apex Legends (Console)"
+  "Call of Duty MW3 (Console)"
+  "Fortnite (Console)"
+  "GTA Online (Console)"
+  "NBA 2K24 (Console)"
+)
+
+# List of Middle East countries
+COUNTRIES=("Iran" "UAE" "Saudi Arabia" "Turkey" "Qatar" "Oman" "Iraq" "Jordan" "Egypt" "Israel" "Kuwait" "Bahrain" "Lebanon")
+
+# Sample DNS dataset
+DNS_DATA_IRAN=("178.22.122.100" "185.51.200.2" "10.202.10.10" "10.202.10.11" "79.175.133.130")
+DNS_DATA_TURKEY=("195.175.39.39" "195.175.39.40" "85.95.250.95")
+DNS_DATA_UAE=("213.42.20.20" "213.42.20.21")
+
+# Function to show ping
+ping_dns() {
+  local dns=$1
+  ping -c1 -W1 $dns >/dev/null 2>&1
+  if [[ $? -eq 0 ]]; then
+    local result=$(ping -c1 -W1 $dns | grep time= | sed -n 's/.*time=\([^ ]*\).*/\1/p')
+    echo "$result ms"
+  else
+    echo "N/A"
+  fi
+}
+
+# Main Menu
+while true; do
+  echo
+  rainbow_echo "[1] Gaming DNS"
+  rainbow_echo "[2] Download DNS"
+  rainbow_echo "[0] Exit"
+  echo
+  read -p "Select an option: " opt
+
+  case $opt in
     1)
-        echo -e "\n\e[1;36mChoose Game:\e[0m"
-        select game in "${!games[@]}"; do
-            [ -n "$game" ] && break
-        done
+      clear
+      rainbow_echo "Select a game:"
+      select game in "${GAMES[@]}"; do
+        [[ -n "$game" ]] && break
+      done
 
-        echo -e "\n\e[1;36mChoose Country:\e[0m"
-        select country in "${countries[@]}"; do
-            [ -n "$country" ] && break
-        done
+      clear
+      rainbow_echo "Select a country:"
+      select country in "${COUNTRIES[@]}"; do
+        [[ -n "$country" ]] && break
+      done
 
-        get_dns_for_use "Gaming" "$country"
-        ;;
+      clear
+      rainbow_echo "DNS results for $game - $country"
+
+      dns_var="DNS_DATA_${country^^}"
+      dns_list=(${!dns_var})
+
+      if [[ ${#dns_list[@]} -eq 0 ]]; then
+        cecho 91 "No DNS found for $country"
+      else
+        for i in {1..15}; do
+          dns=${dns_list[$((RANDOM % ${#dns_list[@]}))]}
+          ping_val=$(ping_dns $dns)
+          cecho 92 "DNS $i: $dns (Ping: $ping_val)"
+        done
+      fi
+      read -p "Press Enter to return..." _
+      ;;
     2)
-        echo -e "\n\e[1;36mChoose Country:\e[0m"
-        select country in "${countries[@]}"; do
-            [ -n "$country" ] && break
+      clear
+      rainbow_echo "Select a country for download DNS:"
+      select country in "${COUNTRIES[@]}"; do
+        [[ -n "$country" ]] && break
+      done
+
+      clear
+      rainbow_echo "Download DNS for $country"
+      dns_var="DNS_DATA_${country^^}"
+      dns_list=(${!dns_var})
+
+      if [[ ${#dns_list[@]} -eq 0 ]]; then
+        cecho 91 "No DNS found for $country"
+      else
+        for i in {1..15}; do
+          dns=${dns_list[$((RANDOM % ${#dns_list[@]}))]}
+          ping_val=$(ping_dns $dns)
+          cecho 96 "DNS $i: $dns (Ping: $ping_val)"
         done
-
-        get_dns_for_use "Download" "$country"
-        ;;
+      fi
+      read -p "Press Enter to return..." _
+      ;;
     0)
-        echo -e "\n\e[1;33mGoodbye. Follow our channel on Telegram to see more updates and scripts. @Academi_vpn\e[0m"
-        exit 0
-        ;;
-    *) echo "Invalid choice. Try again." ;;
-esac
-
+      cecho 93 "Goodbye. Follow our channel on Telegram to see more updates and scripts. @Academi_vpn"
+      exit 0
+      ;;
+    *)
+      cecho 91 "Invalid option. Try again."
+      ;;
+  esac
 done
-
