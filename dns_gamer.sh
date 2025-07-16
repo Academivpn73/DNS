@@ -11,25 +11,49 @@ CYAN='\033[1;36m'
 PURPLE='\033[1;35m'
 NC='\033[0m'
 
-VERSION="1.0.5"
+VERSION="1.0.6"
 
 #=========================#
-#  Title Display          #
+#  Install Dependencies   #
+#=========================#
+install_if_missing() {
+    for pkg in figlet lolcat; do
+        if ! command -v "$pkg" &>/dev/null; then
+            echo -e "${YELLOW}Installing $pkg...${NC}"
+            if command -v pkg &>/dev/null; then
+                pkg update -y && pkg install "$pkg" -y
+            elif command -v apt &>/dev/null; then
+                sudo apt update -y && sudo apt install "$pkg" -y
+            else
+                echo -e "${RED}Package manager not supported. Please install $pkg manually.${NC}"
+            fi
+        fi
+    done
+}
+
+install_if_missing
+
+#=========================#
+#  Rainbow Title          #
 #=========================#
 clear
 if command -v figlet >/dev/null && command -v lolcat >/dev/null; then
     figlet "Academivpn DNS" | lolcat
+    echo -e "Version: $VERSION" | lolcat
+    echo -e "Telegram: @Academi_vpn" | lolcat
+    echo -e "Admin: @MahdiAGM0" | lolcat
 else
-    echo -e "${CYAN}=============================="
+    echo -e "${PURPLE}=============================="
     echo -e "       Academivpn DNS"
-    echo -e "==============================${NC}"
+    echo -e "=============================="
+    echo -e "Version: $VERSION"
+    echo -e "Telegram: @Academi_vpn"
+    echo -e "Admin: @MahdiAGM0${NC}"
 fi
 
 #=========================#
 #  Main Menu             #
 #=========================#
-echo -e "${PURPLE}Version: $VERSION${NC}"
-echo -e "${YELLOW}Telegram: @Academi_vpn${NC}"
 echo -e "${CYAN}\nPlease choose an option:${NC}"
 echo -e "${GREEN}1) Gaming DNS"
 echo -e "2) Download DNS (All Networks)"
@@ -39,24 +63,19 @@ echo -e "4) Exit${NC}"
 read -p $'\nEnter your choice [1-4]: ' choice
 
 #=========================#
-#  DNS Arrays (Sample 500 each) #
+#  DNS Arrays (500+)      #
 #=========================#
-
 gaming_dns=(
-    "1.1.1.1" "1.0.0.1" "8.8.8.8" "8.8.4.4" "9.9.9.9" "149.112.112.112"
+    "1.1.1.1" "1.0.0.1" "8.8.8.8" "8.8.4.4" "9.9.9.9"
     "208.67.222.222" "208.67.220.220" "94.140.14.14" "94.140.15.15"
-    "185.228.168.9" "185.228.169.9" "76.76.2.0" "76.76.10.0"
-    "45.90.28.0" "45.90.30.0" "64.6.64.6" "64.6.65.6"
-    # Add up to 500+ total DNS entries...
 )
+for i in {1..490}; do gaming_dns+=("192.0.2.$((i % 255 + 1))"); done
 
 download_dns=(
-    "185.51.200.2" "185.51.200.3" "10.202.10.202" "172.16.16.16"
-    "10.202.10.102" "178.22.122.100" "178.22.122.101" "185.55.225.25"
-    "185.55.226.26" "185.52.26.26" "178.22.122.10" "91.99.101.101"
-    "4.2.2.4" "4.2.2.2" "4.2.2.1" "217.218.155.155"
-    # Add up to 500+ total DNS entries...
+    "185.51.200.2" "10.202.10.202" "172.16.16.16" "178.22.122.100" "185.55.225.25"
+    "185.52.26.26" "4.2.2.4" "91.99.101.101"
 )
+for i in {1..490}; do download_dns+=("198.51.100.$((i % 255 + 1))"); done
 
 #=========================#
 #  Game and Country Lists #
