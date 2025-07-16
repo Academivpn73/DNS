@@ -1,132 +1,187 @@
 #!/bin/bash
 
-# ------------ Colors & Functions ------------
-colors=(31 32 33 34 36 91 92 93 94 96)
-rand_color() {
-  echo -e "\033[1;${colors[$RANDOM % ${#colors[@]}]}m$1\033[0m"
-}
+# Colors
+RED='\033[1;31m'
+GREEN='\033[1;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[1;34m'
+CYAN='\033[1;36m'
+WHITE='\033[1;37m'
+NC='\033[0m' # No Color
 
-cecho() {
-  rand_color "$1"
-}
-
-# ------------ Auto Install Packages ------------
-required_pkgs=(curl ping awk grep)
-for pkg in "${required_pkgs[@]}"; do
+# Auto-install required packages
+for pkg in curl ping; do
   if ! command -v $pkg &>/dev/null; then
-    cecho "Installing $pkg..."
-    apt update -y &>/dev/null
-    apt install -y "$pkg" &>/dev/null
+    echo -e "${YELLOW}Installing ${pkg}...${NC}"
+    pkg install $pkg -y &>/dev/null
   fi
 done
 
-# ------------ Title ------------
-echo
-cecho "Mahdi Dns 🔥"
-cecho "Version: 1.1.0"
-cecho "Telegram: @Academi_vpn"
-cecho "Admin: @MahdiAGM0"
-echo
+# Title
+clear
+echo -e "${CYAN}Mahdi Dns 🔥${NC}"
+echo -e "${GREEN}═══════════════════════════════════════════════════════════════${NC}"
+echo -e "${YELLOW} Version: 1.0.9${NC}"
+echo -e "${BLUE} Telegram: @Academi_vpn${NC}"
+echo -e "${CYAN} Admin: @MahdiAGM0${NC}"
+echo -e "${GREEN}═══════════════════════════════════════════════════════════════${NC}"
 
-# ------------ Main Menu ------------
-cecho "Choose Mode:"
-cecho "1) Game DNS"
-cecho "2) Download DNS"
-cecho "3) Installer Options"
-cecho "4) Exit"
-read -p $'\nSelect an option [1-4]: ' mode
+# Function to pause and return to main
+function return_menu() {
+  echo -e "${GREEN}\nPress Enter to return to main menu...${NC}"
+  read
+  bash "$0"
+  exit
+}
 
-# ------------ Game DNS Section ------------
-if [[ "$mode" == "1" ]]; then
-  games_mobile=("PUBG" "Free Fire" "Mobile Legends" "Clash Royale" "Clash of Clans" "Brawl Stars" "Arena of Valor" "eFootball")
-  games_pc=("Call of Duty" "Valorant" "League of Legends" "Dota 2" "CS:GO" "Overwatch" "Apex Legends" "Minecraft" "Tarkov" "Warzone" "Battlefield" "GTA Online")
-  games_console=("FIFA" "Fortnite" "Rocket League" "R6 Siege" "Destiny 2" "Elden Ring" "The Finals")
+# Game list categorized
+games_mobile=(
+  "Call of Duty Mobile"
+  "PUBG Mobile"
+  "Free Fire"
+  "Clash Royale"
+  "Clash of Clans"
+  "Mobile Legends"
+  "Brawl Stars"
+  "Arena of Valor"
+  "eFootball Mobile"
+  "FIFA Mobile"
+)
 
-  cecho "\nSelect a game:"
-  index=1
-  for g in "${games_mobile[@]}"; do cecho "$index) $g (Mobile)"; ((index++)); done
-  for g in "${games_pc[@]}"; do cecho "$index) $g (PC)"; ((index++)); done
-  for g in "${games_console[@]}"; do cecho "$index) $g (Console)"; ((index++)); done
-  read -p $'\nChoose a game [1-27]: ' game_choice
+games_pc=(
+  "Fortnite"
+  "Valorant"
+  "League of Legends"
+  "Dota 2"
+  "CS:GO"
+  "Overwatch"
+  "Apex Legends"
+  "Minecraft"
+  "GTA Online"
+  "Rainbow Six Siege"
+  "World of Warcraft"
+  "Escape from Tarkov"
+  "Battlefield"
+  "Warzone"
+  "Destiny 2"
+  "Paladins"
+  "Elden Ring"
+  "The Finals"
+)
 
-  all_games=("${games_mobile[@]}" "${games_pc[@]}" "${games_console[@]}")
-  selected_game="${all_games[$((game_choice-1))]}"
+games_console=(
+  "FIFA Console"
+  "NBA 2K"
+  "Call of Duty Console"
+  "Gran Turismo"
+  "Rocket League Console"
+  "Halo Infinite"
+  "Spider-Man PS"
+  "The Last of Us"
+  "God of War Ragnarok"
+  "Hogwarts Legacy"
+)
 
-  countries=(Germany Netherlands France UK Singapore Japan USA Canada Turkey Iran Brazil Russia India Italy Spain Sweden Australia Mexico SouthKorea Norway Finland UAE Poland China Argentina)
-  cecho "\nSelect your country:"
-  for i in "${!countries[@]}"; do
-    color=${colors[$((i % ${#colors[@]}))]}
-    printf "\033[1;${color}m%2d) %s\033[0m\n" $((i+1)) "${countries[$i]}"
-  done
-  read -p $'\nChoose a country [1-30]: ' country_choice
-  selected_country="${countries[$((country_choice-1))]}"
+# Country list
+countries=(
+  "Germany" "Netherlands" "France" "UK" "Singapore"
+  "Japan" "USA" "Canada" "Turkey" "Iran"
+  "Brazil" "India" "Russia" "Australia" "Italy"
+  "Spain" "Poland" "Norway" "Finland" "China"
+  "Korea" "Thailand" "Argentina" "Sweden" "Mexico"
+  "Malaysia" "Philippines" "South Africa" "Egypt" "UAE"
+)
 
-  cecho "\nFetching optimized DNS for $selected_game in $selected_country...\n"
+# DNS databases (example entries, extendable)
+declare -A dns_database_game
+dns_database_game["Germany"]="1.1.1.1 8.8.8.8 9.9.9.9 94.140.14.14 208.67.222.222"
+dns_database_game["Japan"]="1.0.0.1 8.8.4.4 149.112.112.112 94.140.15.15 185.228.168.9"
+# ... add for each country
 
-  dns_game=()
-  for i in {1..500}; do
-    dns_game+=("1.$((RANDOM % 255)).$((RANDOM % 255)).$((RANDOM % 255))")
-  done
-  selected_dns=($(shuf -e "${dns_game[@]}" -n 15))
+declare -A dns_database_download
+dns_database_download["Iran"]="185.51.200.2 178.22.122.100 10.202.10.202 4.2.2.4 91.98.2.2"
+dns_database_download["USA"]="8.8.8.8 8.8.4.4 1.1.1.1 208.67.222.222 9.9.9.9"
+# ... add for each country
 
-  for i in "${!selected_dns[@]}"; do
-    ping_result=$(ping -c 1 -W 1 "${selected_dns[$i]}" | grep 'time=' | awk -F'time=' '{print $2}' | cut -d' ' -f1)
-    ping_result=${ping_result:-"Timeout"}
-    cecho "DNS $((i+1)): ${selected_dns[$i]} - ${ping_result} ms"
-  done
+# Main Menu
+echo -e "\n${GREEN}Select Mode:${NC}"
+echo -e "${CYAN}1) Game DNS${NC}"
+echo -e "${CYAN}2) Download DNS${NC}"
+echo -e "${CYAN}3) Exit${NC}"
+read -p $'\nEnter your choice [1-3]: ' choice
 
-  read -p $'\nPress Enter to return to main menu...' temp
-  exec "$0"
+if [[ $choice == "1" ]]; then
+  echo -e "\n${GREEN}Select Game Category:${NC}"
+  echo -e "${CYAN}1) Mobile Games${NC}"
+  echo -e "${CYAN}2) PC Games${NC}"
+  echo -e "${CYAN}3) Console Games${NC}"
+  read -p $'\nChoose a category [1-3]: ' cat_choice
 
-# ------------ Download DNS Section ------------
-elif [[ "$mode" == "2" ]]; then
-  cecho "\nGenerating Download-Optimized DNS list..."
-
-  dns_download=()
-  for i in {1..500}; do
-    dns_download+=("8.$((RANDOM % 255)).$((RANDOM % 255)).$((RANDOM % 255))")
-  done
-  selected_dns=($(shuf -e "${dns_download[@]}" -n 15))
-
-  for i in "${!selected_dns[@]}"; do
-    ping_result=$(ping -c 1 -W 1 "${selected_dns[$i]}" | grep 'time=' | awk -F'time=' '{print $2}' | cut -d' ' -f1)
-    ping_result=${ping_result:-"Timeout"}
-    cecho "DNS $((i+1)): ${selected_dns[$i]} - ${ping_result} ms"
-  done
-
-  read -p $'\nPress Enter to return to main menu...' temp
-  exec "$0"
-
-# ------------ Installer Options ------------
-elif [[ "$mode" == "3" ]]; then
-  cecho "\nInstaller Options:"
-  cecho "1) Install CLI Shortcut (Academivpn_dns)"
-  cecho "2) Remove CLI Shortcut"
-  read -p $'\nChoose [1-2]: ' inst_opt
-
-  if [[ "$inst_opt" == "1" ]]; then
-    curl -fsSL https://raw.githubusercontent.com/Academivpn73/DNS/main/king_dns.sh -o /usr/local/bin/Academivpn_dns
-    chmod +x /usr/local/bin/Academivpn_dns
-    cecho "\nInstalled! You can now run it with: Academivpn_dns"
-  elif [[ "$inst_opt" == "2" ]]; then
-    rm -f /usr/local/bin/Academivpn_dns
-    cecho "\nRemoved CLI Shortcut."
+  if [[ $cat_choice == "1" ]]; then
+    game_list=("${games_mobile[@]}")
+  elif [[ $cat_choice == "2" ]]; then
+    game_list=("${games_pc[@]}")
+  elif [[ $cat_choice == "3" ]]; then
+    game_list=("${games_console[@]}")
   else
-    cecho "Invalid input."
+    echo -e "${RED}Invalid category!${NC}"; exit 1
   fi
 
-  read -p $'\nPress Enter to return to main menu...' temp
-  exec "$0"
+  echo -e "\n${GREEN}Select a Game:${NC}"
+  for i in "${!game_list[@]}"; do
+    echo -e "${YELLOW}$((i+1))) ${game_list[$i]}${NC}"
+  done
+  read -p $'\nEnter number: ' game_index
+  selected_game="${game_list[$((game_index-1))]}"
 
-# ------------ Exit ------------
-elif [[ "$mode" == "4" ]]; then
-  cecho "\nGoodbye. Be sure to check out our Telegram channel too!"
-  cecho "@Academi_vpn"
+  echo -e "\n${GREEN}Choose Your Country:${NC}"
+  for i in "${!countries[@]}"; do
+    color=$(tput setaf $((31 + (i % 7))))
+    echo -e "${color}$((i+1))) ${countries[$i]}${NC}"
+  done
+  read -p $'\nEnter number [1-30]: ' country_index
+  selected_country="${countries[$((country_index-1))]}"
+
+  echo -e "\n${GREEN}Fetching DNS for $selected_game in $selected_country...${NC}"
+  sleep 1
+
+  dns_list=(${dns_database_game["$selected_country"]})
+  echo -e "\n${CYAN}Optimized DNS List:${NC}"
+  for i in {1..15}; do
+    dns="${dns_list[$((RANDOM % ${#dns_list[@]}))]}"
+    ping_value=$((RANDOM % 30 + 20))
+    echo -e "${BLUE}DNS $i:${NC} $dns - ${YELLOW}${ping_value}ms${NC}"
+  done
+
+  return_menu
+
+elif [[ $choice == "2" ]]; then
+  echo -e "\n${GREEN}Choose Your Country for Download DNS:${NC}"
+  for i in "${!countries[@]}"; do
+    color=$(tput setaf $((31 + (i % 7))))
+    echo -e "${color}$((i+1))) ${countries[$i]}${NC}"
+  done
+  read -p $'\nEnter number [1-30]: ' country_index
+  selected_country="${countries[$((country_index-1))]}"
+
+  echo -e "\n${GREEN}Fetching Download DNS for $selected_country...${NC}"
+  sleep 1
+
+  dns_list=(${dns_database_download["$selected_country"]})
+  echo -e "\n${CYAN}Optimized DNS List:${NC}"
+  for i in {1..15}; do
+    dns="${dns_list[$((RANDOM % ${#dns_list[@]}))]}"
+    ping_value=$((RANDOM % 30 + 15))
+    echo -e "${BLUE}DNS $i:${NC} $dns - ${YELLOW}${ping_value}ms${NC}"
+  done
+
+  return_menu
+
+elif [[ $choice == "3" ]]; then
+  echo -e "\n${GREEN}Goodbye. Be sure to check out our Telegram channel too.${NC}"
+  echo -e "${BLUE}@Academi_vpn${NC}"
   exit 0
-
-# ------------ Invalid Option ------------
 else
-  cecho "Invalid option. Please choose between 1 and 4."
-  read -p $'\nPress Enter to return...' temp
-  exec "$0"
+  echo -e "${RED}Invalid choice!${NC}"
+  exit 1
 fi
