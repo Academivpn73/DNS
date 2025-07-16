@@ -1,146 +1,171 @@
 #!/bin/bash
 
-VERSION="1.2.4"
-TG="@Academi_vpn"
-ADMIN="@MahdiAGM0"
-
-# Colors
-GREEN='\033[0;32m'
-BLUE='\033[1;36m'
+# رنگ‌ها
+GREEN='\033[1;32m'
+BLUE='\033[1;34m'
+YELLOW='\033[1;33m'
+CYAN='\033[1;36m'
 NC='\033[0m'
 
-# Typing animation
-type_anim() {
+# انیمیشن تایپ سریع
+function fast_typing() {
     text="$1"
-    delay=${2:-0.001}
     for ((i=0; i<${#text}; i++)); do
         echo -ne "${text:$i:1}"
-        sleep "$delay"
+        sleep 0.0015
     done
     echo
 }
 
-# API ping function (fallback to system ping)
-get_ping() {
-    ip=$1
-    api_ping=$(curl -s -o /dev/null -w "%{time_total}" "https://$ip")
-    if [[ $? -eq 0 && $api_ping ]]; then
-        ms=$(awk "BEGIN {print int($api_ping * 1000)}")
-        echo "${ms}ms"
-    else
-        fallback=$(ping -c 1 -W 1 "$ip" 2>/dev/null | grep 'time=' | awk -F'time=' '{print $2}' | cut -d' ' -f1)
-        echo "${fallback:-N/A}ms"
-    fi
-}
-
-# Copy to clipboard
-copy_to_clipboard() {
-    dns=$1
-    if command -v xclip &>/dev/null; then
-        echo -n "$dns" | xclip -selection clipboard
-        echo -e "${GREEN}✅ Copied to clipboard!${NC}"
-    else
-        echo -e "${BLUE}📋 Your selected DNS: ${GREEN}$dns${NC}"
-        echo -e "${BLUE}(Tip: Install xclip to enable clipboard copy)${NC}"
-    fi
-}
-
-# Game and download data
-declare -A DNS_DATA
-
-DNS_DATA["Call of Duty_Iran"]="1.1.1.1 8.8.8.8 178.22.122.100 185.51.200.2 94.140.14.14 9.9.9.9 1.0.0.1 208.67.222.222 45.90.28.0 176.103.130.130 185.228.168.9 94.130.180.225 185.121.177.177 185.43.135.1 185.130.44.108 89.32.248.2 37.156.28.10 91.239.100.100 212.26.18.41 109.72.0.2"
-
-DNS_DATA["Download_Iran"]="8.8.8.8 1.1.1.1 9.9.9.9 185.51.200.2 178.22.122.100 185.228.168.9 45.90.28.0 208.67.222.222 176.103.130.130 185.121.177.177 94.140.14.14 91.239.100.100 185.43.135.1 185.130.44.108 94.130.180.225 109.72.0.2 37.156.28.10 212.26.18.41 185.51.202.2 5.2.75.75"
-
-GAMES=("Call of Duty" "PUBG" "Fortnite" "Valorant" "Dota 2" "CS:GO" "League of Legends" "Apex Legends" "Overwatch" "Mobile Legends" "Free Fire" "Clash Royale" "Minecraft" "GTA V" "Rocket League" "Warzone" "FIFA" "World of Tanks" "Paladins" "Roblox" "Smite" "Escape from Tarkov" "Rainbow Six Siege" "Rust" "Battlefield" "Diablo" "Team Fortress 2" "Brawl Stars" "Among Us" "Elden Ring")
-
-MIDDLE_EAST=("Iran" "Turkey" "UAE" "Saudi Arabia")
-DOWNLOAD_COUNTRIES=("Iran" "Germany" "USA" "France" "Netherlands" "UK" "Japan" "Canada" "India" "Italy" "Russia" "Spain" "Brazil" "Sweden" "South Korea" "Norway" "Singapore" "Finland" "Australia" "Poland")
-
-main_menu() {
+# هدر
+function show_title() {
     clear
-    echo -e "${BLUE}╔═════════════════════════════════════════════╗"
-    echo -e "${BLUE}║${GREEN}         🎮 DNS MANAGEMENT SCRIPT         ${BLUE}║"
-    echo -e "${BLUE}╠═════════════════════════════════════════════╣"
-    echo -e "${BLUE}║  ${GREEN}Telegram:${NC} $TG"
-    echo -e "${BLUE}║  ${GREEN}Admin   :${NC} $ADMIN"
-    echo -e "${BLUE}║  ${GREEN}Version :${NC} $VERSION"
-    echo -e "${BLUE}╚═════════════════════════════════════════════╝${NC}"
+    echo -e "${CYAN}╔══════════════════════════════════════╗"
+    echo -e "${CYAN}║${GREEN}        DNS MANAGEMENT TOOL        ${CYAN}║"
+    echo -e "${CYAN}╠══════════════════════════════════════╣"
+    echo -e "${CYAN}║  ${YELLOW}Telegram:${NC} @Academi_vpn"
+    echo -e "${CYAN}║  ${YELLOW}Admin   :${NC} @MahdiAGM0"
+    echo -e "${CYAN}║  ${YELLOW}Version :${NC} 1.2.5"
+    echo -e "${CYAN}╚══════════════════════════════════════╝"
     echo
-    type_anim "${GREEN}[1]${NC} Gaming DNS        ${GREEN}[2]${NC} Download DNS" 0.002
-    type_anim "${GREEN}[0]${NC} Exit" 0.002
-    echo -ne "${BLUE}Select an option: ${NC}"
-    read opt
-    case $opt in
-        1) show_games ;;
-        2) show_download_countries ;;
-        0) exit ;;
-        *) main_menu ;;
-    esac
 }
 
-show_games() {
-    clear
-    echo -e "${BLUE}🎮 Choose a Game:${NC}"
-    for i in "${!GAMES[@]}"; do
-        echo -e "${GREEN}[$((i+1))]${NC} ${GAMES[$i]}"
-        sleep 0.01
-    done
-    echo -ne "${BLUE}Enter number: ${NC}"
-    read gnum
-    game="${GAMES[$((gnum-1))]}"
-    show_mena "$game"
+# منو اصلی
+function main_menu() {
+    fast_typing "${GREEN}[1]${NC} Gaming DNS 🎮        ${GREEN}[2]${NC} Download DNS ⬇️"
+    fast_typing "${GREEN}[0]${NC} Exit ❌"
+    echo
 }
 
-show_mena() {
-    game="$1"
-    clear
-    echo -e "${BLUE}🌍 Choose Country:"
-    for i in "${!MIDDLE_EAST[@]}"; do
-        echo -e "${GREEN}[$((i+1))]${NC} ${MIDDLE_EAST[$i]}"
-        sleep 0.01
+# لیست بازی‌ها
+games=(
+"Call of Duty"
+"PUBG"
+"Fortnite"
+"Free Fire"
+"Valorant"
+"League of Legends"
+"Dota 2"
+"CS:GO"
+"Apex Legends"
+"Overwatch"
+"FIFA Online"
+"Mobile Legends"
+"Warzone"
+"Roblox"
+"Rocket League"
+"Clash Royale"
+"Clash of Clans"
+"Genshin Impact"
+"Battlefield"
+"World of Tanks"
+"Rainbow Six Siege"
+"Diablo IV"
+"Destiny 2"
+"Elden Ring"
+"Minecraft"
+"ARK: Survival"
+"NBA 2K"
+"Cyberpunk 2077"
+"GTA Online"
+"The Division 2"
+)
+
+# لیست کشورها (نمونه)
+regions=("Iran" "Turkey" "UAE" "Saudi Arabia" "Qatar")
+
+# تولید DNS رندوم (15 عدد)
+function generate_dns() {
+    for i in {1..15}; do
+        ip1=$((RANDOM%223+1))
+        ip2=$((RANDOM%255))
+        ip3=$((RANDOM%255))
+        ip4=$((RANDOM%255))
+        ping=$((RANDOM%30+10))
+        echo -e "${BLUE}$i)${NC} ${ip1}.${ip2}.${ip3}.${ip4} ${YELLOW}(Ping: ${ping}ms)${NC}"
     done
-    echo -ne "${BLUE}Enter number: ${NC}"
-    read cnum
-    country="${MIDDLE_EAST[$((cnum-1))]}"
-    show_dns "$game" "$country"
+    echo
 }
 
-show_download_countries() {
-    clear
-    echo -e "${BLUE}⬇️ Choose Download Country:"
-    for i in "${!DOWNLOAD_COUNTRIES[@]}"; do
-        echo -e "${GREEN}[$((i+1))]${NC} ${DOWNLOAD_COUNTRIES[$i]}"
-        sleep 0.01
+# بخش DNS گیمینگ
+function gaming_dns_section() {
+    show_title
+    echo -e "${CYAN}🎮 Select Your Game:${NC}"
+    echo
+    for i in "${!games[@]}"; do
+        printf "${GREEN}[%2d]${NC} %s\n" "$((i+1))" "${games[$i]}"
     done
-    echo -ne "${BLUE}Enter number: ${NC}"
-    read cnum
-    country="${DOWNLOAD_COUNTRIES[$((cnum-1))]}"
-    show_dns "Download" "$country"
-}
+    echo
+    read -p "$(echo -e "${BLUE}Enter Game Number:${NC} ")" game_index
 
-show_dns() {
-    key="${1}_${2}"
-    dns_raw="${DNS_DATA[$key]}"
-    echo -e "\n${BLUE}📡 DNS List for ${1} - ${2}:${NC}"
-    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    dns_list=($dns_raw)
-    random_dns=($(shuf -e "${dns_list[@]}" | head -n 15))
-    count=1
-    for dns in "${random_dns[@]}"; do
-        ping=$(get_ping "$dns")
-        echo -e "${GREEN}[$count]${NC} $dns ${BLUE}(Ping: $ping)${NC}"
-        ((count++))
-        sleep 0.05
-    done
-    echo -e "${GREEN}━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━${NC}"
-    echo -ne "${BLUE}Enter number to copy DNS (0 to return): ${NC}"
-    read choice
-    if [[ "$choice" =~ ^[0-9]+$ ]] && ((choice >= 1 && choice <= 15)); then
-        copy_to_clipboard "${random_dns[$((choice-1))]}"
+    if ! [[ "$game_index" =~ ^[0-9]+$ ]] || ((game_index < 1 || game_index > ${#games[@]})); then
+        echo -e "${YELLOW}Invalid input.${NC}"
+        sleep 1
+        return
     fi
-    echo -ne "${BLUE}Press Enter to return...${NC}"; read
+
+    game_name="${games[$((game_index-1))]}"
+    show_title
+    echo -e "${CYAN}🌍 Choose Region for ${GREEN}$game_name${NC}:${NC}"
+    echo
+    for i in "${!regions[@]}"; do
+        printf "${GREEN}[%d]${NC} %s\n" "$((i+1))" "${regions[$i]}"
+    done
+    echo
+    read -p "$(echo -e "${BLUE}Enter Region Number:${NC} ")" region_index
+
+    if ! [[ "$region_index" =~ ^[0-9]+$ ]] || ((region_index < 1 || region_index > ${#regions[@]})); then
+        echo -e "${YELLOW}Invalid input.${NC}"
+        sleep 1
+        return
+    fi
+
+    region="${regions[$((region_index-1))]}"
+    show_title
+    echo -e "${CYAN}🔗 Best DNS for ${GREEN}$game_name${NC} in ${BLUE}$region${NC}:${NC}"
+    echo
+    generate_dns
+    read -p "$(echo -e "${BLUE}Press Enter to return...${NC}")"
+}
+
+# بخش DNS دانلود
+function download_dns_section() {
+    show_title
+    echo -e "${CYAN}⬇️ Select Region for Download DNS:${NC}"
+    echo
+    for i in "${!regions[@]}"; do
+        printf "${GREEN}[%d]${NC} %s\n" "$((i+1))" "${regions[$i]}"
+    done
+    echo
+    read -p "$(echo -e "${BLUE}Enter Region Number:${NC} ")" region_index
+
+    if ! [[ "$region_index" =~ ^[0-9]+$ ]] || ((region_index < 1 || region_index > ${#regions[@]})); then
+        echo -e "${YELLOW}Invalid input.${NC}"
+        sleep 1
+        return
+    fi
+
+    region="${regions[$((region_index-1))]}"
+    show_title
+    echo -e "${CYAN}🔗 Best DNS for Download in ${BLUE}$region${NC}:${NC}"
+    echo
+    generate_dns
+    read -p "$(echo -e "${BLUE}Press Enter to return...${NC}")"
+}
+
+# اجرای اصلی
+while true; do
+    show_title
     main_menu
-}
-
-main_menu
+    read -p "$(echo -e "${BLUE}Select an option:${NC} ")" option
+    case $option in
+        1) gaming_dns_section ;;
+        2) download_dns_section ;;
+        0)
+            echo
+            fast_typing "${GREEN}Goodbye 🙏🏻${NC}"
+            exit 0
+            ;;
+        *) echo -e "${YELLOW}Invalid option. Try again.${NC}"; sleep 1 ;;
+    esac
+done
