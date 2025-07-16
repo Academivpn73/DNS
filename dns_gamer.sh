@@ -6,7 +6,6 @@ YELLOW='\033[1;33m'
 GREEN='\033[1;32m'
 CYAN='\033[1;36m'
 BLUE='\033[1;34m'
-MAGENTA='\033[1;35m'
 NC='\033[0m'
 
 # --------- Auto Install Dependencies ---------
@@ -18,14 +17,14 @@ for pkg in curl ping awk grep; do
 done
 
 # --------- Colorful Title ---------
-echo -e "${RED}███    ███ ██ ███    ██ ██   ██ ██████  ██ ██████ "
-echo -e "${YELLOW}████  ████ ██ ████   ██ ██  ██  ██   ██ ██ ██   ██"
-echo -e "${GREEN}██ ████ ██ ██ ██ ██  ██ █████   ██████  ██ ██   ██"
-echo -e "${CYAN}██  ██  ██ ██ ██  ██ ██ ██  ██  ██      ██ ██   ██"
-echo -e "${BLUE}██      ██ ██ ██   ████ ██   ██ ██      ██ ██████"
-echo -e "${MAGENTA}              Mahdi Dns 🔥 - Version: 1.1.0${NC}"
-echo -e "${CYAN}Telegram: @Academi_vpn     Admin: @MahdiAGM0${NC}"
-echo
+echo -e "${RED}██████╗ ███╗   ██╗███████╗"
+echo -e "${YELLOW}██╔══██╗████╗  ██║██╔════╝"
+echo -e "${GREEN}██████╔╝██╔██╗ ██║█████╗  "
+echo -e "${CYAN}██╔═══╝ ██║╚██╗██║██╔══╝  "
+echo -e "${BLUE}██║     ██║ ╚████║███████╗"
+echo -e "${RED}╚═╝     ╚═╝  ╚═══╝╚══════╝${NC}"
+echo -e "${CYAN}Mahdi DNS 🔥   Version: 1.1.0"
+echo -e "Telegram: @Academi_vpn   Admin: @MahdiAGM0${NC}\n"
 
 # --------- Installer Options ---------
 show_menu() {
@@ -38,7 +37,7 @@ show_menu() {
 }
 
 installer_menu() {
-  echo -e "${MAGENTA}\nInstaller Options:${NC}"
+  echo -e "${YELLOW}\nInstaller Options:${NC}"
   echo -e "${CYAN}1) Install Academivpn_dns command${NC}"
   echo -e "${CYAN}2) Remove Academivpn_dns command${NC}"
   echo -e "${BLUE}3) Back${NC}"
@@ -76,7 +75,7 @@ countries=(
 "Finland" "Ukraine" "Pakistan" "Iraq"
 )
 
-# --------- DNS Pool Example (Real ones should be added from best sources) ---------
+# --------- DNS Pool Example ---------
 dns_gaming_us=(
 "1.1.1.1" "8.8.8.8" "208.67.222.222" "9.9.9.9" "76.76.2.0"
 "45.90.28.0" "185.228.168.9" "94.140.14.14" "64.6.64.6" "199.85.126.10"
@@ -108,33 +107,33 @@ while true; do
     1)
       echo -e "\n${CYAN}Select a game:${NC}"
       for i in "${!games[@]}"; do
-        color="\033[1;$((31 + i % 6))m"
+        color="\033[1;$((31 + i % 5))m"
         printf "${color}%2d) %s${NC}\n" $((i + 1)) "${games[$i]}"
       done
       read -p $'\nChoose game [1-${#games[@]}]: ' gidx
       selected_game="${games[$((gidx - 1))]}"
-      echo -e "\n${MAGENTA}Selected Game:${NC} $selected_game"
+      echo -e "\n${CYAN}Selected Game:${NC} $selected_game"
 
       echo -e "\n${CYAN}Select your country:${NC}"
       for i in "${!countries[@]}"; do
-        color="\033[1;$((31 + i % 6))m"
+        color="\033[1;$((32 + i % 5))m"
         printf "${color}%2d) %s${NC}\n" $((i + 1)) "${countries[$i]}"
       done
       read -p $'\nChoose country [1-${#countries[@]}]: ' cidx
       selected_country="${countries[$((cidx - 1))]}"
-      echo -e "\n${MAGENTA}Selected Country:${NC} $selected_country"
+      echo -e "\n${CYAN}Selected Country:${NC} $selected_country"
 
       show_dns_list "${dns_gaming_us[@]}"
       ;;
     2)
       echo -e "\n${CYAN}Select your country for Download DNS:${NC}"
       for i in "${!countries[@]}"; do
-        color="\033[1;$((32 + i % 6))m"
+        color="\033[1;$((33 + i % 4))m"
         printf "${color}%2d) %s${NC}\n" $((i + 1)) "${countries[$i]}"
       done
       read -p $'\nChoose country [1-${#countries[@]}]: ' cidx2
       selected_country2="${countries[$((cidx2 - 1))]}"
-      echo -e "\n${MAGENTA}Selected Country:${NC} $selected_country2"
+      echo -e "\n${CYAN}Selected Country:${NC} $selected_country2"
 
       show_dns_list "${dns_download_ir[@]}"
       ;;
