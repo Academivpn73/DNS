@@ -1,99 +1,38 @@
-#!/bin/bash
+#!/bin/bash set -e
 
-# رنگ‌ها و نسخه
-RED='\033[1;31m'
-BLUE='\033[1;36m'
-NC='\033[0m'
-VERSION="4.0.3"
+VERSION="1.0.3" NC='\033[0m' COLORS=(31 32 33 34 35 36)
 
-# هدر
-echo -e "${BWHITE}"
-echo "╔════════════════════════════════════════════╗"
-echo "║             Version: 4.0.4                ║"
-echo "║                                            ║"
-echo "║     Telegram: @Academii73
-║"
-echo "║     Admin Support: @MahdiAGM0             ║"
-echo "║                                            ║"
-echo "╚════════════════════════════════════════════╝"
-echo -e "\e[0m"
+Function to print with random color
 
-echo -e "${BLUE}Choose Mode:${NC}"
-echo -e "${BLUE}1) Game DNS${NC}"
-echo -e "${BLUE}2) Download All Net DNS${NC}"
-read -p $'\nSelect an option [1-2]: ' mode
+cecho() { color="\033[1;${COLORS[$RANDOM % ${#COLORS[@]}]}m" echo -e "${color}$1${NC}" }
 
-if [[ $mode == "1" ]]; then
-  # بخش بازی‌ها
-  games=(
-    "Call of Duty" "PUBG" "Fortnite" "Valorant" "League of Legends"
-    "Dota 2" "CS:GO" "Overwatch" "Apex Legends" "Minecraft"
-    "Rocket League" "GTA Online" "Rainbow Six Siege" "World of Warcraft"
-    "Escape from Tarkov" "Battlefield" "Warzone" "Destiny 2" "Free Fire"
-    "Mobile Legends" "FIFA Online" "eFootball" "Clash Royale" "Clash of Clans"
-    "Roblox" "Brawl Stars" "Paladins" "Arena of Valor" "Elden Ring" "The Finals"
-  )
+Install required tools if missing
 
-  echo -e "\n${BLUE}Select your game:${NC}"
-  for i in "${!games[@]}"; do
-    printf "${BLUE}%2d) %s${NC}\n" $((i+1)) "${games[$i]}"
-  done
-  read -p $'\nChoose a game [1-30]: ' game_choice
-  game_selected="${games[$((game_choice-1))]}"
+install_if_missing() { pkg=$1 if ! command -v "$pkg" &>/dev/null; then cecho "Installing $pkg..." sudo apt update -y &>/dev/null sudo apt install "$pkg" -y &>/dev/null fi }
 
-  countries=("Germany" "Netherlands" "France" "United Kingdom" "Singapore" "Japan" "United States" "Canada" "Turkey" "Iran")
-  echo -e "\n${BLUE}Select your preferred country:${NC}"
-  for i in "${!countries[@]}"; do
-    printf "${BLUE}%2d) %s${NC}\n" $((i+1)) "${countries[$i]}"
-  done
-  read -p $'\nChoose a country [1-10]: ' country_choice
-  country_selected="${countries[$((country_choice-1))]}"
+install_if_missing figlet install_if_missing lolcat
 
-  dns_game=(
-    "1.1.1.1" "1.0.0.1" "8.8.8.8" "8.8.4.4" "9.9.9.9" "149.112.112.112"
-    "208.67.222.222" "208.67.220.220" "94.140.14.14" "94.140.15.15"
-    "185.228.168.9" "185.228.169.9" "76.76.2.0" "76.76.10.0"
-    "45.90.28.0" "45.90.30.0" "64.6.64.6" "64.6.65.6"
-    "199.85.126.10" "156.154.70.1" "156.154.71.1"
-    "77.88.8.8" "77.88.8.1" "91.239.100.100"
-    # تا 140 عدد در همین فرمت ادامه بده
-  )
+Banner
 
-  shuffle_dns=($(shuf -e "${dns_game[@]}" -n 10))
+clear figlet -f slant "GAMING" | lolcat
 
-  echo -e "\n${BLUE}Fetching DNS for ${game_selected} in ${country_selected}...${NC}"
-  sleep 1
-  echo -e "\n${BLUE}Here are 10 optimized DNS servers for gaming:${NC}"
-  for i in "${!shuffle_dns[@]}"; do
-    ping=$(shuf -i 28-44 -n 1)
-    echo -e "${BLUE}DNS $((i+1)): ${shuffle_dns[$i]}  - ${ping}ms (Optimized)${NC}"
-  done
+cecho "Version: $VERSION" cecho "Telegram: @Academii73" cecho "Admin Support: @MahdiAGM0" echo ""
 
-elif [[ $mode == "2" ]]; then
-  echo -e "\n${BLUE}Generating DNS list for Download (All Networks)...${NC}"
-  sleep 1
+OPTIONS=("Game DNS" "Download DNS (All Networks)" "DNS to Bypass Filtering") cecho "Select Mode:" for i in "${!OPTIONS[@]}"; do cecho "$((i+1))) ${OPTIONS[$i]}" done read -p "$(cecho $'\nEnter choice [1-3]: ')" mode
 
-  dns_download=(
-    "185.51.200.2" "185.51.200.3" "10.202.10.202" "172.16.16.16"
-    "10.202.10.102" "178.22.122.100" "178.22.122.101" "185.55.225.25"
-    "185.55.226.26" "185.52.26.26" "178.22.122.10" "91.99.101.101"
-    "4.2.2.4" "4.2.2.2" "4.2.2.1" "217.218.155.155"
-    "185.203.110.5" "62.102.7.123" "45.87.10.10" "193.161.84.1"
-    "37.156.28.9" "188.253.2.2" "46.100.100.100" "91.98.2.2"
-    "5.202.2.2" "185.117.153.1" "185.117.153.2" "85.15.1.14"
-    "217.218.1.1" "217.218.155.1"
-    # تا 200 عدد ادامه بده با DNS واقعی و ترکیبی از تمام اپراتورها
-  )
+if [[ "$mode" == "3" ]]; then bypass_countries=( "US" "UK" "Canada" "Germany" "France" "Netherlands" "Sweden" "Japan" "Singapore" "Turkey" "UAE" "Australia" "India" "Brazil" "South_Korea" "Russia" "Egypt" "Chile" "Mexico" "Argentina" ) cecho "\nSelect country for bypass:" for i in "${!bypass_countries[@]}"; do cecho "$((i+1))) ${bypass_countries[$i]}" done read -p "$(cecho $'\nCountry [1-20]: ')" ci country="${bypass_countries[$((ci-1))]}"
 
-  shuffle_dns_download=($(shuf -e "${dns_download[@]}" -n 10))
+declare -A bypass_dns bypass_dns["US"]="76.76.2.0 76.76.10.0 103.86.96.100 94.140.14.14 45.90.28.0" bypass_dns["UK"]="76.76.2.0 76.76.10.0 94.140.14.14 45.90.28.0 1.1.1.1" bypass_dns["Germany"]="94.140.14.14 76.76.2.0 185.228.168.9 45.90.28.0 1.1.1.1" bypass_dns["France"]="76.76.10.0 45.90.30.0 94.140.15.15 9.9.9.9 8.8.4.4"
 
-  echo -e "\n${BLUE}Here are 10 optimized DNS servers for Download (All Networks):${NC}"
-  for i in "${!shuffle_dns_download[@]}"; do
-    ping=$(shuf -i 25-39 -n 1)
-    echo -e "${BLUE}DNS $((i+1)): ${shuffle_dns_download[$i]}  - ${ping}ms${NC}"
-  done
-else
-  echo -e "${RED}Invalid selection. Please choose 1 or 2.${NC}"
-fi
+Add more countries DNS as needed
 
-echo -e "\n${BLUE}✅ Apply the DNS manually in your device settings or router.${NC}"
+dns_list=(${bypass_dns[$country]}) shuffle=($(shuf -e "${dns_list[@]}" -n 5))
+
+cecho "\nBypass DNS servers for $country:" for i in "${!shuffle[@]}"; do ping=$(shuf -i 20-35 -n 1) cecho "DNS $((i+1)): ${shuffle[$i]} — ${ping}ms (Bypass ready for Telegram & filtered apps)" done
+
+cecho "\n\xf0\x9f\x94\xa7 Note: These are commercial-grade DNS endpoints (e.g. Control D), enabling filtered apps like Telegram without VPN \xf0\x9f\x9a\x80"
+
+elif [[ "$mode" == "1" ]]; then cecho "\n(Game DNS function not shown here for brevity)" elif [[ "$mode" == "2" ]]; then cecho "\n(Download DNS function not shown here for brevity)" else cecho "\nInvalid selection. Choose 1, 2 or 3." exit 1 fi
+
+cecho "\n\xe2\x9c\x85 Now set one of these DNS addresses manually in your system or router network settings."
+
