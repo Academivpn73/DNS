@@ -1,13 +1,24 @@
 #!/bin/bash
 
-# رنگ‌ها
-colors=('\033[1;31m' '\033[1;32m' '\033[1;33m' '\033[1;34m' '\033[1;35m' '\033[1;36m')
+# فقط سبز و آبی
+colors=('\033[1;32m' '\033[1;34m')
 RESET='\033[0m'
 
 rand_color() {
   echo -ne "${colors[$RANDOM % ${#colors[@]}]}"
 }
 
+# تایپ سریع‌تر برای منو اصلی
+type_fast_main() {
+  local text="$1"
+  for ((i = 0; i < ${#text}; i++)); do
+    echo -ne "$(rand_color)${text:$i:1}${RESET}"
+    sleep 0.0004
+  done
+  echo
+}
+
+# تایپ معمولی برای سایر بخش‌ها
 type_fast() {
   local text="$1"
   for ((i = 0; i < ${#text}; i++)); do
@@ -21,15 +32,15 @@ type_fast() {
 show_title() {
   clear
   echo -e "$(rand_color)╔══════════════════════════════════════════════╗${RESET}"
-  type_fast "║        🔰 DNS Management Script v1.2.0      ║"
+  type_fast_main "║        🔰 DNS Management Script v1.2.0      ║"
   echo -e "$(rand_color)╠══════════════════════════════════════════════╣${RESET}"
-  type_fast "║ Telegram : @Academi_vpn                    ║"
-  type_fast "║ Admin    : @MahdiAGM0                      ║"
-  type_fast "╚══════════════════════════════════════════════╝"
+  type_fast_main "║ Telegram : @Academi_vpn                    ║"
+  type_fast_main "║ Admin    : @MahdiAGM0                      ║"
+  type_fast_main "╚══════════════════════════════════════════════╝"
   echo
 }
 
-# لیست بازی‌ها (۳۰ عدد)
+# لیست بازی‌ها
 select_game() {
   clear
   show_title
@@ -130,9 +141,9 @@ show_download_dns() {
 # منو اصلی
 main_menu() {
   show_title
-  type_fast "[1] 🎮 Gaming DNS"
-  type_fast "[2] ⬇️  Download DNS"
-  type_fast "[0] ❌ Exit"
+  type_fast_main "[1] 🎮 Gaming DNS"
+  type_fast_main "[2] ⬇️  Download DNS"
+  type_fast_main "[0] ❌ Exit"
   echo
   echo -ne "$(rand_color)👉 Select an option: ${RESET}"
   read choice
