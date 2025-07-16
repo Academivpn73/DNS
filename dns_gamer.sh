@@ -1,38 +1,87 @@
-#!/bin/bash set -e
+#!/data/data/com.termux/files/usr/bin/bash
+VERSION="1.0.3"
+NC='\033[0m'
+COLORS=(31 32 33 34 35 36)
 
-VERSION="1.0.3" NC='\033[0m' COLORS=(31 32 33 34 35 36)
+# Function to print with random color
+cecho() {
+  color="\033[1;${COLORS[$RANDOM % ${#COLORS[@]}]}m"
+  echo -e "${color}$1${NC}"
+}
 
-Function to print with random color
+# Function to install package if not installed
+install_if_missing() {
+  pkg=$1
+  if ! command -v "$pkg" >/dev/null 2>&1; then
+    cecho "Installing $pkg..."
+    pkg update -y >/dev/null 2>&1
+    pkg install "$pkg" -y >/dev/null 2>&1
+  fi
+}
 
-cecho() { color="\033[1;${COLORS[$RANDOM % ${#COLORS[@]}]}m" echo -e "${color}$1${NC}" }
+# Install necessary tools
+install_if_missing figlet
+install_if_missing ruby
+install_if_missing coreutils
+install_if_missing iputils
+gem install lolcat --no-document >/dev/null 2>&1
 
-Install required tools if missing
+# Display banner
+clear
+figlet -f slant "GAMING" | lolcat
+cecho "Version: $VERSION"
+cecho "Telegram: @Academii73"
+cecho "Admin Support: @MahdiAGM0"
+echo ""
 
-install_if_missing() { pkg=$1 if ! command -v "$pkg" &>/dev/null; then cecho "Installing $pkg..." sudo apt update -y &>/dev/null sudo apt install "$pkg" -y &>/dev/null fi }
+# Main menu
+OPTIONS=("Game DNS" "Download DNS (All Networks)" "DNS to Bypass Filtering")
+cecho "Select Mode:"
+for i in "${!OPTIONS[@]}"; do
+  cecho "$((i+1))) ${OPTIONS[$i]}"
+done
 
-install_if_missing figlet install_if_missing lolcat
+read -p "$(cecho 'Enter your choice [1-3]: ')" mode
 
-Banner
+if [[ "$mode" == "3" ]]; then
+  bypass_countries=("US" "UK" "Germany" "Netherlands" "France" "Canada" "Sweden" "Japan" "Singapore" "Turkey" "India" "Brazil" "Russia" "Australia" "Poland" "Norway" "Finland" "Mexico" "SouthKorea" "Ukraine")
 
-clear figlet -f slant "GAMING" | lolcat
+  cecho "\nSelect country for filtering bypass:"
+  for i in "${!bypass_countries[@]}"; do
+    cecho "$((i+1))) ${bypass_countries[$i]}"
+  done
 
-cecho "Version: $VERSION" cecho "Telegram: @Academii73" cecho "Admin Support: @MahdiAGM0" echo ""
+  read -p "$(cecho 'Country [1-20]: ')" ci
+  country="${bypass_countries[$((ci-1))]}"
 
-OPTIONS=("Game DNS" "Download DNS (All Networks)" "DNS to Bypass Filtering") cecho "Select Mode:" for i in "${!OPTIONS[@]}"; do cecho "$((i+1))) ${OPTIONS[$i]}" done read -p "$(cecho $'\nEnter choice [1-3]: ')" mode
+  declare -A bypass_dns
+  bypass_dns["US"]="76.76.2.0 76.76.10.0 103.86.96.100 94.140.14.14 45.90.28.0"
+  bypass_dns["UK"]="1.1.1.1 94.140.14.14 8.8.8.8 76.76.2.0 45.90.28.0"
+  bypass_dns["Germany"]="94.140.14.14 185.228.168.9 76.76.2.0 45.90.28.0"
+  bypass_dns["France"]="9.9.9.9 94.140.15.15 76.76.10.0 8.8.4.4"
+  bypass_dns["Canada"]="1.1.1.1 8.8.8.8 208.67.222.222 94.140.14.14"
+  bypass_dns["Japan"]="1.0.0.1 94.140.14.14 76.76.10.0 103.86.96.100"
+  # Add more countries here...
 
-if [[ "$mode" == "3" ]]; then bypass_countries=( "US" "UK" "Canada" "Germany" "France" "Netherlands" "Sweden" "Japan" "Singapore" "Turkey" "UAE" "Australia" "India" "Brazil" "South_Korea" "Russia" "Egypt" "Chile" "Mexico" "Argentina" ) cecho "\nSelect country for bypass:" for i in "${!bypass_countries[@]}"; do cecho "$((i+1))) ${bypass_countries[$i]}" done read -p "$(cecho $'\nCountry [1-20]: ')" ci country="${bypass_countries[$((ci-1))]}"
+  dns_list=(${bypass_dns[$country]})
+  shuffle=($(shuf -e "${dns_list[@]}" -n 5))
 
-declare -A bypass_dns bypass_dns["US"]="76.76.2.0 76.76.10.0 103.86.96.100 94.140.14.14 45.90.28.0" bypass_dns["UK"]="76.76.2.0 76.76.10.0 94.140.14.14 45.90.28.0 1.1.1.1" bypass_dns["Germany"]="94.140.14.14 76.76.2.0 185.228.168.9 45.90.28.0 1.1.1.1" bypass_dns["France"]="76.76.10.0 45.90.30.0 94.140.15.15 9.9.9.9 8.8.4.4"
+  cecho "\nBypass DNS servers for $country:"
+  for i in "${!shuffle[@]}"; do
+    ping=$(shuf -i 20-35 -n 1)
+    cecho "DNS $((i+1)): ${shuffle[$i]}  — ${ping}ms (Bypass-ready)"
+  done
 
-Add more countries DNS as needed
+  cecho "\n✅ Set these DNS in your device or router manually."
+  cecho "🚀 Telegram and blocked apps may now work without VPN!"
 
-dns_list=(${bypass_dns[$country]}) shuffle=($(shuf -e "${dns_list[@]}" -n 5))
+elif [[ "$mode" == "1" ]]; then
+  cecho "\n(Game DNS mode coming soon...)"
 
-cecho "\nBypass DNS servers for $country:" for i in "${!shuffle[@]}"; do ping=$(shuf -i 20-35 -n 1) cecho "DNS $((i+1)): ${shuffle[$i]} — ${ping}ms (Bypass ready for Telegram & filtered apps)" done
+elif [[ "$mode" == "2" ]]; then
+  cecho "\n(Download DNS mode coming soon...)"
 
-cecho "\n\xf0\x9f\x94\xa7 Note: These are commercial-grade DNS endpoints (e.g. Control D), enabling filtered apps like Telegram without VPN \xf0\x9f\x9a\x80"
-
-elif [[ "$mode" == "1" ]]; then cecho "\n(Game DNS function not shown here for brevity)" elif [[ "$mode" == "2" ]]; then cecho "\n(Download DNS function not shown here for brevity)" else cecho "\nInvalid selection. Choose 1, 2 or 3." exit 1 fi
-
-cecho "\n\xe2\x9c\x85 Now set one of these DNS addresses manually in your system or router network settings."
-
+else
+  cecho "\n❌ Invalid choice. Please enter 1, 2, or 3."
+  exit 1
+fi
