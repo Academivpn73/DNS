@@ -1,18 +1,19 @@
 #!/bin/bash
 
-# Version 1.2.1 | Admin: @MahdiAGM0
+# Version 1.2.2 | Telegram: @Academi_vpn | Admin: @MahdiAGM0
 
 # Colors
 green="\e[1;32m"
 blue="\e[1;34m"
 cyan="\e[1;36m"
+red="\e[1;31m"
 reset="\e[0m"
 bold="\e[1m"
 
 # Typing animation
 type_text() {
     text="$1"
-    delay="${2:-0.0015}"
+    delay="${2:-0.0007}"
     for ((i=0; i<${#text}; i++)); do
         echo -ne "${text:$i:1}"
         sleep $delay
@@ -26,17 +27,17 @@ show_title() {
     rand_color=${colors[$RANDOM % ${#colors[@]}]}
     clear
     echo -e "${rand_color}"
-    type_text "╔══════════════════════════════════════╗" 0.00008
-    type_text "║         DNS MANAGEMENT TOOL         ║" 0.00008
-    type_text "╠══════════════════════════════════════╣" 0.00008
-    type_text "║  Version: 1.2.1                      ║" 0.00008
-    type_text "║  Admin: @MahdiAGM0                  ║" 0.00008
-    type_text "║  Telegram: @Academi_vpn                  ║" 0.00008
-    type_text "╚══════════════════════════════════════╝" 0.00008
+    type_text "╔══════════════════════════════════════╗" 0.0004
+    type_text "║         DNS MANAGEMENT TOOL         ║" 0.0004
+    type_text "╠══════════════════════════════════════╣" 0.0004
+    type_text "║  Version: 1.2.2                      ║" 0.0004
+    type_text "║  Telegram: @Academi_vpn             ║" 0.0004
+    type_text "║  Admin: @MahdiAGM0                  ║" 0.0004
+    type_text "╚══════════════════════════════════════╝" 0.0004
     echo -e "${reset}"
 }
 
-# List of games (30 total)
+# Games
 games=(
   "Call of Duty" "PUBG" "Fortnite" "Valorant" "League of Legends"
   "Dota 2" "CS:GO" "Overwatch" "Rainbow Six Siege" "Apex Legends"
@@ -46,10 +47,9 @@ games=(
   "Elden Ring" "Cyberpunk 2077" "ARK" "Sea of Thieves" "Diablo IV"
 )
 
-# Middle East countries
 countries=("Iran" "Turkey" "UAE" "Saudi Arabia" "Qatar" "Iraq" "Jordan")
 
-# Game DNS pool
+# DNS Pools
 dns_pool_game=(
   "10.202.10.10 10.202.10.11"
   "78.157.42.101 78.157.42.100"
@@ -64,7 +64,6 @@ dns_pool_game=(
   "8.8.8.8 8.8.4.4"
 )
 
-# Download DNS pool
 dns_pool_download=(
   "1.1.1.1 1.0.0.1"
   "8.8.8.8 8.8.4.4"
@@ -83,7 +82,18 @@ dns_pool_download=(
   "10.202.10.10 10.202.10.11"
 )
 
-# Game DNS menu
+# Ping Test Function
+check_ping() {
+    ip="$1"
+    result=$(ping -c 1 -W 1 "$ip" 2>/dev/null | grep 'time=' | awk -F'time=' '{print $2}' | cut -d' ' -f1)
+    if [ -z "$result" ]; then
+        echo "Timeout"
+    else
+        echo "${result} ms"
+    fi
+}
+
+# Gaming DNS Menu
 gaming_dns_menu() {
   clear
   echo -e "${bold}${green}Select a Game:${reset}"
@@ -104,34 +114,40 @@ gaming_dns_menu() {
   echo -ne "\n${green}Choose country: ${reset}"; read copt
   [[ "$copt" == "0" ]] && return
 
-  # Random DNS
   pick=${dns_pool_game[$RANDOM % ${#dns_pool_game[@]}]}
-  echo -e "\n${cyan}Primary DNS:${reset} $(echo $pick | awk '{print $1}')"
-  echo -e "${cyan}Secondary DNS:${reset} $(echo $pick | awk '{print $2}')"
+  dns1=$(echo "$pick" | awk '{print $1}')
+  dns2=$(echo "$pick" | awk '{print $2}')
+
+  echo -e "\n${cyan}Primary DNS:${reset} $dns1"
+  echo -e "${cyan}Secondary DNS:${reset} $dns2"
+  echo -e "${blue}Ping 1:${reset} $(check_ping $dns1)"
+  echo -e "${blue}Ping 2:${reset} $(check_ping $dns2)"
   echo -e "\n${green}Press Enter to return...${reset}"; read
 }
 
-# Download DNS menu
+# Download DNS Menu
 download_dns_menu() {
   clear
   echo -e "${green}Select country or global DNS:${reset}"
   for i in "${!countries[@]}"; do
     printf "${blue}[%2d]${reset} %s\n" $((i+1)) "${countries[$i]}"
   done
-  for i in {1..13}; do
-    printf "${blue}[%2d]${reset} Country-$((i+8))\n" $((i+7))
-  done
   echo -e "${blue}[0]${reset} Back"
   echo -ne "\n${green}Choose option: ${reset}"; read copt
   [[ "$copt" == "0" ]] && return
 
   pick=${dns_pool_download[$RANDOM % ${#dns_pool_download[@]}]}
-  echo -e "\n${cyan}Primary DNS:${reset} $(echo $pick | awk '{print $1}')"
-  echo -e "${cyan}Secondary DNS:${reset} $(echo $pick | awk '{print $2}')"
+  dns1=$(echo "$pick" | awk '{print $1}')
+  dns2=$(echo "$pick" | awk '{print $2}')
+
+  echo -e "\n${cyan}Primary DNS:${reset} $dns1"
+  echo -e "${cyan}Secondary DNS:${reset} $dns2"
+  echo -e "${blue}Ping 1:${reset} $(check_ping $dns1)"
+  echo -e "${blue}Ping 2:${reset} $(check_ping $dns2)"
   echo -e "\n${green}Press Enter to return...${reset}"; read
 }
 
-# Main menu
+# Main Menu
 main_menu() {
   while true; do
     show_title
