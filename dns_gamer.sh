@@ -26,12 +26,13 @@ show_title() {
     rand_color=${colors[$RANDOM % ${#colors[@]}]}
     clear
     echo -e "${rand_color}"
-    type_text "╔══════════════════════════════════════╗" 0.0008
-    type_text "║         DNS MANAGEMENT TOOL         ║" 0.0008
-    type_text "╠══════════════════════════════════════╣" 0.0008
-    type_text "║  Version: 1.2.1                      ║" 0.0008
-    type_text "║  Admin: @MahdiAGM0                  ║" 0.0008
-    type_text "╚══════════════════════════════════════╝" 0.0008
+    type_text "╔══════════════════════════════════════╗" 0.00008
+    type_text "║         DNS MANAGEMENT TOOL         ║" 0.00008
+    type_text "╠══════════════════════════════════════╣" 0.00008
+    type_text "║  Version: 1.2.1                      ║" 0.00008
+    type_text "║  Admin: @MahdiAGM0                  ║" 0.00008
+    type_text "║  Telegram: @Academi_vpn                  ║" 0.00008
+    type_text "╚══════════════════════════════════════╝" 0.00008
     echo -e "${reset}"
 }
 
