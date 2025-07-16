@@ -1,136 +1,150 @@
 #!/bin/bash
-# DNS Manager v1.3.1
 
-colors=(31 32 33 34 35 36 91 92)
-random_color=${colors[$RANDOM % ${#colors[@]}]}
-NC='\033[0m'
+# Version 1.2.1 | Admin: @MahdiAGM0
 
-type_anim() {
-  for ((i=0; i<${#1}; i++)); do echo -ne "${1:$i:1}"; sleep 0.001; done
-  echo
+# Colors
+green="\e[1;32m"
+blue="\e[1;34m"
+cyan="\e[1;36m"
+reset="\e[0m"
+bold="\e[1m"
+
+# Typing animation
+type_text() {
+    text="$1"
+    delay="${2:-0.0015}"
+    for ((i=0; i<${#text}; i++)); do
+        echo -ne "${text:$i:1}"
+        sleep $delay
+    done
+    echo
 }
 
-scroll_list() {
-  for item in "$@"; do echo -e "$item"; sleep 0.03; done
+# Random colored title
+show_title() {
+    colors=("\e[1;31m" "\e[1;32m" "\e[1;34m" "\e[1;35m" "\e[1;36m")
+    rand_color=${colors[$RANDOM % ${#colors[@]}]}
+    clear
+    echo -e "${rand_color}"
+    type_text "╔══════════════════════════════════════╗" 0.0008
+    type_text "║         DNS MANAGEMENT TOOL         ║" 0.0008
+    type_text "╠══════════════════════════════════════╣" 0.0008
+    type_text "║  Version: 1.2.1                      ║" 0.0008
+    type_text "║  Admin: @MahdiAGM0                  ║" 0.0008
+    type_text "╚══════════════════════════════════════╝" 0.0008
+    echo -e "${reset}"
 }
 
-get_ping() {
-  res=$(ping -c1 -W1 "$1" 2>/dev/null | grep 'time=' | awk -F'time=' '{print $2}' | cut -d' ' -f1)
-  echo "${res:-N/A}ms"
-}
-
+# List of games (30 total)
 games=(
-"Call of Duty" "PUBG" "Fortnite" "Valorant" "Dota 2" "CS:GO" "League of Legends" "Overwatch"
-"Free Fire" "Apex Legends" "Minecraft" "Rocket League" "Rainbow Six Siege" "Genshin Impact"
-"FIFA" "eFootball" "Warzone" "Battlefield" "Rust" "ARK" "Roblox" "Brawl Stars" "Mobile Legends"
-"Clash Royale" "Clash of Clans" "Honkai Impact" "World of Warcraft" "GTA V Online" "Destiny 2"
-"The Finals"
+  "Call of Duty" "PUBG" "Fortnite" "Valorant" "League of Legends"
+  "Dota 2" "CS:GO" "Overwatch" "Rainbow Six Siege" "Apex Legends"
+  "Rocket League" "Minecraft" "Genshin Impact" "Battlefield V" "Roblox"
+  "FIFA 24" "Warzone" "Escape from Tarkov" "War Thunder" "Destiny 2"
+  "Smite" "Halo Infinite" "Fall Guys" "Paladins" "World of Warcraft"
+  "Elden Ring" "Cyberpunk 2077" "ARK" "Sea of Thieves" "Diablo IV"
 )
 
-regions=("Iran" "Turkey" "UAE" "Saudi Arabia" "Iraq" "Germany" "USA" "UK" "Netherlands" "France" "India" "Russia" "Brazil" "Canada" "Italy" "Spain" "Qatar" "Kuwait" "Pakistan" "China")
+# Middle East countries
+countries=("Iran" "Turkey" "UAE" "Saudi Arabia" "Qatar" "Iraq" "Jordan")
 
-declare -A dns_sources
-dns_sources["Radar"]="10.202.10.10 10.202.10.11"
-dns_sources["Cloudflare"]="1.1.1.1 1.0.0.1"
-dns_sources["Google"]="8.8.8.8 8.8.4.4"
-dns_sources["Quad9"]="9.9.9.9 149.112.112.112"
-dns_sources["OpenDNS"]="208.67.222.222 208.67.220.220"
-dns_sources["CleanBrowsing"]="185.228.168.9 185.228.169.9"
+# Game DNS pool
+dns_pool_game=(
+  "10.202.10.10 10.202.10.11"
+  "78.157.42.101 78.157.42.100"
+  "185.51.200.2 178.22.122.100"
+  "185.55.225.25 185.55.226.26"
+  "9.9.9.9 149.112.112.112"
+  "64.6.64.6 64.6.65.6"
+  "156.154.70.2 156.154.71.2"
+  "159.250.35.250 159.250.35.251"
+  "208.67.222.222 208.67.220.220"
+  "1.1.1.1 1.0.0.1"
+  "8.8.8.8 8.8.4.4"
+)
 
-show_title() {
+# Download DNS pool
+dns_pool_download=(
+  "1.1.1.1 1.0.0.1"
+  "8.8.8.8 8.8.4.4"
+  "64.6.64.6 64.6.65.6"
+  "156.154.70.2 156.154.71.2"
+  "159.250.35.250 159.250.35.251"
+  "208.67.222.222 208.67.220.220"
+  "185.51.200.2 178.22.122.100"
+  "9.9.9.9 149.112.112.112"
+  "78.157.42.101 78.157.42.100"
+  "185.55.225.25 185.55.226.26"
+  "37.220.84.124 208.67.222.222"
+  "74.82.42.42 0.0.0.0"
+  "91.239.100.100 89.223.43.71"
+  "208.67.220.200 208.67.222.222"
+  "10.202.10.10 10.202.10.11"
+)
+
+# Game DNS menu
+gaming_dns_menu() {
   clear
-  echo -e "\e[1;${random_color}m╔════════════════════════════════════════════╗"
-  echo -e "║         DNS MANAGEMENT TOOL v1.3.1         ║"
-  echo -e "╠════════════════════════════════════════════╣"
-  echo -e "║ Telegram : @Academi_vpn                    ║"
-  echo -e "║ Admin    : @MahdiAGM0                      ║"
-  echo -e "╚════════════════════════════════════════════╝${NC}\n"
-}
-
-main_menu() {
-  show_title
-  type_anim $'\e[1;36m[1]\e[0m Gaming DNS 🎮'
-  type_anim $'\e[1;36m[2]\e[0m Download DNS ⬇️'
-  type_anim $'\e[1;36m[0]\e[0m Exit ❌'
-  echo
-  read -p "Select an option: " opt
-  case $opt in
-    1) gaming_menu ;;
-    2) download_menu ;;
-    0) echo -e "\n\e[1;32mGoodbye 🙏🏻${NC}" && exit ;;
-    *) main_menu ;;
-  esac
-}
-
-gaming_menu() {
-  show_title
-  echo -e "\e[1;34mSelect a game:\e[0m"
+  echo -e "${bold}${green}Select a Game:${reset}"
   for i in "${!games[@]}"; do
-    printf "\e[1;32m[%2d]\e[0m %s\n" $((i+1)) "${games[$i]}"
-    sleep 0.02
+    printf "${blue}[%2d]${reset} %s\n" $((i+1)) "${games[$i]}"
   done
-  echo -e "\e[1;32m[0]\e[0m Return"
-  read -p $'\nGame #: ' gi
-  [[ "$gi" == "0" ]] && main_menu
-  [[ "$gi" -gt 0 && "$gi" -le ${#games[@]} ]] || gaming_menu
-  game="${games[$((gi-1))]}"
+  echo -e "${blue}[0]${reset} Back"
+  echo -ne "\n${green}Choose a game: ${reset}"; read gopt
+  [[ "$gopt" == "0" ]] && return
+  [[ -z "${games[$((gopt-1))]}" ]] && echo "Invalid!" && sleep 1 && return
 
-  show_title
-  echo -e "\e[1;34mSelect region:\e[0m"
-  for i in "${!regions[@]}"; do
-    printf "\e[1;36m[%2d]\e[0m %s\n" $((i+1)) "${regions[$i]}"
-    sleep 0.01
+  clear
+  echo -e "${green}Select your country:${reset}"
+  for i in "${!countries[@]}"; do
+    printf "${blue}[%2d]${reset} %s\n" $((i+1)) "${countries[$i]}"
   done
-  echo -e "\e[1;32m[0]\e[0m Return"
-  read -p $'\nRegion #: ' ri
-  [[ "$ri" == "0" ]] && main_menu
-  [[ "$ri" -gt 0 && "$ri" -le ${#regions[@]} ]] || gaming_menu
-  region="${regions[$((ri-1))]}"
+  echo -e "${blue}[0]${reset} Back"
+  echo -ne "\n${green}Choose country: ${reset}"; read copt
+  [[ "$copt" == "0" ]] && return
 
-  show_title
-  echo -e "\e[1;33mDNS for:\e[0m $game - $region"
-  all_dns=()
-  for src in "${!dns_sources[@]}"; do
-    all_dns+=(${dns_sources[$src]})
-  done
-  mapfile -t picks < <(printf "%s\n" "${all_dns[@]}" | shuf | head -n15)
-  for i in "${!picks[@]}"; do
-    ping=$(get_ping "${picks[$i]}")
-    printf "\e[1;32m[%2d]\e[0m %s  \e[1;36mPing:\e[0m %s\n" $((i+1)) "${picks[$i]}" "$ping"
-    sleep 0.03
-  done
-  read -p $'\nPress Enter to return...' _
-  main_menu
+  # Random DNS
+  pick=${dns_pool_game[$RANDOM % ${#dns_pool_game[@]}]}
+  echo -e "\n${cyan}Primary DNS:${reset} $(echo $pick | awk '{print $1}')"
+  echo -e "${cyan}Secondary DNS:${reset} $(echo $pick | awk '{print $2}')"
+  echo -e "\n${green}Press Enter to return...${reset}"; read
 }
 
-download_menu() {
-  show_title
-  echo -e "\e[1;34mSelect download region:\e[0m"
-  for i in "${!regions[@]}"; do
-    printf "\e[1;36m[%2d]\e[0m %s\n" $((i+1)) "${regions[$i]}"
-    sleep 0.01
+# Download DNS menu
+download_dns_menu() {
+  clear
+  echo -e "${green}Select country or global DNS:${reset}"
+  for i in "${!countries[@]}"; do
+    printf "${blue}[%2d]${reset} %s\n" $((i+1)) "${countries[$i]}"
   done
-  echo -e "\e[1;32m[0]\e[0m Return"
-  read -p $'\nRegion #: ' ri
-  [[ "$ri" == "0" ]] && main_menu
-  [[ "$ri" -gt 0 && "$ri" -le ${#regions[@]} ]] || download_menu
-  region="${regions[$((ri-1))]}"
+  for i in {1..13}; do
+    printf "${blue}[%2d]${reset} Country-$((i+8))\n" $((i+7))
+  done
+  echo -e "${blue}[0]${reset} Back"
+  echo -ne "\n${green}Choose option: ${reset}"; read copt
+  [[ "$copt" == "0" ]] && return
 
-  show_title
-  echo -e "\e[1;33mDownload DNS for:\e[0m $region"
-  all_dns=()
-  for src in "${!dns_sources[@]}"; do
-    all_dns+=(${dns_sources[$src]})
-  done
-  mapfile -t picks < <(printf "%s\n" "${all_dns[@]}" | shuf | head -n15)
-  for i in "${!picks[@]}"; do
-    ping=$(get_ping "${picks[$i]}")
-    printf "\e[1;32m[%2d]\e[0m %s  \e[1;36mPing:\e[0m %s\n" $((i+1)) "${picks[$i]}" "$ping"
-    sleep 0.03
-  done
-  read -p $'\nPress Enter to return...' _
-  main_menu
+  pick=${dns_pool_download[$RANDOM % ${#dns_pool_download[@]}]}
+  echo -e "\n${cyan}Primary DNS:${reset} $(echo $pick | awk '{print $1}')"
+  echo -e "${cyan}Secondary DNS:${reset} $(echo $pick | awk '{print $2}')"
+  echo -e "\n${green}Press Enter to return...${reset}"; read
 }
 
-# Start script
+# Main menu
+main_menu() {
+  while true; do
+    show_title
+    echo -e "${blue}[1]${reset} Gaming DNS 🎮"
+    echo -e "${blue}[2]${reset} Download DNS ⬇️"
+    echo -e "${blue}[0]${reset} Exit ❌"
+    echo -ne "\n${green}Choose an option: ${reset}"; read opt
+    case $opt in
+      1) gaming_dns_menu ;;
+      2) download_dns_menu ;;
+      0) echo -e "${green}Goodbye 🙏🏻${reset}"; exit ;;
+      *) echo -e "${red}Invalid input!${reset}"; sleep 1 ;;
+    esac
+  done
+}
+
 main_menu
