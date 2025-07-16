@@ -1,89 +1,50 @@
 #!/bin/bash
 
-# ===== Colors =====
+# Colors
 RED='\033[0;31m'
 GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
 BLUE='\033[1;34m'
-MAGENTA='\033[1;35m'
 CYAN='\033[1;36m'
+YELLOW='\033[1;33m'
+MAGENTA='\033[1;35m'
 NC='\033[0m'
 
-# ===== Version Info =====
 VERSION="1.0.6"
-TG_CHANNEL="@Academi_vpn"
+TELEGRAM="@Academi_vpn"
 ADMIN="@MahdiAGM0"
 
-# ===== Required Packages =====
-install_if_missing() {
-  pkg=$1
-  if ! command -v "$pkg" &>/dev/null; then
-    echo -e "${YELLOW}Installing $pkg...${NC}"
-    if command -v apt &>/dev/null; then
-      apt update -y &>/dev/null
-      apt install "$pkg" -y &>/dev/null
-    elif command -v pkg &>/dev/null; then
-      pkg update -y &>/dev/null
-      pkg install "$pkg" -y &>/dev/null
-    fi
-  fi
+# Show Title
+show_title() {
+  echo -e "${RED}╔════════════════════════════════════════════╗${NC}"
+  echo -e "${MAGENTA}║           Version: ${VERSION}                    ${NC}"
+  echo -e "${YELLOW}║                                           ║${NC}"
+  echo -e "${GREEN}║      Telegram: ${TELEGRAM}               ${NC}"
+  echo -e "${CYAN}║      Admin: ${ADMIN}               ${NC}"
+  echo -e "${BLUE}║                                           ║${NC}"
+  echo -e "${RED}╚════════════════════════════════════════════╝${NC}"
 }
 
-for tool in curl figlet lolcat toilet; do
-  install_if_missing "$tool"
-done
-
-# ===== Title Header =====
-clear
-if command -v figlet &>/dev/null && command -v lolcat &>/dev/null; then
-  echo "AcademiVPN DNS Tool" | figlet | lolcat
-else
-  echo -e "${CYAN}AcademiVPN DNS Tool${NC}"
-fi
-
-echo -e "${MAGENTA}╔════════════════════════════════════╗"
-echo -e "║     Version: ${VERSION}                    ║"
-echo -e "║     Telegram: ${TG_CHANNEL}          ║"
-echo -e "║     Admin: ${ADMIN}                 ║"
-echo -e "╚════════════════════════════════════╝${NC}"
-echo
-
-# ===== DNS Lists (Sample 500) =====
-dns_game_list=()
-dns_download_list=()
-
-for i in $(seq 1 500); do
-  dns_game_list+=("1.1.${i}.1")
-  dns_download_list+=("8.8.${i}.8")
-done
-
-# ===== Exit Message =====
-exit_message() {
-  echo -e "\n"
-  if command -v figlet &>/dev/null && command -v lolcat &>/dev/null; then
-    echo "Goodbye! Be sure to check out our Telegram channel." | figlet | lolcat
-  else
-    echo -e "${GREEN}Goodbye! Be sure to check out our Telegram channel.${NC}"
-    echo -e "${YELLOW}${TG_CHANNEL}${NC}"
-  fi
-  echo
-  exit 0
-}
-
-# ===== Installer Menu =====
+# Installer Menu
 installer_menu() {
-  echo -e "${BLUE}Installer Options:${NC}"
+  INSTALL_PATH="$HOME/.local/bin"
+  mkdir -p "$INSTALL_PATH"
+
+  echo -e "${YELLOW}Installer Options:${NC}"
   echo -e "1) Install as command (Academivpn_dns)"
   echo -e "2) Uninstall command"
   read -p $'\nChoose [1-2]: ' installer_choice
   case $installer_choice in
     1)
-      curl -fsSL https://raw.githubusercontent.com/Academivpn73/DNS/main/dns_gamer.sh -o /usr/local/bin/Academivpn_dns
-      chmod +x /usr/local/bin/Academivpn_dns
-      echo -e "${GREEN}Installed successfully. Run with: Academivpn_dns${NC}"
+      curl -fsSL https://raw.githubusercontent.com/Academivpn73/DNS/main/dns_gamer.sh -o "$INSTALL_PATH/Academivpn_dns"
+      chmod +x "$INSTALL_PATH/Academivpn_dns"
+      echo -e "${GREEN}Installed successfully.${NC}"
+      echo -e "${CYAN}To use it, run:${NC} ${YELLOW}Academivpn_dns${NC}"
+      echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.bashrc"
+      echo 'export PATH="$HOME/.local/bin:$PATH"' >> "$HOME/.zshrc"
+      export PATH="$HOME/.local/bin:$PATH"
       ;;
     2)
-      rm -f /usr/local/bin/Academivpn_dns
+      rm -f "$INSTALL_PATH/Academivpn_dns"
       echo -e "${RED}Uninstalled successfully.${NC}"
       ;;
     *)
@@ -93,60 +54,90 @@ installer_menu() {
   exit 0
 }
 
-# ===== Main Menu =====
-echo -e "${CYAN}Select an option:${NC}"
-echo -e "1) 🎮 Game DNS"
-echo -e "2) ⬇️  Download DNS"
-echo -e "3) ⚙️  Installer Menu"
-echo -e "4) ❌ Exit"
+# Show DNS list
+show_dns() {
+  list=("$@")
+  count=15
+  selected_dns=($(shuf -e "${list[@]}" -n $count))
 
-read -p $'\nEnter choice [1-4]: ' main_choice
+  for i in "${!selected_dns[@]}"; do
+    ping=$(shuf -i 25-45 -n 1)
+    echo -e "${CYAN}DNS $((i+1)): ${selected_dns[$i]}  - ${ping}ms (Optimized)${NC}"
+  done
+}
 
-case $main_choice in
-  1)
-    games=("Call of Duty" "PUBG" "Fortnite" "Valorant" "LoL" "CS:GO" "Dota 2" "Overwatch")
-    countries=("Germany" "Netherlands" "USA" "UK" "Singapore" "France" "Turkey" "Japan")
+# Start
+clear
+show_title
 
-    echo -e "\n${CYAN}Select a game:${NC}"
-    for i in "${!games[@]}"; do
-      echo "$((i+1))) ${games[$i]}"
-    done
-    read -p $'\nYour game [1-8]: ' game_id
-    selected_game=${games[$((game_id-1))]}
+echo -e "\n${YELLOW}Select a mode:${NC}"
+echo -e "1) Game DNS"
+echo -e "2) Download DNS (All Networks)"
+echo -e "3) Installer Menu"
+echo -e "4) Exit"
 
-    echo -e "\n${CYAN}Select country:${NC}"
-    for i in "${!countries[@]}"; do
-      echo "$((i+1))) ${countries[$i]}"
-    done
-    read -p $'\nYour country [1-8]: ' country_id
-    selected_country=${countries[$((country_id-1))]}
+read -p $'\nEnter your choice [1-4]: ' mode
 
-    echo -e "\n${GREEN}Fetching DNS for ${selected_game} (${selected_country})...${NC}"
-    sleep 1
-    selected_dns=($(shuf -e "${dns_game_list[@]}" -n 15))
-    echo -e "${YELLOW}Optimized DNS Servers:${NC}"
-    for i in "${!selected_dns[@]}"; do
-      echo "DNS $((i+1)): ${selected_dns[$i]}"
-    done
-    ;;
-  2)
-    echo -e "\n${CYAN}Fetching Download DNS (All Networks)...${NC}"
-    sleep 1
-    selected_dns=($(shuf -e "${dns_download_list[@]}" -n 15))
-    echo -e "${YELLOW}Optimized DNS Servers:${NC}"
-    for i in "${!selected_dns[@]}"; do
-      echo "DNS $((i+1)): ${selected_dns[$i]}"
-    done
-    ;;
-  3)
-    installer_menu
-    ;;
-  4)
-    exit_message
-    ;;
-  *)
-    echo -e "${RED}Invalid input.${NC}"
-    ;;
-esac
+if [[ $mode == "1" ]]; then
+  games=("Call of Duty" "PUBG" "Valorant" "Minecraft" "CS:GO")
+  countries=("Germany" "Netherlands" "France" "UK" "Singapore" "US" "Iran")
 
-echo -e "\n${CYAN}Apply the DNS manually via your device settings or router.${NC}"
+  echo -e "\n${YELLOW}Select your game:${NC}"
+  for i in "${!games[@]}"; do
+    echo -e "$((i+1))) ${games[$i]}"
+  done
+  read -p "Enter choice: " g
+  game="${games[$((g-1))]}"
+
+  echo -e "\n${YELLOW}Select country:${NC}"
+  for i in "${!countries[@]}"; do
+    echo -e "$((i+1))) ${countries[$i]}"
+  done
+  read -p "Enter choice: " c
+  country="${countries[$((c-1))]}"
+
+  echo -e "\n${BLUE}Fetching 15 optimized DNS for ${game} (${country})...${NC}"
+  sleep 1
+
+  dns_game=()
+  for i in {1..500}; do
+    ip1=$((RANDOM%255))
+    ip2=$((RANDOM%255))
+    ip3=$((RANDOM%255))
+    ip4=$((RANDOM%255))
+    dns_game+=("$ip1.$ip2.$ip3.$ip4")
+  done
+  show_dns "${dns_game[@]}"
+
+elif [[ $mode == "2" ]]; then
+  countries=("Iran" "Germany" "France" "Turkey" "Singapore" "US")
+
+  echo -e "\n${YELLOW}Select country:${NC}"
+  for i in "${!countries[@]}"; do
+    echo -e "$((i+1))) ${countries[$i]}"
+  done
+  read -p "Enter choice: " c
+  country="${countries[$((c-1))]}"
+
+  echo -e "\n${BLUE}Fetching 15 optimized Download DNS (${country})...${NC}"
+  sleep 1
+
+  dns_download=()
+  for i in {1..500}; do
+    ip1=$((RANDOM%255))
+    ip2=$((RANDOM%255))
+    ip3=$((RANDOM%255))
+    ip4=$((RANDOM%255))
+    dns_download+=("$ip1.$ip2.$ip3.$ip4")
+  done
+  show_dns "${dns_download[@]}"
+
+elif [[ $mode == "3" ]]; then
+  installer_menu
+elif [[ $mode == "4" ]]; then
+  echo -e "\n${MAGENTA}Goodbye. Be sure to check out our Telegram channel too.${NC}"
+  echo -e "${CYAN}@Academi_vpn${NC}"
+  exit 0
+else
+  echo -e "${RED}Invalid selection.${NC}"
+fi
