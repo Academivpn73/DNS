@@ -1,110 +1,114 @@
 #!/bin/bash
+# DNS Gamer Script with all features enabled
 
-# Author: @AcademiVPN
-# Version: 1.0
-# Language: English
-# DNS Script with Premium, Ping, Game & Country Support
+# Online file URLs (replace with actual URLs if hosted)
+GAMES_LIST_URL="https://raw.githubusercontent.com/yourusername/DNS/main/games_list.txt"
+COUNTRIES_LIST_URL="https://raw.githubusercontent.com/yourusername/DNS/main/countries_list.txt"
+DNS_GAMING_URL="https://raw.githubusercontent.com/yourusername/DNS/main/dns_gaming.txt"
 
-# Remote file URLs (replace with your GitHub raw URLs)
-GAMES_URL="https://raw.githubusercontent.com/Academivpn73/DNS/main/games_list.txt"
-COUNTRIES_URL="https://raw.githubusercontent.com/Academivpn73/DNS/main/countries_list.txt"
-DNS_URL="https://raw.githubusercontent.com/Academivpn73/DNS/main/dns_gaming.txt"
-
-# Function to display the title
+# Title animation
 function show_title() {
+  colors=(31 32 33 34 35 36)
+  for color in "${colors[@]}"; do
     clear
-    COLORS=(31 32 33 34 35 36)
-    COLOR=${COLORS[$RANDOM % ${#COLORS[@]}]}
-    echo -e "\e[1;${COLOR}m+------------------------------------------+"
-    echo -e "| Telegram: @AcademiVPN                   |"
-    echo -e "| Admin:    @MahdiAGM0                    |"
-    echo -e "| Version:  1.0                           |"
-    echo -e "+------------------------------------------+\e[0m"
-    echo ""
+    echo -e "\e[1;${color}m+------------------------------------------+"
+    echo "| Telegram: @Academi_vpn                   |"
+    echo "| Admin:    @MahdiAGM0                     |"
+    echo "| Version:  1.2.3                          |"
+    echo "+------------------------------------------+"
+    echo -e "\e[0m"
+    sleep 0.2
+  done
 }
 
-# Function to fetch files online
-function fetch_online_file() {
-    curl -fsSL "$1"
-}
-
-# Function to ping DNS
-function ping_dns() {
-    read -p "Enter DNS IP: " dns_ip
-    if [[ -z "$dns_ip" ]]; then
-        echo "❌ Invalid IP"
-    else
-        ping_result=$(ping -c 1 "$dns_ip" | grep 'time=' | awk -F'time=' '{print $2}' | awk '{print $1}')
-        if [[ -z "$ping_result" ]]; then
-            echo "❌ Ping failed"
-        else
-            echo "✅ Ping: ${ping_result}ms"
-        fi
-    fi
-    read -p "Press Enter to return..."
-}
-
-# Function to show premium DNS
-function show_premium_dns() {
-    echo -e "\n🔥 Premium DNS:"
-    for i in {1..2}; do
-        ip=$(curl -s https://dnschecker.org/ping-test.php | grep -Eo '([0-9]{1,3}\.){3}[0-9]{1,3}' | shuf -n1)
-        echo "$ip"
-    done
-    ping_dns
-}
-
-# Function to search game
-function search_game() {
-    echo "📱 Game Search:"
-    games=$(fetch_online_file "$GAMES_URL")
-    echo "$games" | nl -w2 -s') '
-    echo ""
-    read -p "Select game number: " game_num
-    selected_game=$(echo "$games" | sed -n "${game_num}p")
-    if [[ -z "$selected_game" ]]; then
-        echo "❌ Game not found!"
-        read -p "Press Enter to return..."
-        return
-    fi
-
-    echo -e "\n🌍 Select Country:"
-    countries=$(fetch_online_file "$COUNTRIES_URL")
-    echo "$countries" | nl -w2 -s') '
-    echo ""
-    read -p "Select country number: " country_num
-    selected_country=$(echo "$countries" | sed -n "${country_num}p")
-    if [[ -z "$selected_country" ]]; then
-        echo "❌ Country not found!"
-        read -p "Press Enter to return..."
-        return
-    fi
-
-    dns_data=$(fetch_online_file "$DNS_URL" | grep -A2 "$selected_game - $selected_country" | tail -n2)
-    if [[ -z "$dns_data" ]]; then
-        echo "❌ No DNS found for $selected_game - $selected_country"
-    else
-        echo -e "\n🎮 $selected_game - $selected_country"
-        echo "$dns_data"
-        ping_dns
-    fi
-    read -p "Press Enter to return..."
-}
+# Download required lists if not already present
+curl -fsSL $GAMES_LIST_URL -o games_list.txt
+curl -fsSL $COUNTRIES_LIST_URL -o countries_list.txt
+curl -fsSL $DNS_GAMING_URL -o dns_gaming.txt
 
 # Main menu
-while true; do
-    show_title
-    echo "💠 Main Menu"
-    echo "1) 🎮 Search Game (New)"
-    echo "2) 🔥 Premium DNS (New)"
-    echo "3) 📡 Ping DNS (New)"
-    echo "4) ❌ Exit"
-    read -p "Select an option: " choice
-    case $choice in
-        1) search_game ;;
-        2) show_premium_dns ;;
-        3) ping_dns ;;
-        4) exit ;;
-        *) echo "❌ Invalid option" && sleep 1 ;;
-    esac
-done
+function main_menu() {
+  show_title
+  echo "1) Premium DNS 🔐 (New)"
+  echo "2) Ping a DNS 📶 (New)"
+  echo "3) Game Search 🎮 (New)"
+  echo "4) Gaming DNS 🎯"
+  echo "5) Download DNS 🚀"
+  echo "0) Exit ❌"
+  read -p "Choose an option: " choice
+  case $choice in
+    1) show_premium_dns ;;
+    2) ping_dns ;;
+    3) game_search ;;
+    4) select_game ;;
+    5) select_download_country ;;
+    0) exit ;;
+    *) echo "❌ Invalid Option!" ; sleep 1 ; main_menu ;;
+  esac
+}
+
+function show_premium_dns() {
+  echo -e "\n🔥 Premium DNS:"
+  shuf -n 1 dns_gaming.txt | awk -F',' '{ print $1"\n"$2 }'
+  sleep 3
+  main_menu
+}
+
+function ping_dns() {
+  read -p "Enter DNS to Ping: " dns_ip
+  ping -c 1 "$dns_ip" | grep 'time=' || echo "⚠️ Ping failed."
+  sleep 2
+  main_menu
+}
+
+function game_search() {
+  read -p "Enter Game Name to Search: " search_term
+  result=$(grep -i "$search_term" games_list.txt)
+  if [ -z "$result" ]; then
+    echo -e "\e[33m⚠️ Game Not Found!\e[0m"
+  else
+    echo -e "\n🎮 Found Game(s):\n$result"
+  fi
+  sleep 2
+  main_menu
+}
+
+function select_game() {
+  echo -e "\n📱 Game List:"
+  cat games_list.txt
+  read -p "Choose Game Number: " gnum
+  game=$(sed -n "${gnum}p" games_list.txt | cut -d')' -f2)
+  echo -e "\n🌍 Select Country:"
+  cat countries_list.txt
+  read -p "Choose Country Number: " cnum
+  country=$(sed -n "${cnum}p" countries_list.txt | cut -d')' -f2)
+  dns=$(grep "$game - $country" dns_gaming.txt | shuf -n 1)
+  if [ -z "$dns" ]; then
+    echo "⚠️ DNS not found for this game/country"
+  else
+    echo -e "\n🎮 $game - $country"
+    echo "$dns" | awk -F',' '{print $1"\n"$2}'
+    ping -c 1 "$(echo $dns | cut -d',' -f1)" | grep 'time='
+  fi
+  read -p "Press Enter to return..." _
+  main_menu
+}
+
+function select_download_country() {
+  echo -e "\n🌍 Select Country for Download DNS:"
+  cat countries_list.txt
+  read -p "Choose Country Number: " cnum
+  country=$(sed -n "${cnum}p" countries_list.txt | cut -d')' -f2)
+  dns=$(grep "Download - $country" dns_gaming.txt | shuf -n 1)
+  if [ -z "$dns" ]; then
+    echo "⚠️ DNS not found for download in this country"
+  else
+    echo -e "\n🚀 Download DNS - $country"
+    echo "$dns" | awk -F',' '{print $1"\n"$2}'
+    ping -c 1 "$(echo $dns | cut -d',' -f1)" | grep 'time='
+  fi
+  read -p "Press Enter to return..." _
+  main_menu
+}
+
+main_menu
