@@ -1,220 +1,129 @@
 #!/bin/bash
 
-# Check and install required tools silently
-for tool in curl ping; do
-  command -v $tool &> /dev/null || { echo "Installing $tool..."; apt update -y &>/dev/null; apt install -y $tool &>/dev/null; }
+# Auto-install dependencies
+for pkg in curl ping figlet lolcat; do
+  if ! command -v $pkg &>/dev/null; then
+    echo "Installing $pkg..."
+    apt update -y &>/dev/null
+    apt install -y $pkg &>/dev/null
+  fi
 done
 
-# Optional visual tools
-has_figlet=false
-has_lolcat=false
-command -v figlet &>/dev/null && has_figlet=true
-command -v lolcat &>/dev/null && has_lolcat=true
-
-# Colors
+# Color cycling
 colors=(31 32 33 34 35 36)
-get_color() {
-  echo "${colors[$RANDOM % ${#colors[@]}]}"
-}
 
 # Typing animation
-typing() {
-  speed=0.008
+function typer() {
   text="$1"
-  for ((i=0; i<${#text}; i++)); do
+  for ((i = 0; i < ${#text}; i++)); do
     echo -n "${text:$i:1}"
-    sleep $speed
+    sleep 0.0008
   done
   echo
 }
 
-# Title section
-draw_title() {
+# Header with color and animation
+function print_header() {
   clear
-  color=$(get_color)
+  color=${colors[$RANDOM % ${#colors[@]}]}
   echo -e "\033[1;${color}m"
-  if $has_figlet && $has_lolcat; then
-    figlet "DNS Gamer Pro" | lolcat
-  else
-    typing "===== DNS Gamer Pro ====="
-  fi
+  figlet -f slant "DNS Gamer Pro" | lolcat
   echo -e "\033[0m"
-
-  box="+------------------------------------------+"
-  echo -e "\033[1;${color}m$box"
-  echo -e "| Telegram: @Academi_vpn                   |"
-  echo -e "| Admin:    @MahdiAGM0                     |"
-  echo -e "| Version:  1.2.3                          |"
-  echo -e "$box\033[0m"
+  echo -e "\033[1;${color}m+------------------------------------------+\033[0m"
+  echo -e "\033[1;${color}m| Telegram: @Academi_vpn                   |\033[0m"
+  echo -e "\033[1;${color}m| Admin:    @MahdiAGM0                     |\033[0m"
+  echo -e "\033[1;${color}m| Version:  1.2.3                          |\033[0m"
+  echo -e "\033[1;${color}m+------------------------------------------+\033[0m"
   echo
 }
 
-# Simulated premium DNS pool
-dns_pool=(
-"1.1.1.1,1.0.0.1"
-"8.8.8.8,8.8.4.4"
-"9.9.9.9,149.112.112.112"
-"94.140.14.14,94.140.15.15"
-"76.76.2.0,76.76.10.0"
-"208.67.222.222,208.67.220.220"
-"185.228.168.168,185.228.169.168"
-"1.1.1.2,1.0.0.2"
-"8.26.56.26,8.20.247.20"
-"64.6.64.6,64.6.65.6"
-)
+# DNS Lists
+gaming_dns=("1.1.1.1" "9.9.9.9" "94.140.14.14" "76.76.2.0" "8.26.56.26")
+download_dns=("178.22.122.100" "185.51.200.2" "10.202.10.202" "1.0.0.1")
+premium_dns=("45.90.28.0" "1.1.1.1" "94.140.14.14" "9.9.9.11" "8.8.4.4" "8.26.56.26" "208.67.222.222")
 
-get_random_dns() {
-  random_index=$((RANDOM % ${#dns_pool[@]}))
-  echo "${dns_pool[$random_index]}"
+games=("Call of Duty Mobile" "Arena Breakout (New)" "PUBG Mobile" "Free Fire" "Mobile Legends" "Brawl Stars" "Clash Royale" "Clash of Clans" "Fortnite Mobile" "War Robots" "League of Legends Wild Rift" "Apex Legends Mobile" "Among Us" "FIFA Mobile" "eFootball 2024" "Honkai Impact" "Genshin Impact" "Marvel Future Fight" "Modern Combat 5" "Shadowgun Legends" "World of Tanks Blitz" "Asphalt 9" "Roblox" "Zooba" "Critical Ops" "Cyber Hunter" "Dead by Daylight Mobile" "Dragon Ball Legends" "Garena AOV" "Hero Hunters" "Last Day on Earth" "Mobile Suit Gundam" "Minecraft PE" "Omega Legends" "Pixel Gun 3D" "Rogue Company Mobile" "Sky Children of the Light" "Standoff 2" "Tacticool" "Teamfight Tactics" "Tower of Fantasy" "Vainglory" "Warface Mobile" "Wild Rift" "ZombsRoyale" "World War Heroes" "Modern Strike" "Battle Prime" "Creative Destruction")
+
+countries=("Iran" "UAE" "Turkey" "Saudi Arabia" "Iraq")
+
+# DNS Show Function
+function show_dns() {
+  dns="$1"
+  ping_result=$(ping -c 1 -W 1 $dns 2>/dev/null | grep 'time=' | awk -F'time=' '{print $2}' | cut -d' ' -f1)
+  if [[ -z "$ping_result" ]]; then
+    ping_result="Ping failed"
+  else
+    ping_result="${ping_result}ms"
+  fi
+  echo -e "\n\033[1;37m$dns\033[0m"
+  echo -e "Ping: \033[1;32m$ping_result\033[0m"
 }
 
-ping_dns() {
-  ip="$1"
-  ping -c 1 -W 1 "$ip" | grep "time=" | awk -F"time=" '{print $2}' | cut -d' ' -f1
-}
-
-show_dns_result() {
-  IFS=',' read -r d1 d2 <<< "$(get_random_dns)"
-  ping1=$(ping_dns $d1)
-  [ -z "$ping1" ] && ping1="Fail"
-  echo -e "\n$d1\n$d2\nPing: $ping1 ms"
-}
-
-# Game list
-games=(
-"Call of Duty Mobile"
-"PUBG Mobile"
-"Arena Breakout [NEW]"
-"Free Fire"
-"Genshin Impact [NEW]"
-"League of Legends: Wild Rift"
-"Mobile Legends"
-"Fortnite"
-"Clash Royale"
-"Clash of Clans"
-"Among Us"
-"Apex Legends Mobile [NEW]"
-"Critical Ops"
-"Modern Combat 5"
-"Warface"
-"Shadowgun Legends"
-"Bullet Force"
-"Pixel Gun 3D"
-"Standoff 2"
-"Sky: Children of the Light"
-"Pokémon Unite"
-"Roblox"
-"Asphalt 9"
-"N.O.V.A Legacy"
-"Into the Dead 2"
-"Marvel Future Fight"
-"Injustice 2"
-"Dragon Ball Legends"
-"FIFA Mobile"
-"eFootball 2024 [NEW]"
-"Real Racing 3"
-"SimCity BuildIt"
-"Dead Trigger 2"
-"Sniper 3D"
-"Zombie Gunship Survival"
-"Subway Surfers"
-"Temple Run 2"
-"Shadow Fight 4 [NEW]"
-"Stick War Legacy"
-"Growtopia"
-"Terraria"
-"Minecraft PE"
-"Kingdom Rush"
-"Geometry Dash"
-"Honkai Impact 3rd"
-"PUBG: NEW STATE [NEW]"
-"Valorant Mobile [NEW]"
-"War Robots"
-"Cyber Hunter"
-)
-
-countries=("Iran" "UAE" "Turkey" "Saudi Arabia" "Iraq" "Qatar" "Jordan" "Other")
-
-# Start menu
+# Menu
 while true; do
-  draw_title
-  echo "📌 1) Gaming DNS"
-  echo "📥 2) Download DNS"
-  echo "💎 3) Premium DNS [NEW]"
-  echo "🎮 4) Search Game [NEW]"
-  echo "📶 5) Ping a DNS  [NEW]"
-  echo "🚪 6) Exit"
-  echo
-  read -p "Choose an option: " opt
+  print_header
+  typer "📌 Choose an option:"
+  typer "1️⃣  Gaming DNS"
+  typer "2️⃣  Download DNS (Anti-Filter)"
+  typer "3️⃣  Search Game DNS  🔍 New"
+  typer "4️⃣  Premium DNS  💎 New"
+  typer "5️⃣  Ping a DNS     📶 New"
+  typer "6️⃣  Exit ❌"
+  read -p $'\nEnter your choice: ' opt
 
   case $opt in
     1)
-      draw_title
-      echo "🎮 Gaming DNS"
-      for i in "${!games[@]}"; do
-        echo "$((i+1)). ${games[$i]}"
-      done
-      read -p $'\nChoose game number: ' gindex
-      [ -z "${games[$((gindex-1))]}" ] && continue
-      echo
-      select c in "${countries[@]}"; do
-        echo -e "\n🌐 $c - DNS for ${games[$((gindex-1))]}:"
-        show_dns_result
-        break
-      done
+      print_header
+      typer "🎮 Gaming DNS Selected:"
+      show_dns "${gaming_dns[$RANDOM % ${#gaming_dns[@]}]}"
       read -p $'\nPress Enter to return...'
       ;;
     2)
-      draw_title
-      echo "📥 Download DNS"
-      select c in "${countries[@]}"; do
-        echo -e "\n🌐 $c - Download Optimized DNS:"
-        show_dns_result
-        break
-      done
+      print_header
+      typer "📥 Download DNS Selected:"
+      show_dns "${download_dns[$RANDOM % ${#download_dns[@]}]}"
       read -p $'\nPress Enter to return...'
       ;;
     3)
-      draw_title
-      echo "💎 Premium Ultra Fast DNS"
-      show_dns_result
-      read -p $'\nPress Enter to return...'
-      ;;
-    4)
-      draw_title
-      read -p "🔎 Enter game name: " gname
+      print_header
+      typer "🔍 Search your game:"
+      read -p "Enter game name: " search
       found=false
-      for g in "${games[@]}"; do
-        clean_g=$(echo "$g" | sed 's/ \[NEW\]//g')
-        if [[ "${clean_g,,}" == *"${gname,,}"* ]]; then
-          echo -e "\nGame found: $clean_g"
-          select c in "${countries[@]}"; do
-            echo -e "\n🌐 $c - DNS for $clean_g:"
-            show_dns_result
+      for game in "${games[@]}"; do
+        if [[ "${game,,}" == *"${search,,}"* ]]; then
+          found=true
+          echo -e "\nGame found: $game"
+          echo "Select Region:"
+          select region in "${countries[@]}"; do
+            echo -e "\nRecommended DNS for $game in $region:"
+            show_dns "${gaming_dns[$RANDOM % ${#gaming_dns[@]}]}"
             break
           done
-          found=true
-          break
         fi
       done
-      if ! $found; then
-        echo -e "\033[1;33m⚠️ Game not found in list.\033[0m"
+      if [ "$found" = false ]; then
+        echo -e "\n\033[1;33mGame not found.\033[0m"
       fi
       read -p $'\nPress Enter to return...'
       ;;
+    4)
+      print_header
+      typer "💎 Premium Ultra Fast DNS:"
+      show_dns "${premium_dns[$RANDOM % ${#premium_dns[@]}]}"
+      read -p $'\nPress Enter to return...'
+      ;;
     5)
-      draw_title
-      read -p "📶 Enter DNS IP to ping: " userdns
-      echo -e "\nPinging $userdns..."
-      ping -c 4 "$userdns"
+      print_header
+      read -p "Enter DNS to ping: " user_dns
+      show_dns "$user_dns"
       read -p $'\nPress Enter to return...'
       ;;
     6)
-      echo -e "\n👋 Bye!"
+      typer "Exiting..."
       exit 0
       ;;
     *)
-      echo "❌ Invalid option."
+      echo -e "\nInvalid choice!"
       sleep 1
       ;;
   esac
