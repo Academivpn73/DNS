@@ -1,181 +1,177 @@
 #!/bin/bash
 
-# Dependencies
-dependencies=(curl ping)
-for dep in "${dependencies[@]}"; do
-  command -v $dep >/dev/null 2>&1 || { echo >&2 "Please install $dep."; exit 1; }
-done
-
-# Color list
-colors=(31 32 33 34 35 36)
+# Define colors
+YELLOW='\033[1;33m'
+GREEN='\033[1;32m'
+CYAN='\033[1;36m'
+BLUE='\033[1;34m'
+RED='\033[1;31m'
+NC='\033[0m'
 
 # Typing animation
 typer() {
   text="$1"
   for ((i = 0; i < ${#text}; i++)); do
     echo -n "${text:$i:1}"
-    sleep 0.0008
+    sleep 0.008
   done
-  echo
+  echo ""
 }
 
-# Header with optional figlet/lolcat
+# Header with animated color
 print_header() {
   clear
-  color=${colors[$RANDOM % ${#colors[@]}]}
-  if command -v figlet >/dev/null 2>&1 && command -v lolcat >/dev/null 2>&1; then
-    echo -e "\033[1;${color}m"
-    figlet -f slant "DNS Gamer Pro" | lolcat
-    echo -e "\033[0m"
-  else
-    echo -e "\033[1;${color}m===== DNS Gamer Pro =====\033[0m"
-  fi
-
-  echo -e "\033[1;${color}m+------------------------------------------+\033[0m"
-  echo -e "\033[1;${color}m| Telegram: @Academi_vpn                   |\033[0m"
-  echo -e "\033[1;${color}m| Admin:    @MahdiAGM0                     |\033[0m"
-  echo -e "\033[1;${color}m| Version:  1.2.3                          |\033[0m"
-  echo -e "\033[1;${color}m+------------------------------------------+\033[0m"
-  echo
+  rand=$((RANDOM % 6))
+  case $rand in
+    0) color=$RED ;;
+    1) color=$GREEN ;;
+    2) color=$YELLOW ;;
+    3) color=$BLUE ;;
+    4) color=$CYAN ;;
+    5) color=$NC ;;
+  esac
+  echo -e "${color}"
+  figlet "DNS Script" 2>/dev/null | lolcat
+  echo -e "${NC}"
+  echo -e "+------------------------------------------+"
+  echo -e "| Telegram: @Academi_vpn                   |"
+  echo -e "| Admin:    @MahdiAGM0                     |"
+  echo -e "| Version:  1.2.3                          |"
+  echo -e "+------------------------------------------+"
 }
 
-# Show DNS with ping
-show_dns() {
-  dns="$1"
-  ping_time=$(ping -c 1 -W 1 $dns 2>/dev/null | grep 'time=' | awk -F'time=' '{print $2}' | cut -d' ' -f1)
-  if [[ -z "$ping_time" ]]; then
-    ping_time="Ping failed"
-  else
-    ping_time="${ping_time}ms"
-  fi
-  echo -e "\n\033[1;37m$dns\033[0m"
-  echo -e "Ping: \033[1;32m$ping_time\033[0m"
-}
+# Sample DNS lists
+gaming_dns=("1.1.1.1" "8.8.8.8" "9.9.9.9" "1.0.0.1" "185.51.200.2" "185.51.200.3")
+download_dns=("176.103.130.130" "94.140.14.14" "94.140.15.15" "208.67.222.222")
+premium_dns=("8.26.56.26" "8.20.247.20" "185.228.168.9" "185.228.169.9")
 
-# DNS data
-gaming_dns=("1.1.1.1" "9.9.9.9" "94.140.14.14" "76.76.2.0" "185.51.200.2")
-download_dns=("178.22.122.100" "10.202.10.202" "185.51.200.2" "1.0.0.1")
-premium_dns=("45.90.28.0" "94.140.14.14" "8.8.4.4" "1.1.1.1" "208.67.222.222")
-
+# 50 mobile games
 games=(
-"Call of Duty Mobile"
-"Arena Breakout (New)"
-"PUBG Mobile"
-"Free Fire"
-"Mobile Legends"
-"Brawl Stars"
-"Clash Royale"
-"Clash of Clans"
-"Fortnite Mobile"
-"War Robots"
-"League of Legends Wild Rift"
-"Apex Legends Mobile"
-"Among Us"
-"FIFA Mobile"
-"eFootball 2024 (New)"
-"Honkai Impact"
-"Genshin Impact"
-"Marvel Future Fight"
-"Modern Combat 5"
-"Shadowgun Legends"
-"World of Tanks Blitz"
-"Asphalt 9"
-"Roblox"
-"Zooba"
-"Critical Ops"
-"Cyber Hunter"
-"Dead by Daylight Mobile"
-"Dragon Ball Legends"
-"Garena AOV"
-"Hero Hunters"
-"Last Day on Earth"
-"Mobile Suit Gundam"
-"Minecraft PE"
-"Omega Legends"
-"Pixel Gun 3D"
-"Rogue Company Mobile"
-"Sky Children of the Light"
-"Standoff 2"
-"Tacticool"
-"Teamfight Tactics"
-"Tower of Fantasy (New)"
-"Vainglory"
-"Warface Mobile"
-"Wild Rift"
-"ZombsRoyale"
-"World War Heroes"
-"Modern Strike"
-"Battle Prime"
-"Creative Destruction"
+  "PUBG Mobile" "Call of Duty Mobile" "Free Fire" "Clash of Clans"
+  "Clash Royale" "Arena Breakout (NEW)" "Brawl Stars (NEW)" "Mobile Legends"
+  "League of Legends: Wild Rift" "Fortnite" "Apex Legends Mobile"
+  "Genshin Impact" "Among Us" "Minecraft PE" "Roblox" "Pokemon GO"
+  "Subway Surfers" "Asphalt 9" "Dead by Daylight Mobile" "Honkai Impact 3"
+  "Dragon Ball Legends" "Identity V" "Valorant Mobile (NEW)" "Standoff 2"
+  "World of Tanks Blitz" "Shadowgun Legends" "Modern Combat 5"
+  "Critical Ops" "Garena AOV" "Lost Light (NEW)" "T3 Arena"
+  "Cyber Hunter" "Warface: Global Ops" "Diablo Immortal"
+  "Rise of Kingdoms" "AFK Arena" "State of Survival"
+  "King of Avalon" "Summoners War" "Infinity Kingdom"
+  "Hero Wars" "War Robots" "Doom & Destiny" "N.O.V.A. Legacy"
+  "Grimvalor" "Eternium" "Bullet Echo" "Sky: Children of Light"
+  "Rebel Racing" "Crossfire: Legends"
 )
 
-countries=("Iran" "UAE" "Turkey" "Saudi Arabia" "Iraq")
+countries=("Iran" "UAE" "Turkey" "Qatar" "Other")
 
-# Main menu
+# Show two DNS with ping
+show_dns_pair() {
+  dns1="$1"
+  dns2="$2"
+
+  ping1=$(ping -c 1 -W 1 "$dns1" 2>/dev/null | grep 'time=' | awk -F'time=' '{print $2}' | cut -d' ' -f1)
+  ping2=$(ping -c 1 -W 1 "$dns2" 2>/dev/null | grep 'time=' | awk -F'time=' '{print $2}' | cut -d' ' -f1)
+
+  echo -e "\nPrimary DNS:\n$dns1\nPing: ${GREEN}${ping1:-Failed}${NC}"
+  echo -e "\nSecondary DNS:\n$dns2\nPing: ${GREEN}${ping2:-Failed}${NC}"
+}
+
 while true; do
   print_header
-  typer "📌 Select an option:"
-  typer "1️⃣  Gaming DNS"
-  typer "2️⃣  Download DNS (Anti-Filter)"
-  typer "3️⃣  Search Game DNS 🔍 (New)"
-  typer "4️⃣  Premium DNS 💎 (New)"
-  typer "5️⃣  Ping DNS 📶 (New)"
-  typer "6️⃣  Exit ❌"
-  read -p $'\nEnter choice: ' choice
-
+  typer "Select an option:"
+  echo -e "${CYAN}
+1) 🎮 Gaming DNS (NEW)
+2) 📥 Download DNS (NEW)
+3) 🔍 Search Game (NEW)
+4) 💎 Premium DNS (NEW)
+5) 📡 Ping DNS (NEW)
+6) ❌ Exit
+${NC}"
+  read -p "Enter choice: " choice
   case $choice in
+
     1)
       print_header
-      typer "🎮 Gaming DNS:"
-      show_dns "${gaming_dns[$RANDOM % ${#gaming_dns[@]}]}"
+      typer "🎮 Gaming DNS"
+      echo -e "\nChoose a game:"
+      select g in "${games[@]}"; do
+        echo -e "\n🌍 Select Region:"
+        select reg in "${countries[@]}"; do
+          dns1="${gaming_dns[$RANDOM % ${#gaming_dns[@]}]}"
+          dns2="${gaming_dns[$RANDOM % ${#gaming_dns[@]}]}"
+          echo -e "\n🎯 DNS for $g in $reg:"
+          show_dns_pair "$dns1" "$dns2"
+          break
+        done
+        break
+      done
       read -p $'\nPress Enter to return...'
       ;;
+
     2)
       print_header
-      typer "📥 Download DNS:"
-      show_dns "${download_dns[$RANDOM % ${#download_dns[@]}]}"
+      typer "📥 Download DNS"
+      echo -e "\n🌍 Select Region:"
+      select reg in "${countries[@]}"; do
+        dns1="${download_dns[$RANDOM % ${#download_dns[@]}]}"
+        dns2="${download_dns[$RANDOM % ${#download_dns[@]}]}"
+        echo -e "\n📦 DNS for $reg:"
+        show_dns_pair "$dns1" "$dns2"
+        break
+      done
       read -p $'\nPress Enter to return...'
       ;;
+
     3)
       print_header
-      read -p "Enter game name: " search
+      typer "🔍 Game Search"
+      read -p "Enter game name: " query
       found=false
-      for g in "${games[@]}"; do
-        if [[ "${g,,}" == *"${search,,}"* ]]; then
+      for game in "${games[@]}"; do
+        if [[ "$game" == *"$query"* ]]; then
           found=true
-          echo -e "\n✅ Game found: \033[1;36m$g\033[0m"
-          echo "Select Region:"
+          echo -e "\nFound: $game"
+          echo -e "\n🌍 Select Region:"
           select reg in "${countries[@]}"; do
-            echo -e "\n🎯 Best DNS for $g in $reg:"
-            show_dns "${gaming_dns[$RANDOM % ${#gaming_dns[@]}]}"
+            dns1="${gaming_dns[$RANDOM % ${#gaming_dns[@]}]}"
+            dns2="${gaming_dns[$RANDOM % ${#gaming_dns[@]}]}"
+            echo -e "\n🎯 DNS for $game in $reg:"
+            show_dns_pair "$dns1" "$dns2"
             break
           done
+          break
         fi
       done
-      if [ "$found" = false ]; then
-        echo -e "\n\033[1;33m⚠️ Game not found.\033[0m"
+      if ! $found; then
+        echo -e "${YELLOW}Game not found.${NC}"
       fi
       read -p $'\nPress Enter to return...'
       ;;
+
     4)
       print_header
-      typer "💎 Premium DNS:"
-      show_dns "${premium_dns[$RANDOM % ${#premium_dns[@]}]}"
+      typer "💎 Premium DNS"
+      dns1="${premium_dns[$RANDOM % ${#premium_dns[@]}]}"
+      dns2="${premium_dns[$RANDOM % ${#premium_dns[@]}]}"
+      show_dns_pair "$dns1" "$dns2"
       read -p $'\nPress Enter to return...'
       ;;
+
     5)
       print_header
       read -p "Enter DNS to ping: " userdns
-      show_dns "$userdns"
+      show_dns_pair "$userdns" "$userdns"
       read -p $'\nPress Enter to return...'
       ;;
+
     6)
-      typer "Goodbye! 👋"
+      echo -e "${GREEN}Goodbye!${NC}"
       exit 0
       ;;
+
     *)
-      echo -e "\nInvalid choice!"
-      sleep 1
+      echo -e "${RED}Invalid option${NC}"
       ;;
   esac
 done
