@@ -1,148 +1,114 @@
 #!/bin/bash
 
-# Auto-fetch files if not exist
-[[ ! -f "dns_list.txt" ]] && curl -fsSLO https://raw.githubusercontent.com/Academivpn73/DNS/main/dns_list.txt
-[[ ! -f "games_list.txt" ]] && curl -fsSLO https://raw.githubusercontent.com/Academivpn73/DNS/main/games_list.txt
-
-# Clear screen
-clear
-
-# Function: Show title
+# Title box function
 show_title() {
-    clear
-    colors=(31 32 33 34 35 36)
-    rand_color=${colors[$RANDOM % ${#colors[@]}]}
-    echo -e "\e[1;${rand_color}m+------------------------------------------+"
-    echo -e "|       DNS Tool | Version: 1.2.3           |"
-    echo -e "| Telegram: @Academi_vpn                   |"
-    echo -e "| Admin:    @MahdiAGM0                     |"
-    echo -e "+------------------------------------------+\e[0m"
-    echo ""
+  colors=(31 32 33 34 35 36)
+  color=${colors[$RANDOM % ${#colors[@]}]}
+  clear
+  echo -e "\e[1;${color}m"
+  echo "╔═══════════════════════════════════════════════╗"
+  echo "║         DNS Management Script v1.2.3         ║"
+  echo "║         Admin: @MahdiAGM0                    ║"
+  echo "║         Telegram: @Academi_vpn               ║"
+  echo "╚═══════════════════════════════════════════════╝"
+  echo -e "\e[0m"
 }
 
-# Function: Show main menu
-main_menu() {
-    show_title
-    echo "🔹 Choose an option:"
-    echo "1. 🎮 Gaming DNS"
-    echo "2. ⬇️  Download DNS"
-    echo "3. 💎 Premium DNS (New)"
-    echo "4. 📶 Ping a DNS (New)"
-    echo "5. 🔍 Search Game (New)"
-    echo "6. ❌ Exit"
-    echo ""
-    read -p "Enter your choice: " choice
-    case $choice in
-        1) dns_gaming ;;
-        2) dns_download ;;
-        3) premium_dns ;;
-        4) ping_dns ;;
-        5) search_game ;;
-        6) exit 0 ;;
-        *) echo "❌ Invalid choice."; sleep 1; main_menu ;;
-    esac
+# Show main menu
+show_menu() {
+  show_title
+  echo "📌 Choose an option:"
+  echo "1️⃣  Premium DNS (New)"
+  echo "2️⃣  Ping a DNS"
+  echo "3️⃣  Search Game DNS (New)"
+  echo "4️⃣  Gaming DNS"
+  echo "5️⃣  Download DNS"
+  echo "0️⃣  Exit"
+  echo -n "👉 Enter your choice: "
+  read choice
+  case $choice in
+    1) premium_dns ;;
+    2) ping_dns ;;
+    3) search_game ;;
+    4) show_dns "dns_gaming.txt" ;;
+    5) show_dns "dns_download.txt" ;;
+    0) exit 0 ;;
+    *) echo "❌ Invalid choice."; sleep 1; show_menu ;;
+  esac
 }
 
-# Function: DNS for gaming
-dns_gaming() {
-    show_title
-    echo "📱 Game List:"
-    nl -w2 -s'. ' games_list.txt
-    echo ""
-    read -p "Choose game number: " game_number
-    selected_game=$(sed -n "${game_number}p" games_list.txt)
-    echo ""
-    echo "🌍 Select Region:"
-    echo "1. Iran"
-    echo "2. UAE"
-    echo "3. Turkey"
-    echo "4. Other"
-    read -p "Region number: " region
-
-    # Random DNS from file
-    dns=$(shuf -n 2 dns_list.txt)
-    echo ""
-    echo "Recommended DNS for $selected_game:"
-    echo -e "🟢 Primary DNS: $(echo "$dns" | sed -n 1p)"
-    echo -e "🟢 Secondary DNS: $(echo "$dns" | sed -n 2p)"
-    echo ""
-    read -p "Press Enter to return..." 
-    main_menu
+# Read and show 2 random DNS from file
+show_dns() {
+  show_title
+  file=$1
+  if [[ ! -f "$file" ]]; then
+    echo "❌ DNS list file '$file' not found!"
+    read -p "Press Enter to return..." ; show_menu
+    return
+  fi
+  echo "📡 DNS Suggestions:"
+  shuf -n 2 "$file" | while read dns; do
+    ping_time=$(ping -c 1 -W 1 "$dns" | grep time= | awk -F"time=" '{print $2}' | cut -d' ' -f1)
+    echo -e "🔹 $dns  (Ping: ${ping_time:-Fail})"
+  done
+  echo ""
+  read -p "Press Enter to return..." ; show_menu
 }
 
-# Function: DNS for downloads
-dns_download() {
-    show_title
-    echo "🌍 Select Region:"
-    echo "1. Iran"
-    echo "2. UAE"
-    echo "3. Turkey"
-    echo "4. Other"
-    read -p "Region number: " region
-
-    dns=$(shuf -n 2 dns_list.txt)
-    echo ""
-    echo "Recommended DNS for Download:"
-    echo -e "🟢 Primary DNS: $(echo "$dns" | sed -n 1p)"
-    echo -e "🟢 Secondary DNS: $(echo "$dns" | sed -n 2p)"
-    echo ""
-    read -p "Press Enter to return..."
-    main_menu
-}
-
-# Function: Premium DNS
+# Premium DNS (from both files)
 premium_dns() {
-    show_title
-    dns=$(shuf -n 2 dns_list.txt)
-    echo "💎 Premium DNS:"
-    echo -e "🟢 Primary DNS: $(echo "$dns" | sed -n 1p)"
-    echo -e "🟢 Secondary DNS: $(echo "$dns" | sed -n 2p)"
-    echo ""
-    read -p "Press Enter to return..."
-    main_menu
+  show_title
+  echo "✨ Premium DNS:"
+  (cat dns_gaming.txt; cat dns_download.txt) 2>/dev/null | shuf -n 2 | while read dns; do
+    ping_time=$(ping -c 1 -W 1 "$dns" | grep time= | awk -F"time=" '{print $2}' | cut -d' ' -f1)
+    echo -e "⭐ $dns  (Ping: ${ping_time:-Fail})"
+  done
+  echo ""
+  read -p "Press Enter to return..." ; show_menu
 }
 
-# Function: Ping DNS
+# Ping a custom DNS
 ping_dns() {
-    show_title
-    read -p "Enter DNS to ping: " user_dns
-    ping_result=$(ping -c 1 "$user_dns" | grep 'time=' | awk -F'time=' '{print $2}' | cut -d' ' -f1)
-    if [ -n "$ping_result" ]; then
-        echo "📶 Ping: ${ping_result} ms"
-    else
-        echo "❌ Ping failed."
-    fi
-    echo ""
-    read -p "Press Enter to return..."
-    main_menu
+  show_title
+  read -p "🌐 Enter DNS to ping: " user_dns
+  echo ""
+  echo "⏱️ Pinging $user_dns..."
+  ping -c 3 -W 1 "$user_dns"
+  echo ""
+  read -p "Press Enter to return..." ; show_menu
 }
 
-# Function: Search Game
+# Search game and show DNS
 search_game() {
-    show_title
-    read -p "🔍 Enter game name: " search
-    result=$(grep -i "$search" games_list.txt)
-    if [ -z "$result" ]; then
-        echo -e "\e[33m⚠️  Game not found.\e[0m"
-    else
-        echo "🎯 Found: $result"
-        echo ""
-        echo "🌍 Choose Region:"
-        echo "1. Iran"
-        echo "2. UAE"
-        echo "3. Turkey"
-        echo "4. Other"
-        read -p "Region number: " region
-        dns=$(shuf -n 2 dns_list.txt)
-        echo ""
-        echo "Recommended DNS for $result:"
-        echo -e "🟢 Primary DNS: $(echo "$dns" | sed -n 1p)"
-        echo -e "🟢 Secondary DNS: $(echo "$dns" | sed -n 2p)"
-    fi
-    echo ""
-    read -p "Press Enter to return..."
-    main_menu
+  show_title
+  if [[ ! -f "games_list.txt" ]]; then
+    echo "❌ 'games_list.txt' not found."
+    read -p "Press Enter to return..." ; show_menu
+    return
+  fi
+  read -p "🎮 Enter game name to search: " game
+  found=$(grep -i "$game" games_list.txt)
+  if [[ -z "$found" ]]; then
+    echo -e "\e[1;33m⚠️ Game not found.\e[0m"
+  else
+    echo -e "\n📍 Game Found: $found"
+    echo "🌍 Choose Region:"
+    select region in Iran UAE Turkey Other; do
+      case $region in
+        Iran|UAE|Turkey|Other)
+          echo -e "\n🌐 DNS for $found ($region):"
+          shuf -n 2 dns_gaming.txt | while read dns; do
+            ping_time=$(ping -c 1 -W 1 "$dns" | grep time= | awk -F"time=" '{print $2}' | cut -d' ' -f1)
+            echo -e "🔹 $dns  (Ping: ${ping_time:-Fail})"
+          done
+          break ;;
+        *) echo "❌ Invalid option." ;;
+      esac
+    done
+  fi
+  echo ""
+  read -p "Press Enter to return..." ; show_menu
 }
 
-# Start program
-main_menu
+# Start script
+show_menu
