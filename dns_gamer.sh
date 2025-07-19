@@ -1,14 +1,14 @@
 #!/bin/bash
 
-# نصب خودکار پیش‌نیازها
+# Auto-install required packages
 for pkg in curl lolcat figlet; do
   if ! command -v $pkg &>/dev/null; then
-    echo "در حال نصب $pkg ..."
+    echo "Installing $pkg..."
     apt update &>/dev/null && apt install -y $pkg &>/dev/null
   fi
 done
 
-# نمایش عنوان رنگی و مشخصات
+# Title with color
 colors=(31 32 33 34 35 36)
 color=${colors[$RANDOM % ${#colors[@]}]}
 clear
@@ -19,7 +19,7 @@ echo -e "\033[1;30m--------------------------------------------\033[0m"
 echo -e "\033[1;37mTelegram: @Academi_vpn        Admin: @MahdiAGM0\033[0m"
 echo -e "\033[1;30m--------------------------------------------\033[0m"
 
-# انیمیشن تایپ
+# Typing animation
 function typer() {
   text="$1"
   for ((i=0; i<${#text}; i++)); do
@@ -29,8 +29,8 @@ function typer() {
   echo ""
 }
 
-# لیست بازی‌های موبایل (۵۰ عدد)
-game_list=(
+# Mobile game list (50 games)
+games=(
 "Arena Breakout"
 "Call of Duty: Mobile"
 "PUBG Mobile"
@@ -39,8 +39,7 @@ game_list=(
 "Clash Royale"
 "Mobile Legends: Bang Bang"
 "Arena of Valor"
-"Wild Rift"
-"League of Legends: WR"
+"League of Legends: Wild Rift"
 "Brawl Stars"
 "Genshin Impact"
 "Among Us"
@@ -53,12 +52,10 @@ game_list=(
 "War Robots"
 "eFootball 2024"
 "Roblox"
-"Subway Surfers"
 "Minecraft Pocket Edition"
 "Dead by Daylight Mobile"
 "Marvel Snap"
 "Pokemon Unite"
-"Zula Mobile"
 "Rise of Kingdoms"
 "State of Survival"
 "Bullet Echo"
@@ -66,7 +63,7 @@ game_list=(
 "CarX Drift Racing 2"
 "8 Ball Pool"
 "Stumble Guys"
-"ZOBA"
+"Zuba"
 "Badlanders"
 "N.O.V.A. Legacy"
 "Real Racing 3"
@@ -79,14 +76,14 @@ game_list=(
 "LifeAfter"
 "Modern Strike Online"
 "Tacticool"
-"Naraka Bladepoint Mobile"  # [New]
-"Farlight 84"               # [New]
-"Blood Strike"              # [New]
-"T3 Arena"                  # [New]
-"Warzone Mobile"            # [New]
+"Naraka Bladepoint Mobile" # [New]
+"Farlight 84"              # [New]
+"Blood Strike"             # [New]
+"T3 Arena"                 # [New]
+"Warzone Mobile"           # [New]
 )
 
-# ساخت DNS های تصادفی و پرسرعت
+# Generate 500 DNS entries
 dns_list=(
 "1.1.1.1,1.0.0.1"
 "8.8.8.8,8.8.4.4"
@@ -100,80 +97,88 @@ dns_list=(
 "76.76.2.0,76.76.10.0"
 )
 
-# افزایش به 500
 while [ ${#dns_list[@]} -lt 500 ]; do
   dns_list+=("${dns_list[$RANDOM % ${#dns_list[@]}]}")
 done
 
-# تابع نمایش DNS
+# Function to show 2 random DNS
 function show_dns() {
-  random_index=$((RANDOM % ${#dns_list[@]}))
-  IFS=',' read -r dns1 dns2 <<< "${dns_list[$random_index]}"
-  echo -e "\nPrimary DNS: $dns1"
-  echo -e "Secondary DNS: $dns2\n"
+  index=$((RANDOM % ${#dns_list[@]}))
+  IFS=',' read -r dns1 dns2 <<< "${dns_list[$index]}"
+  echo -e "\nPrimary DNS : $dns1"
+  echo -e "Secondary DNS : $dns2\n"
 }
 
-# نمایش منو
+# Menu
 echo
-typer "1) دریافت DNS مخصوص بازی"
-typer "2) دریافت DNS مخصوص دانلود (آنتی‌فیلتر)"
-typer "3) جستجوی DNS با نام بازی"
-typer "4) DNS پرمیوم (سریع و پینگ زیر 40ms)"
-typer "5) بررسی پینگ DNS دلخواه"
-typer "6) خروج"
-read -p $'\nانتخاب گزینه: ' opt
+typer "1) Get Gaming DNS"
+typer "2) Get Download DNS (Anti-Filter)"
+typer "3) Search DNS by Game Name"
+typer "4) Premium DNS (Ultra Fast <40ms)"
+typer "5) Ping Test"
+typer "6) Exit"
+read -p $'\nChoose an option: ' opt
 
-# عملیات بر اساس گزینه کاربر
 case $opt in
   1)
-    echo -e "\nلیست بازی‌ها:"
-    for i in "${!game_list[@]}"; do
-      idx=$((i+1))
-      if [ $idx -ge 46 ]; then
-        echo -e "$idx) \033[1;34m${game_list[$i]} [New]\033[0m"
+    echo -e "\nSelect a Game:"
+    for i in "${!games[@]}"; do
+      n=$((i+1))
+      if [ $n -ge 46 ]; then
+        echo -e "$n) \033[1;34m${games[$i]} [New]\033[0m"
       else
-        echo "$idx) ${game_list[$i]}"
+        echo "$n) ${games[$i]}"
       fi
     done
-    read -p $'\nشماره بازی مورد نظر: ' gnum
-    read -p $'\nکشور خود را انتخاب کنید:\n1) ایران\n2) امارات\n3) ترکیه\n4) عراق\n5) عربستان\nانتخاب: ' cntry
-    echo -e "\nDNS مناسب برای ${game_list[$((gnum-1))]} در کشور انتخابی:"
+    read -p $'\nEnter game number: ' gnum
+    echo -e "\nChoose region:"
+    echo "1) Iran"
+    echo "2) UAE"
+    echo "3) Turkey"
+    echo "4) Saudi Arabia"
+    echo "5) Iraq"
+    read -p "Region: " region
+    echo -e "\nRecommended DNS for ${games[$((gnum-1))]}:"
     show_dns
     ;;
   2)
-    read -p $'\nکشور خود را انتخاب کنید:\n1) ایران\n2) امارات\n3) ترکیه\nانتخاب: ' dcntry
-    echo -e "\nبهترین DNS برای دانلود در کشور انتخابی:"
+    echo -e "\nChoose country for optimized download:"
+    echo "1) Iran"
+    echo "2) UAE"
+    echo "3) Turkey"
+    read -p "Country: " download_region
+    echo -e "\nBest DNS for Download:"
     show_dns
     ;;
   3)
-    read -p "نام بازی را وارد کنید: " search
+    read -p "Enter game name to search: " query
     found=false
-    for g in "${game_list[@]}"; do
-      if [[ "${g,,}" == *"${search,,}"* ]]; then
-        echo -e "\nبازی یافت شد: $g"
+    for g in "${games[@]}"; do
+      if [[ "${g,,}" == *"${query,,}"* ]]; then
+        echo -e "\nMatch found: $g"
         show_dns
         found=true
         break
       fi
     done
     if [ "$found" = false ]; then
-      echo -e "\n\033[1;31mبازی مورد نظر در لیست یافت نشد.\033[0m"
+      echo -e "\n\033[1;31mGame not found in list.\033[0m"
     fi
     ;;
   4)
-    echo -e "\n\033[1;33mDNS پرمیوم (پینگ کمتر از 40ms)\033[0m"
+    echo -e "\n\033[1;33mPREMIUM DNS (Ultra Low Ping <40ms)\033[0m"
     show_dns
     ;;
   5)
-    read -p "آدرس DNS برای تست پینگ: " pingdns
-    echo -e "\nدر حال پینگ $pingdns ..."
-    ping -c 4 $pingdns
+    read -p "Enter DNS IP to ping: " ip
+    echo -e "\nPinging $ip ..."
+    ping -c 4 $ip
     ;;
   6)
-    echo "خروج از برنامه. موفق باشی :)"
+    echo "Goodbye!"
     exit 0
     ;;
   *)
-    echo "گزینه نامعتبر است."
+    echo "Invalid option!"
     ;;
 esac
