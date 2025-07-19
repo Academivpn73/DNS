@@ -1,159 +1,144 @@
 #!/bin/bash
 
-VERSION="1.2.3"
-ADMIN="@MahdiAGM0"
-CHANNEL="@Academi_vpn"
+version="1.2.3"
+admin="@MahdiAGM0"
+telegram="@Academi_vpn"
 
-# Colors
-GREEN="\033[1;32m"
-CYAN="\033[1;36m"
-RESET="\033[0m"
-BLUE="\033[1;34m"
-YELLOW="\033[1;33m"
-MAGENTA="\033[1;35m"
+# Title Colors Randomizer
+colors=(31 32 33 34 35 36 91 92 93 94 95 96)
+color=${colors[$RANDOM % ${#colors[@]}]}
 
-# Function to simulate typing
-type_effect() {
-    text="$1"
-    delay="${2:-0.002}"
-    for ((i=0; i<${#text}; i++)); do
-        echo -ne "${text:$i:1}"
-        sleep $delay
-    done
+function title() {
+    clear
+    echo -e "\e[1;${color}m"
+    echo "██████╗ ███╗   ██╗███████╗    ██████╗ ███╗   ██╗███████╗██╗  ██╗"
+    echo "██╔══██╗████╗  ██║██╔════╝    ██╔══██╗████╗  ██║██╔════╝██║  ██║"
+    echo "██████╔╝██╔██╗ ██║█████╗      ██████╔╝██╔██╗ ██║█████╗  ███████║"
+    echo "██╔═══╝ ██║╚██╗██║██╔══╝      ██╔═══╝ ██║╚██╗██║██╔══╝  ██╔══██║"
+    echo "██║     ██║ ╚████║███████╗    ██║     ██║ ╚████║███████╗██║  ██║"
+    echo "╚═╝     ╚═╝  ╚═══╝╚══════╝    ╚═╝     ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝"
+    echo -e "\e[0m"
+    echo -e "🔹 Version: $version    🔹 Admin: $admin"
+    echo -e "📡 Telegram: $telegram"
     echo
 }
 
-# Function to pick a random color for title
-random_color() {
-    colors=("$GREEN" "$CYAN" "$BLUE" "$YELLOW" "$MAGENTA")
-    echo -ne "${colors[$RANDOM % ${#colors[@]}]}"
-}
-
-# Title Screen
-clear
-random_color
-type_effect "╔════════════════════════════════════════╗" 0.001
-type_effect "║          DNS MANAGEMENT SCRIPT        ║" 0.001
-type_effect "╠════════════════════════════════════════╣" 0.001
-type_effect "║ Telegram : $CHANNEL" 0.001
-type_effect "║ Admin    : $ADMIN" 0.001
-type_effect "║ Version  : $VERSION" 0.001
-type_effect "╚════════════════════════════════════════╝" 0.001
-
-sleep 0.5
-
-main_menu() {
-    echo -e "${GREEN}[1]${RESET} Gaming DNS 🎮"
-    echo -e "${GREEN}[2]${RESET} Download DNS ⬇️"
-    echo -e "${GREEN}[3]${RESET} Premium DNS ⚡"
-    echo -e "${GREEN}[4]${RESET} Real-Time Ping Test 📡"
-    echo -e "${GREEN}[0]${RESET} Exit ❌"
+function main_menu() {
+    title
+    echo -e "\033[1;32m[1]\033[0m Gaming DNS 🎮"
+    echo -e "\033[1;32m[2]\033[0m Download DNS ⬇️"
+    echo -e "\033[1;32m[3]\033[0m Ping DNS Test 📶"
+    echo -e "\033[1;32m[4]\033[0m Premium DNS (Low Ping) 💎"
+    echo -e "\033[1;32m[0]\033[0m Exit ❌"
     echo
-    read -p "Select an option: " choice
-
-    case $choice in
-        1) show_game_dns ;;
-        2) show_download_dns ;;
-        3) show_premium_dns ;;
-        4) ping_test ;;
-        0) echo -e "${GREEN}Goodbye 🙏🏻${RESET}"; exit 0 ;;
-        *) echo "Invalid option"; main_menu ;;
+    read -p "Select an option: " option
+    case $option in
+        1) gaming_dns ;;
+        2) download_dns ;;
+        3) ping_test ;;
+        4) premium_dns ;;
+        0) echo -e "\033[1;32mGoodbye 🙏🏻\033[0m"; exit ;;
+        *) main_menu ;;
     esac
 }
 
-# Gaming DNS section
-show_game_dns() {
-    clear
-    echo -e "${CYAN}Select a Game:${RESET}"
-    games=("PUBG" "Call of Duty" "Fortnite" "Valorant" "Free Fire" "Arena Breakout")
+games=(
+"Call of Duty" "PUBG" "Fortnite" "Valorant" "League of Legends"
+"Dota 2" "CS:GO" "Overwatch" "Apex Legends" "Minecraft"
+"Roblox" "Rocket League" "Rainbow Six Siege" "Free Fire" "Genshin Impact"
+"Warzone" "Battlefield" "Mobile Legends" "Arena Breakout" "Escape from Tarkov"
+"FIFA" "eFootball" "Clash Royale" "Clash of Clans" "Brawl Stars"
+"New World" "World of Warcraft" "Elden Ring" "Honkai Impact" "Cyberpunk 2077"
+)
+
+countries=("Germany" "Netherlands" "France" "UAE" "Turkey" "Iran")
+
+function gaming_dns() {
+    title
+    echo "🎮 Select a game:"
     for i in "${!games[@]}"; do
-        echo -e "${GREEN}[$((i+1))]${RESET} ${games[$i]}"
+        echo -e "\033[36m[$((i+1))]\033[0m ${games[$i]}"
     done
-    echo -e "${GREEN}[0]${RESET} Back"
-    read -p "Choose a game: " gopt
-
-    [[ "$gopt" == "0" ]] && main_menu
-
-    case $gopt in
-        1) dns=("10.202.10.10" "10.202.10.11") ;;
-        2) dns=("78.157.42.100" "78.157.42.101") ;;
-        3) dns=("1.1.1.1" "1.0.0.1") ;;
-        4) dns=("9.9.9.9" "149.112.112.112") ;;
-        5) dns=("156.154.70.2" "156.154.71.2") ;;
-        6) dns=("185.51.200.2" "178.22.122.100") ;;
-        *) echo "Invalid"; sleep 1; show_game_dns ;;
-    esac
-
-    echo -e "\n${BLUE}Primary DNS:${RESET} ${dns[0]}"
-    echo -e "${BLUE}Secondary DNS:${RESET} ${dns[1]}"
-    echo -e "${YELLOW}Press Enter to go back...${RESET}"
-    read
-    main_menu
-}
-
-# Download DNS section
-show_download_dns() {
-    clear
-    echo -e "${CYAN}Download DNS with Anti-Censorship:${RESET}"
-
-    dns_list=(
-        "78.157.42.100|78.157.42.101"  # Electro
-        "185.51.200.2|178.22.122.100"  # Shecan
-        "185.55.225.25|185.55.226.26"  # Begzar
-        "64.6.64.6|64.6.65.6"          # Ultra
-        "159.250.35.250|159.250.35.251" # NTT
-    )
-
-    selected="${dns_list[$RANDOM % ${#dns_list[@]}]}"
-    primary=$(echo $selected | cut -d'|' -f1)
-    secondary=$(echo $selected | cut -d'|' -f2)
-
-    echo -e "\n${BLUE}Primary DNS:${RESET} $primary"
-    echo -e "${BLUE}Secondary DNS:${RESET} $secondary"
-    echo -e "${YELLOW}Press Enter to go back...${RESET}"
-    read
-    main_menu
-}
-
-# Premium DNS section
-show_premium_dns() {
-    clear
-    echo -e "${CYAN}High Performance Premium DNS:${RESET}"
-
-    dns_list=(
-        "103.86.96.100|103.86.99.100"  # NordVPN DNS
-        "94.140.14.14|94.140.15.15"    # AdGuard DNS
-        "8.26.56.26|8.20.247.20"       # Comodo Secure
-        "76.76.2.0|76.76.10.0"         # Control D
-    )
-
-    selected="${dns_list[$RANDOM % ${#dns_list[@]}]}"
-    primary=$(echo $selected | cut -d'|' -f1)
-    secondary=$(echo $selected | cut -d'|' -f2)
-
-    echo -e "\n${BLUE}Primary DNS:${RESET} $primary"
-    echo -e "${BLUE}Secondary DNS:${RESET} $secondary"
-    echo -e "${YELLOW}Press Enter to go back...${RESET}"
-    read
-    main_menu
-}
-
-# Real-time Ping Test
-ping_test() {
-    clear
-    echo -e "${CYAN}Testing DNS latency...${RESET}"
-    servers=("1.1.1.1" "8.8.8.8" "9.9.9.9" "185.51.200.2")
-    for s in "${servers[@]}"; do
-        ping -c 1 -W 1 $s &>/dev/null
-        if [ $? -eq 0 ]; then
-            ping_result=$(ping -c 1 -W 1 $s | grep 'time=' | awk -F'time=' '{print $2}')
-            echo -e "${GREEN}$s${RESET} => ${YELLOW}${ping_result}${RESET}"
-        else
-            echo -e "${RED}$s => No Response${RESET}"
-        fi
+    echo -e "\033[36m[0]\033[0m Back"
+    read -p "Choose a game: " game_choice
+    [[ $game_choice == 0 ]] && main_menu
+    selected_game="${games[$((game_choice-1))]}"
+    title
+    echo "🌍 Select a region for $selected_game:"
+    for i in "${!countries[@]}"; do
+        echo -e "\033[36m[$((i+1))]\033[0m ${countries[$i]}"
     done
-    echo -e "${YELLOW}Press Enter to go back...${RESET}"
-    read
+    echo -e "\033[36m[0]\033[0m Back"
+    read -p "Choose a region: " country_choice
+    [[ $country_choice == 0 ]] && gaming_dns
+    echo
+    echo "🔐 DNS for $selected_game in ${countries[$((country_choice-1))]}:"
+    dns_list=(
+        "185.51.200.2"
+        "1.1.1.1"
+        "8.8.8.8"
+        "185.55.225.25"
+        "10.202.10.11"
+        "156.154.70.2"
+        "64.6.64.6"
+        "208.67.222.222"
+        "9.9.9.9"
+    )
+    random1=${dns_list[$RANDOM % ${#dns_list[@]}]}
+    random2=${dns_list[$RANDOM % ${#dns_list[@]}]}
+    echo -e "🟢 Primary: \033[1;32m$random1\033[0m"
+    echo -e "🔵 Secondary: \033[1;34m$random2\033[0m"
+    read -p "Press Enter to return..." enter
+    main_menu
+}
+
+function download_dns() {
+    title
+    echo "🌍 Choose country for optimized download:"
+    for i in "${!countries[@]}"; do
+        echo -e "\033[36m[$((i+1))]\033[0m ${countries[$i]}"
+    done
+    echo -e "\033[36m[0]\033[0m Back"
+    read -p "Choose a country: " d_choice
+    [[ $d_choice == 0 ]] && main_menu
+    echo
+    echo "⬇️ Fast & Anti-Censorship DNS for ${countries[$((d_choice-1))]}:"
+    list=(
+        "10.202.10.10"
+        "178.22.122.100"
+        "156.154.71.2"
+        "185.55.226.26"
+        "208.67.220.200"
+    )
+    echo -e "🟢 Primary: \033[1;32m${list[$RANDOM % ${#list[@]}]}\033[0m"
+    echo -e "🔵 Secondary: \033[1;34m${list[$RANDOM % ${#list[@]}]}\033[0m"
+    read -p "Press Enter to return..." enter
+    main_menu
+}
+
+function ping_test() {
+    title
+    read -p "🔍 Enter DNS to ping (e.g., 1.1.1.1): " dns
+    echo "📡 Testing ping to $dns ..."
+    ping -c 4 $dns
+    read -p "Press Enter to return..." enter
+    main_menu
+}
+
+function premium_dns() {
+    title
+    echo "💎 Premium Low-Ping DNS Providers:"
+    prem_dns=(
+        "5.2.75.75"
+        "185.228.168.9"
+        "94.140.14.14"
+        "176.103.130.130"
+        "45.90.28.0"
+        "8.26.56.26"
+    )
+    echo -e "🟢 Primary: \033[1;32m${prem_dns[$RANDOM % ${#prem_dns[@]}]}\033[0m"
+    echo -e "🔵 Secondary: \033[1;34m${prem_dns[$RANDOM % ${#prem_dns[@]}]}\033[0m"
+    read -p "Press Enter to return..." enter
     main_menu
 }
 
