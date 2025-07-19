@@ -1,0 +1,26 @@
+Free Fire|Iran|1.1.1.1|1.0.0.1
+Free Fire|Iran|45.90.28.0|45.90.30.0
+Free Fire|Iran|94.140.14.14|94.140.15.15
+Free Fire|Iran|9.9.9.9|149.112.112.112
+Free Fire|Iran|185.228.168.9|185.228.169.9
+Free Fire|Turkey|8.8.8.8|8.8.4.4
+Free Fire|Turkey|1.1.1.2|1.0.0.2
+Free Fire|Turkey|176.103.130.130|176.103.130.131
+PUBG Mobile|Iran|4.2.2.4|4.2.2.2
+PUBG Mobile|Iran|9.9.9.9|149.112.112.112
+PUBG Mobile|Iran|76.76.2.0|76.76.10.0
+PUBG Mobile|Turkey|1.1.1.1|1.0.0.1
+PUBG Mobile|Turkey|94.140.14.15|94.140.14.16
+Call of Duty Mobile|Iran|1.1.1.1|1.0.0.1
+Call of Duty Mobile|Iran|9.9.9.10|149.112.112.10
+Call of Duty Mobile|Iran|185.228.168.10|185.228.169.10
+Call of Duty Mobile|Turkey|8.8.8.8|8.8.4.4
+Call of Duty Mobile|Turkey|176.103.130.130|176.103.130.131
+Fortnite|Iran|1.1.1.1|1.0.0.1
+Fortnite|Iran|185.228.168.9|185.228.169.9
+Fortnite|Turkey|8.8.8.8|8.8.4.4
+Download|Iran|103.86.96.100|103.86.99.100
+Download|Iran|5.5.5.5|5.5.5.6
+Download|Iran|76.76.2.0|76.76.10.0
+Download|Turkey|4.2.2.4|4.2.2.2
+Download|Turkey|9.9.9.9|149.112.112.112
