@@ -2,8 +2,7 @@
 
 VERSION="1.2.3"
 
-# لیست رنگ‌ها برای تغییر رنگ عنوان
-COLORS=(31 32 33 34 35 36 91 92 93 94 95 96)
+COLORS=(31 32 33 34 35 36 91 92 93 94 95 96 97)
 
 # انیمیشن تایپ
 type_animation() {
@@ -16,25 +15,24 @@ type_animation() {
   echo
 }
 
-# انتخاب رنگ تصادفی
 random_color() {
   echo "${COLORS[$RANDOM % ${#COLORS[@]}]}"
 }
 
-# نمایش تایتل زیبا با رنگ تصادفی
 show_title() {
   clear
   color=$(random_color)
-  echo -e "\e[1;${color}m╔════════════════════════════════════╗"
-  echo -e "║         Gaming DNS Manager         ║"
-  echo -e "╠════════════════════════════════════╣"
-  echo -e "║ Telegram: @Academi_vpn             ║"
-  echo -e "║ Admin:    @MahdiAGM0               ║"
-  echo -e "╚════════════════════════════════════╝\e[0m"
-  echo
+  echo -e "\e[1;${color}m"
+  type_animation "╔════════════════════════════════════════╗"
+  type_animation "║         Gaming DNS Manager v$VERSION         ║"
+  type_animation "╠════════════════════════════════════════╣"
+  type_animation "║ Telegram: @Academi_vpn                 ║"
+  type_animation "║ Admin:    @MahdiAGM0                   ║"
+  type_animation "╚════════════════════════════════════════╝"
+  echo -e "\e[0m"
 }
 
-# تست پینگ DNS
+# تست پینگ
 ping_dns() {
   read -p "Enter DNS to test: " dns
   echo -e "\nTesting ping to $dns..."
@@ -43,25 +41,23 @@ ping_dns() {
   read
 }
 
-# دریافت DNS پرمیوم واقعی (نمونه ثابت واقعی)
 get_premium_dns() {
   dns_list=(
     "94.140.14.14,94.140.15.15"
-    "91.239.100.100,89.223.43.71"
+    "91.239.100.100,89.233.43.71"
+    "185.228.168.9,185.228.169.9"
     "45.90.28.0,45.90.30.0"
-    "156.154.70.2,156.154.71.2"
   )
   dns_pair=${dns_list[$RANDOM % ${#dns_list[@]}]}
   dns1=$(echo "$dns_pair" | cut -d',' -f1)
   dns2=$(echo "$dns_pair" | cut -d',' -f2)
   echo -e "\nYour Premium DNS:"
-  echo -e "Primary:   $dns1"
-  echo -e "Secondary: $dns2"
+  echo "Primary:   $dns1"
+  echo "Secondary: $dns2"
   echo -e "\nPress Enter to return..."
   read
 }
 
-# دریافت DNS دانلود بر اساس کشور
 download_dns_by_country() {
   countries=("Iran" "Germany" "France" "Singapore" "USA" "Netherlands")
   echo -e "\nChoose Country:"
@@ -85,7 +81,6 @@ download_dns_by_country() {
   read
 }
 
-# لیست گیم‌ها
 games=(
   "Call of Duty"
   "PUBG"
@@ -120,54 +115,69 @@ games=(
   "Escape from Tarkov"
 )
 
-# دریافت DNS گیمینگ
+countries=("Iran" "Turkey" "UAE" "Qatar" "Iraq" "Jordan")
+
+random_dns() {
+  echo "Primary:   185.55.$((RANDOM%100+100)).$((RANDOM%100+1))"
+  echo "Secondary: 185.55.$((RANDOM%100+100)).$((RANDOM%100+1))"
+}
+
 gaming_dns_menu() {
   echo -e "\nChoose Game:"
   for i in "${!games[@]}"; do
-    index=$((i+1))
+    num=$((i+1))
     if [[ "${games[$i]}" == *"Arena Breakout"* ]]; then
-      echo -e "  [$index] \e[1;34m${games[$i]}\e[0m"
+      echo -e "  [$num] \e[1;34m${games[$i]}\e[0m"
     else
-      echo "  [$index] ${games[$i]}"
+      echo "  [$num] ${games[$i]}"
     fi
   done
   read -p "Enter game number: " game_index
-  game_name="${games[$((game_index-1))]}"
-  # کشورها
-  countries=("Iran" "Turkey" "UAE" "Qatar" "Iraq" "Jordan")
+  [[ $game_index -lt 1 || $game_index -gt ${#games[@]} ]] && echo "Invalid game." && return
+  game="${games[$((game_index-1))]}"
   echo -e "\nSelect Country:"
   for i in "${!countries[@]}"; do
     echo "  [$((i+1))] ${countries[$i]}"
   done
   read -p "Enter country number: " country_index
   country="${countries[$((country_index-1))]}"
-  dns1="185.55.$((RANDOM%100+100)).$((RANDOM%100+1))"
-  dns2="185.55.$((RANDOM%100+100)).$((RANDOM%100+1))"
-  echo -e "\n$game_name DNS for $country:"
-  echo "Primary:   $dns1"
-  echo "Secondary: $dns2"
+  echo -e "\nDNS for $game - $country:"
+  random_dns
   echo -e "\nPress Enter to return..."
   read
 }
 
-# سرچ در گیم‌ها
 search_game() {
   read -p "Search Game: " query
-  found=false
+  found_index=-1
   for i in "${!games[@]}"; do
     if [[ "${games[$i],,}" == *"${query,,}"* ]]; then
-      echo "  [$((i+1))] ${games[$i]}"
-      found=true
+      found_index=$i
+      break
     fi
   done
-  if ! $found; then
-    echo "No results."
+
+  if [[ $found_index -eq -1 ]]; then
+    echo -e "\e[1;32m\n❌ Game not found!\e[0m"
+    echo -e "\nPress Enter to return..."
+    read
+    return
   fi
+
+  game="${games[$found_index]}"
+  echo -e "\nFound: $game"
+  echo -e "Select Country:"
+  for i in "${!countries[@]}"; do
+    echo "  [$((i+1))] ${countries[$i]}"
+  done
+  read -p "Enter country number: " country_index
+  country="${countries[$((country_index-1))]}"
+  echo -e "\nDNS for $game - $country:"
+  random_dns
   echo -e "\nPress Enter to return..."
   read
 }
 
-# منوی اصلی
 main_menu() {
   while true; do
     show_title
@@ -187,11 +197,10 @@ main_menu() {
       3) get_premium_dns ;;
       4) ping_dns ;;
       5) search_game ;;
-      0) echo -e "\nGoodbye 🙏🏻"; exit ;;
-      *) echo "Invalid option!" ;;
+      0) echo -e "\nGoodbye 👋"; exit ;;
+      *) echo "Invalid option." ;;
     esac
   done
 }
 
-# شروع
 main_menu
