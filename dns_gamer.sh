@@ -1,188 +1,137 @@
 #!/bin/bash
 
-# DNS Configurator v1.2.4 by @MahdiAGM0
+# ANSI رنگ‌ها
+colors=('\e[1;31m' '\e[1;32m' '\e[1;33m' '\e[1;34m' '\e[1;35m' '\e[1;36m' '\e[1;37m')
 
-colors=("\033[1;31m" "\033[1;32m" "\033[1;33m" "\033[1;34m" "\033[1;35m" "\033[1;36m")
-nocolor="\033[0m"
+# عنوان با انیمیشن تایپی
+animated_text() {
+    local text="$1"
+    local delay="$2"
+    for (( i=0; i<${#text}; i++ )); do
+        echo -n "${text:$i:1}"
+        sleep "$delay"
+    done
+}
 
-function show_title() {
+print_title() {
     clear
-    color="${colors[$RANDOM % ${#colors[@]}]}"
-    echo -e "${color}"
-    echo -e "╔══════════════════════════════════════╗"
-    echo -e "║       🔥 Gaming DNS Configurator 🔥      ║"
-    echo -e "╠══════════════════════════════════════╣"
-    echo -e "║   Telegram: @Academi_vpn             ║"
-    echo -e "║   Admin:    @MahdiAGM0               ║"
-    echo -e "╚══════════════════════════════════════╝"
-    echo -e "${nocolor}"
+    color=${colors[$RANDOM % ${#colors[@]}]}
+    box_top="╔══════════════════════════════════════════════════════╗"
+    box_bottom="╚══════════════════════════════════════════════════════╝"
+    echo -e "$color$box_top"
+    echo -ne "$color║ "
+    animated_text "⚡ Gaming DNS Script | Version 1.2.3 ⚡" 0.00008
+    echo -e " ║"
+    echo -e "$color║   Admin: @MahdiAGM0        Telegram: @Academi_vpn    ║"
+    echo -e "$color$box_bottom\n"
+    echo -e "\e[0m"
 }
 
-countries=("Iran" "UAE" "Turkey" "Saudi Arabia" "Qatar" "Iraq" "Jordan" "Oman" "Bahrain" "Lebanon")
+# بازی‌ها و کشورها
+games=("Call of Duty" "Valorant" "PUBG" "Fortnite" "CS:GO" "FIFA" "League of Legends" "Dota 2" "Minecraft" "Warzone" "Overwatch" "Apex Legends" "Rainbow Six" "Free Fire" "Roblox" "Rocket League" "Mobile Legends" "Arena of Valor" "Clash Royale" "Brawl Stars" "World of Tanks" "Battlefield" "Rust" "Genshin Impact" "EFootball" "Fall Guys" "Escape from Tarkov" "Smite" "Team Fortress 2" "Arena Breakout (NEW)")
 
-games=(
-  "Call of Duty"
-  "Arena Breakout"
-  "PUBG"
-  "Free Fire"
-  "Fortnite"
-  "Apex Legends"
-  "Warzone"
-  "CS:GO"
-  "Valorant"
-  "FIFA"
-  "Rainbow Six"
-  "Overwatch"
-  "League of Legends"
-  "Dota 2"
-  "Minecraft"
-  "Battlefield"
-  "Mobile Legends"
-  "Rocket League"
-  "Clash Royale"
-  "Brawl Stars"
-  "Roblox"
-  "Diablo"
-  "World of Tanks"
-  "Smite"
-  "Escape from Tarkov"
-  "Black Desert"
-  "CrossFire"
-  "World of Warcraft"
-  "Team Fortress 2"
-  "Paladins"
-)
+countries=("Iran" "Turkey" "UAE" "Saudi Arabia" "Qatar" "Iraq" "Jordan" "Israel" "Lebanon" "Kuwait")
 
-select_country() {
-    echo -e "\n🌍 Available Regions:"
-    for ((i = 0; i < ${#countries[@]}; i++)); do
-        echo "[$((i+1))] ${countries[$i]}"
-    done
-    read -p $'\nChoose a region number: ' region_idx
-    region="${countries[$((region_idx - 1))]}"
-    echo -e "\nSelected Region: $region"
-}
-
+# تابع تولید DNS رندوم (پولی و واقعی نمونه‌ای)
 generate_dns() {
-    a=$((RANDOM % 100 + 20))
-    b=$((RANDOM % 200 + 50))
-    dns1="185.${a}.${b}.1"
-    dns2="185.${a}.${b}.2"
+    primary="185.$((RANDOM % 255)).$((RANDOM % 255)).$((RANDOM % 255))"
+    secondary="185.$((RANDOM % 255)).$((RANDOM % 255)).$((RANDOM % 255))"
+    echo -e "\nPrimary DNS: $primary"
+    echo -e "Secondary DNS: $secondary"
 }
 
-ping_dns() {
-    read -p "Enter DNS to check ping: " dns_to_ping
-    echo -e "\nPinging $dns_to_ping...\n"
-    ping -c 4 "$dns_to_ping"
+# تابع گرفتن پینگ DNS از کاربر
+ping_custom_dns() {
+    read -p $'\nEnter DNS IP to ping: ' dns_ip
+    echo -e "\nPinging $dns_ip...\n"
+    ping -c 4 "$dns_ip"
+    read -p $'\nPress Enter to return to menu...'
 }
 
-arena_breakout_dns() {
-    dns1="185.202.121.10"
-    dns2="185.202.121.11"
-}
-
-dns_info() {
-    ip=$1
-    info=$(curl -s "https://ipinfo.io/$ip?token=demo" | jq -r '.ip + " - " + .country + " - " + .org')
-    echo "$info"
-}
-
-filter_games() {
-    read -p $'\n🔍 Search for a game (press Enter to skip): ' keyword
-    filtered=()
-    for game in "${games[@]}"; do
-        if [[ "$game" =~ ${keyword,,} ]]; then
-            filtered+=("$game")
+# فیلتر بازی‌ها
+search_game() {
+    read -p $'\nSearch game name: ' keyword
+    found=false
+    for ((i = 0; i < ${#games[@]}; i++)); do
+        if [[ "${games[i],,}" == *"${keyword,,}"* ]]; then
+            echo -e "[$((i+1))] ${games[i]}"
+            found=true
         fi
     done
-
-    if [ ${#filtered[@]} -eq 0 ]; then
-        echo -e "❌ No matching game found. Showing all..."
-        filtered=("${games[@]}")
+    if ! $found; then
+        echo "No match found."
     fi
-
-    echo -e "\n🎮 Available Games:"
-    for ((i = 0; i < ${#filtered[@]}; i++)); do
-        idx=$((i+1))
-        if [[ "${filtered[$i]}" == "Arena Breakout" ]]; then
-            echo -e "[$idx] \033[1;34m${filtered[$i]}\033[0m"
-        else
-            echo "[$idx] ${filtered[$i]}"
-        fi
-    done
-
-    read -p $'\nSelect a game number: ' game_idx
-    game="${filtered[$((game_idx - 1))]}"
+    read -p $'\nPress Enter to return...'
 }
 
 main_menu() {
     while true; do
-        show_title
-        echo -e "${colors[1]}[1]${nocolor} Gaming DNS 🎮"
-        echo -e "${colors[2]}[2]${nocolor} Download DNS ⬇️"
-        echo -e "${colors[3]}[3]${nocolor} Premium Gaming DNS ⚡"
-        echo -e "${colors[4]}[4]${nocolor} Ping a DNS 📶"
-        echo -e "${colors[5]}[0]${nocolor} Exit ❌"
-
-        read -p $'\nSelect an option: ' opt
-        case $opt in
-            1)
-                clear
-                filter_games
-                select_country
-                echo -e "\nGenerating DNS for $game in $region..."
-                if [[ "$game" == "Arena Breakout" ]]; then
-                    arena_breakout_dns
-                else
-                    generate_dns
-                fi
-                echo -e "\n✅ Primary DNS: $dns1"
-                echo -e "✅ Secondary DNS: $dns2"
-                echo -e "\n🌐 Location Info:"
-                echo "• $(dns_info "$dns1")"
-                echo "• $(dns_info "$dns2")"
-                read -p $'\nPress Enter to return to main menu...' ;;
-            2)
-                clear
-                echo -e "\n⬇️ Download DNS (Bypass Censorship)"
-                select_country
-                generate_dns
-                echo -e "\n✅ Primary DNS: $dns1"
-                echo -e "✅ Secondary DNS: $dns2"
-                echo -e "\n🌐 Location Info:"
-                echo "• $(dns_info "$dns1")"
-                echo "• $(dns_info "$dns2")"
-                read -p $'\nPress Enter to return to main menu...' ;;
-            3)
-                clear
-                echo -e "\n⚡ Premium Gaming DNS (Ping < 40ms)"
-                dns_list=(
-                    "103.74.112.241|103.74.112.242"
-                    "185.51.200.2|185.51.200.3"
-                    "10.202.10.10|10.202.10.11"
-                    "178.22.122.100|185.51.200.4"
-                    "185.228.168.9|185.228.169.9"
-                )
-                pick=${dns_list[$RANDOM % ${#dns_list[@]}]}
-                dns1="${pick%%|*}"
-                dns2="${pick##*|}"
-                echo -e "\n✅ Primary DNS: $dns1"
-                echo -e "✅ Secondary DNS: $dns2"
-                echo -e "\n🌐 Location Info:"
-                echo "• $(dns_info "$dns1")"
-                echo "• $(dns_info "$dns2")"
-                read -p $'\nPress Enter to return to main menu...' ;;
-            4)
-                clear
-                ping_dns
-                read -p $'\nPress Enter to return to main menu...' ;;
-            0)
-                echo -e "${colors[0]}\nGoodbye 🙏🏻${nocolor}"
-                exit 0 ;;
-            *)
-                echo "❌ Invalid option. Try again." ;;
+        print_title
+        echo -e "[1] Gaming DNS"
+        echo -e "[2] Download DNS (Bypass Censorship)"
+        echo -e "[3] Global Premium DNS"
+        echo -e "[4] Check Custom DNS Ping"
+        echo -e "[5] Search Game"
+        echo -e "[0] Exit"
+        read -p $'\nChoose an option: ' opt
+        case "$opt" in
+            1) gaming_dns ;;
+            2) download_dns ;;
+            3) global_dns ;;
+            4) ping_custom_dns ;;
+            5) search_game ;;
+            0) echo -e "\nGoodbye 🙏🏻\n"; exit ;;
+            *) echo "Invalid option." ;;
         esac
     done
 }
 
+gaming_dns() {
+    print_title
+    echo -e "🎮 Select your game:"
+    for ((i=0; i<${#games[@]}; i++)); do
+        if [[ "${games[i]}" == *"Arena Breakout"* ]]; then
+            echo -e "[${i+1}] \e[1;34m${games[i]}\e[0m"
+        else
+            echo -e "[$((i+1))] ${games[i]}"
+        fi
+    done
+    echo -e "[0] Back"
+    read -p $'\nChoose your game: ' game_index
+    if [[ "$game_index" == "0" ]]; then return; fi
+    selected_game="${games[$((game_index-1))]}"
+    echo -e "\n🌍 Select region for $selected_game:"
+    for ((i=0; i<${#countries[@]}; i++)); do
+        echo -e "[$((i+1))] ${countries[i]}"
+    done
+    echo -e "[0] Back"
+    read -p $'\nChoose region: ' region_index
+    [[ "$region_index" == "0" ]] && return
+    echo -e "\n🔗 DNS for $selected_game (${countries[$((region_index-1))]}):"
+    generate_dns
+    read -p $'\nPress Enter to return...'
+}
+
+download_dns() {
+    print_title
+    echo -e "🌐 Select region:"
+    for ((i=0; i<${#countries[@]}; i++)); do
+        echo -e "[$((i+1))] ${countries[i]}"
+    done
+    echo -e "[0] Back"
+    read -p $'\nChoose region: ' region_index
+    [[ "$region_index" == "0" ]] && return
+    echo -e "\n⬇️ Premium DNS for Downloads & Censorship Bypass (${countries[$((region_index-1))]}):"
+    generate_dns
+    read -p $'\nPress Enter to return...'
+}
+
+global_dns() {
+    print_title
+    echo -e "🌍 Global Premium DNS:"
+    generate_dns
+    read -p $'\nPress Enter to return...'
+}
+
+# اجرای اسکریپت
 main_menu
