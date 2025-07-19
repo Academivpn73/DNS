@@ -1,77 +1,70 @@
-PUBG Mobile
-Call of Duty Mobile
-Free Fire
-Arena Breakout (New)
-Fortnite
-Apex Legends Mobile
-Clash of Clans
-Clash Royale
-Brawl Stars
-League of Legends: Wild Rift
-Mobile Legends
-Valorant Mobile
-Genshin Impact
-Minecraft
-Roblox
-Subway Surfers
-Among Us
-FIFA Mobile
-eFootball 2024
-NBA Live Mobile
-Rocket League Sideswipe
-Modern Combat 5
-Critical Ops
-War Robots
-Dead by Daylight Mobile
-Asphalt 9
-CSR Racing 2
-Need for Speed No Limits
-Real Racing 3
-SimCity BuildIt
-Plague Inc.
-Boom Beach
-Hay Day
-8 Ball Pool
-Shadow Fight 3
-Plants vs Zombies 2
-Dragon Ball Legends
-Pokémon Unite
-Pokemon GO
-Naruto x Boruto Ninja Voltage
-Honkai Impact 3rd
-Honkai Star Rail
-Summoners War
-Marvel Contest of Champions
-Injustice 2
-Mortal Kombat
-AFK Arena
-Raid: Shadow Legends
-Rise of Kingdoms
-State of Survival
-Lords Mobile
-Game of Sultans
-Idle Heroes
-King of Avalon
-Clash of Kings
-World of Warships Blitz
-World of Tanks Blitz
-Warface Global Operations
-PUBG New State
-T3 Arena
-Torchlight Infinite
-Ni no Kuni: Cross Worlds
-Sky: Children of the Light
-Identity V
-Rebel Inc.
-Zooba
-Super Mecha Champions
-Dragon Raja
-Bloodline: Heroes of Lithas
-League of Pantheons
-One Piece Bounty Rush
-Blue Archive
-Tower of Fantasy
-Tacticool
-Call of Dragons
-Survivor.io
-Solo Leveling: Arise
+1) Call of Duty Mobile
+2) PUBG Mobile
+3) Fortnite
+4) Free Fire
+5) Apex Legends Mobile
+6) Clash of Clans
+7) Clash Royale
+8) Brawl Stars
+9) Mobile Legends
+10) League of Legends: Wild Rift
+11) Arena of Valor
+12) Genshin Impact
+13) Pokemon Unite
+14) Roblox
+15) Minecraft
+16) Valorant
+17) CS:GO
+18) Dota 2
+19) GTA V Online
+20) Rocket League
+21) FIFA Mobile
+22) PES eFootball
+23) NBA 2K Mobile
+24) Among Us
+25) Subway Surfers
+26) 8 Ball Pool
+27) Real Racing 3
+28) Asphalt 9
+29) Modern Combat 5
+30) Shadowgun Legends
+31) Dead by Daylight Mobile
+32) Diablo Immortal
+33) War Robots
+34) CrossFire: Legends
+35) Critical Ops
+36) Bullet Force
+37) World of Tanks Blitz
+38) Tank Stars
+39) Rise of Kingdoms
+40) Lords Mobile
+41) Clash of Kings
+42) Evony
+43) State of Survival
+44) The Walking Dead
+45) Cyber Hunter
+46) LifeAfter
+47) Identity V
+48) Into the Dead 2
+49) Nova Legacy
+50) Zombie Frontier 3
+51) Sniper 3D
+52) Hitman Sniper
+53) Sky: Children of the Light
+54) Alto's Odyssey
+55) Monument Valley
+56) Candy Crush Saga
+57) Gardenscapes
+58) Homescapes
+59) Toon Blast
+60) Angry Birds 2
+61) Temple Run 2
+62) Jetpack Joyride
+63) Fruit Ninja
+64) Hill Climb Racing 2
+65) Standoff 2
+66) Modern Strike Online
+67) Warface: Global Operations
+68) Tacticool
+69) Battle Prime
+70) Arena Breakout (New)
