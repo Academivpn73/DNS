@@ -2,165 +2,118 @@
 
 # Colors
 colors=(31 32 33 34 35 36)
-random_color=${colors[$RANDOM % ${#colors[@]}]}
-reset="\e[0m"
-bold="\e[1m"
-title_color="\e[1;${random_color}m"
-
-# GitHub DNS file
-DNS_URL="https://raw.githubusercontent.com/Academivpn73/DNS/main/dns_list.txt"
+color=${colors[$RANDOM % ${#colors[@]}]}
+box_line="------------------------------------------"
 
 # Title
-show_title() {
-  clear
-  echo -e "${title_color}"
-  echo "╔═══════════════════════════════════════════════╗"
-  echo "║         Academi VPN DNS Tool v1.2.3          ║"
-  echo "║      Admin: @MahdiAGM0 | TG: @Academi_vpn     ║"
-  echo "╚═══════════════════════════════════════════════╝"
-  echo -e "${reset}"
-}
+clear
+echo -e "\e[1;${color}m$box_line"
+echo -e "|         DNS Utility Script v1.2.3        |"
+echo -e "|   Telegram: @Academi_vpn                 |"
+echo -e "|   Admin:    @MahdiAGM0                   |"
+echo -e "$box_line\e[0m"
+echo ""
 
-# List of top 50 games (partial for example)
-declare -a games=(
-"PUBG Mobile"
-"Call of Duty Mobile"
-"Free Fire"
-"Clash of Clans"
-"Mobile Legends"
-"Fortnite"
-"Apex Legends Mobile"
-"Brawl Stars"
-"Valorant"
-"Warzone Mobile"
-"Roblox"
-"Among Us"
-"FIFA Mobile"
-"Asphalt 9"
-"Rocket League Sideswipe"
-"Diablo Immortal"
-"Genshin Impact"
-"League of Legends: Wild Rift"
-"Pokemon Unite"
-"New State Mobile"
-"Honor of Kings"
-"Marvel Snap"
-"Subway Surfers"
-"Temple Run"
-"8 Ball Pool"
-"Real Racing 3"
-"Clash Royale"
-"Cyber Hunter"
-"World of Tanks Blitz"
-"Zula Mobile"
-"Critical Ops"
-"Modern Combat 5"
-"Garena AOV"
-"Summoners War"
-"Dragon Ball Legends"
-"Minion Rush"
-"Dream League Soccer"
-"eFootball PES"
-"Shadowgun Legends"
-"Call of Dragons"
-"Rebel Inc"
-"Dead Trigger 2"
-"Shadow Fight 4"
-"Magic Rampage"
-"Sky: Children of the Light"
-"Tower of Fantasy"
-"Albion Online"
-"N.O.V.A. Legacy"
-"Legends of Runeterra"
-)
+# DNS File
+DNS_FILE="dns_list.txt"
+if [[ ! -f $DNS_FILE ]]; then
+    echo "Missing dns_list.txt. Please place it in the same folder."
+    exit 1
+fi
 
-# List of countries
-countries=("Iran" "UAE" "Turkey" "Qatar" "Saudi Arabia" "Iraq" "Jordan" "Global")
-
-# Search & show DNS
-search_dns() {
-  show_title
-  echo -e "${bold}🔍 Enter game name to search:${reset}"
-  read -p "Game: " game_input
-
-  match_found=false
-  for game in "${games[@]}"; do
-    if [[ "${game,,}" == *"${game_input,,}"* ]]; then
-      match_found=true
-      echo -e "\n✅ Game Found: ${bold}$game${reset}"
-      echo -e "\n🌍 Select Country:"
-      for i in "${!countries[@]}"; do
-        echo "$((i+1)). ${countries[$i]}"
-      done
-
-      read -p "Enter number: " region_index
-      selected_country="${countries[$((region_index-1))]}"
-
-      dns_line=$(curl -s "$DNS_URL" | grep -i "$game" | grep -i "$selected_country" | shuf -n 1)
-      if [[ -z "$dns_line" ]]; then
-        echo -e "${bold}⚠️ No DNS found for this game and country.${reset}"
-      else
-        dns1=$(echo "$dns_line" | cut -d',' -f3)
-        dns2=$(echo "$dns_line" | cut -d',' -f4)
-        echo -e "\n🎯 ${bold}DNS for $game in $selected_country:${reset}"
-        echo "Primary:   $dns1"
-        echo "Secondary: $dns2"
-
-        ping=$(ping -c 1 -W 1 "$dns1" | grep time= | awk -F'time=' '{print $2}' | awk '{print $1}')
-        [[ -z "$ping" ]] && ping="Unavailable"
-        echo -e "Ping: ${bold}$ping ms${reset}"
-      fi
-      break
-    fi
-  done
-
-  if [ "$match_found" = false ]; then
-    echo -e "${bold}\n⚠️ Game not found.${reset}"
-  fi
-  echo -e "\nPress Enter to return..."
-  read
-}
-
-# Menu
-main_menu() {
-  while true; do
-    show_title
-    echo -e "${bold}Choose an option:${reset}"
-    echo "1) 🌐 Premium DNS"
-    echo "2) 📶 Ping DNS"
-    echo "3) 🔍 Search Game DNS"
-    echo "0) ❌ Exit"
-    read -p "Your choice: " choice
+# Main Menu
+while true; do
+    echo -e "\nChoose an option:"
+    echo "1. 🎮 DNS for Gaming"
+    echo "2. 📥 DNS for Downloading"
+    echo "3. 💎 Premium DNS (NEW)"
+    echo "4. 📶 Ping a DNS (NEW)"
+    echo "5. 🔍 Search Game (NEW)"
+    echo "0. Exit"
+    read -p "Enter choice: " choice
 
     case $choice in
-      1)
-        dns_line=$(curl -s "$DNS_URL" | shuf -n 1)
-        dns1=$(echo "$dns_line" | cut -d',' -f3)
-        dns2=$(echo "$dns_line" | cut -d',' -f4)
-        echo -e "\n💎 Premium DNS:"
-        echo "Primary:   $dns1"
-        echo "Secondary: $dns2"
-        ;;
-      2)
-        read -p "Enter DNS to ping: " dns
-        ping=$(ping -c 1 -W 1 "$dns" | grep time= | awk -F'time=' '{print $2}' | awk '{print $1}')
-        [[ -z "$ping" ]] && ping="Unavailable"
-        echo -e "Ping: ${bold}$ping ms${reset}"
-        ;;
-      3)
-        search_dns
-        ;;
-      0)
-        echo "Bye!"
-        exit
-        ;;
-      *)
-        echo "❌ Invalid choice."
-        ;;
-    esac
-    echo -e "\nPress Enter to return..."
-    read
-  done
-}
+        1)
+            echo -e "\n🎮 Available Games:"
+            mapfile -t games < <(awk -F',' '$5=="Gaming"{print $1}' "$DNS_FILE" | sort -u)
+            i=1
+            for game in "${games[@]}"; do
+                if [[ "$game" == "Arena Breakout" ]]; then
+                    echo -e "$i. \e[36m$game (NEW)\e[0m"
+                else
+                    echo "$i. $game"
+                fi
+                ((i++))
+            done
+            read -p "Select game: " game_index
+            game="${games[$((game_index-1))]}"
 
-main_menu
+            echo -e "\n🌍 Choose Country:"
+            mapfile -t countries < <(awk -F',' -v g="$game" '$1==g{print $2}' "$DNS_FILE" | sort -u)
+            i=1
+            for c in "${countries[@]}"; do echo "$i. $c"; ((i++)); done
+            read -p "Select country: " country_index
+            country="${countries[$((country_index-1))]}"
+
+            dns=$(awk -F',' -v g="$game" -v c="$country" '$1==g && $2==c{print $3" "$4}' "$DNS_FILE" | shuf -n1)
+            echo -e "\nRecommended DNS for $game ($country):"
+            echo "Primary DNS:  $(echo $dns | cut -d' ' -f1)"
+            echo "Secondary DNS: $(echo $dns | cut -d' ' -f2)"
+            read -p "Press Enter to return..."
+            ;;
+
+        2)
+            echo -e "\n🌍 Choose Country:"
+            mapfile -t dl_countries < <(awk -F',' '$5=="Download"{print $2}' "$DNS_FILE" | sort -u)
+            i=1
+            for c in "${dl_countries[@]}"; do echo "$i. $c"; ((i++)); done
+            read -p "Select country: " country_index
+            country="${dl_countries[$((country_index-1))]}"
+
+            dns=$(awk -F',' -v c="$country" '$2==c && $5=="Download"{print $3" "$4}' "$DNS_FILE" | shuf -n1)
+            echo -e "\nRecommended DNS for Downloads ($country):"
+            echo "Primary DNS:  $(echo $dns | cut -d' ' -f1)"
+            echo "Secondary DNS: $(echo $dns | cut -d' ' -f2)"
+            read -p "Press Enter to return..."
+            ;;
+
+        3)
+            echo -e "\n💎 Premium DNS:"
+            dns=$(awk -F',' '$5=="Premium"{print $3" "$4}' "$DNS_FILE" | shuf -n1)
+            echo "Primary DNS:  $(echo $dns | cut -d' ' -f1)"
+            echo "Secondary DNS: $(echo $dns | cut -d' ' -f2)"
+            read -p "Press Enter to return..."
+            ;;
+
+        4)
+            read -p "Enter DNS to ping: " pingdns
+            echo -e "\nPinging $pingdns..."
+            ping -c 1 $pingdns | grep "time=" || echo "Ping failed."
+            read -p "Press Enter to return..."
+            ;;
+
+        5)
+            read -p "Enter game name to search: " search_game
+            found=$(awk -F',' -v g="$search_game" '$1==g{print $0}' "$DNS_FILE")
+            if [[ -z "$found" ]]; then
+                echo -e "\e[33mGame not found.\e[0m"
+                read -p "Press Enter to return..."
+            else
+                echo -e "\n🌍 Choose Country:"
+                mapfile -t countries < <(awk -F',' -v g="$search_game" '$1==g{print $2}' "$DNS_FILE" | sort -u)
+                i=1
+                for c in "${countries[@]}"; do echo "$i. $c"; ((i++)); done
+                read -p "Select country: " cidx
+                country="${countries[$((cidx-1))]}"
+                dns=$(awk -F',' -v g="$search_game" -v c="$country" '$1==g && $2==c{print $3" "$4}' "$DNS_FILE" | shuf -n1)
+                echo -e "\nRecommended DNS for $search_game ($country):"
+                echo "Primary DNS:  $(echo $dns | cut -d' ' -f1)"
+                echo "Secondary DNS: $(echo $dns | cut -d' ' -f2)"
+                read -p "Press Enter to return..."
+            fi
+            ;;
+
+        0) exit ;;
+        *) echo "Invalid option." ;;
+    esac
+done
