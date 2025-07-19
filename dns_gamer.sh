@@ -1,126 +1,110 @@
 #!/bin/bash
 
-# ==========[ Configuration ]============
-DNS_GAMING_FILE="dns_gaming.txt"
-DNS_DOWNLOAD_FILE="dns_download.txt"
-GAMES_LIST_FILE="games_list.txt"
-VERSION="1.2.3"
-ADMIN="@MahdiAGM0"
-TELEGRAM="@Academi_vpn"
-# =======================================
+# رنگ‌ها
+red='\e[31m'
+green='\e[32m'
+yellow='\e[33m'
+blue='\e[34m'
+nc='\e[0m'
 
-# ==========[ Color Setup ]=============
-GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
-NC='\033[0m' # No Color
-# =======================================
+# مسیرهای آنلاین
+GAMES_LIST_URL="https://raw.githubusercontent.com/Academivpn73/DNS/main/games_list.txt"
+DNS_GAMING_URL="https://raw.githubusercontent.com/Academivpn73/DNS/main/dns_gaming.txt"
+DNS_DOWNLOAD_URL="https://raw.githubusercontent.com/Academivpn73/DNS/main/dns_download.txt"
 
-# ==========[ Functions ]===============
+# تابع نمایش عنوان با رنگ متغیر
 show_title() {
-  clear
-  COLOR=$((31 + RANDOM % 7))
-  echo -e "\033[1;${COLOR}m"
-  echo "╔═══════════════════════════════════╗"
-  echo "║           DNS TOOL MENU           ║"
-  echo "╚═══════════════════════════════════╝"
-  echo -e "\033[0m"
-  echo -e "+---------------------------------------------+"
-  echo -e "| Telegram: ${TELEGRAM}"
-  echo -e "| Admin:    ${ADMIN}"
-  echo -e "| Version:  ${VERSION}"
-  echo -e "+---------------------------------------------+"
-}
-
-random_dns_from_file() {
-  file="$1"
-  total=$(wc -l < "$file")
-  line1=$((RANDOM % total + 1))
-  line2=$((RANDOM % total + 1))
-  dns1=$(sed -n "${line1}p" "$file")
-  dns2=$(sed -n "${line2}p" "$file")
-  echo "$dns1"
-  echo "$dns2"
-}
-
-ping_dns() {
-  read -p "Enter DNS to test: " dns
-  echo -e "${YELLOW}Pinging $dns...${NC}"
-  ping -c 3 "$dns"
+  colors=("$red" "$green" "$yellow" "$blue")
+  rand_color=${colors[$RANDOM % ${#colors[@]}]}
+  echo -e "${rand_color}+-------------------------------+${nc}"
+  echo -e "${rand_color}|     ACADEMI VPN SCRIPT       |${nc}"
+  echo -e "${rand_color}|     Admin: @MahdiAGM0        |${nc}"
+  echo -e "${rand_color}|     Version: 1.2.3           |${nc}"
+  echo -e "${rand_color}+-------------------------------+${nc}"
   echo
-  read -p "Press Enter to return..."
 }
 
-search_game_dns() {
-  show_title
-  echo -e "📱 ${GREEN}Game List:${NC}"
-  nl "$GAMES_LIST_FILE"
-  echo
-  read -p "Enter game name to search: " game
+# تابع انتخاب DNS رندوم
+pick_random_dns() {
+  dns_list=("$@")
+  count=${#dns_list[@]}
+  if (( count < 2 )); then
+    echo -e "${red}❌ Not enough DNS entries!${nc}"
+    return
+  fi
+  idx1=$((RANDOM % count))
+  idx2=$((RANDOM % count))
+  while [[ $idx2 -eq $idx1 ]]; do
+    idx2=$((RANDOM % count))
+  done
+  echo -e "${green}🟢 Primary DNS:${nc} ${dns_list[$idx1]}"
+  echo -e "${green}🟡 Secondary DNS:${nc} ${dns_list[$idx2]}"
+}
 
-  found=$(grep -i "^$game\$" "$GAMES_LIST_FILE")
-  if [[ -z "$found" ]]; then
-    echo -e "${YELLOW}Game not found!${NC}"
-    read -p "Press Enter to return..."
+# بخش بازی
+dns_gaming_section() {
+  echo -e "${blue}📱 Game List:${nc}"
+  curl -fsSL "$GAMES_LIST_URL" || {
+    echo -e "${red}❌ Failed to load games list!${nc}"
+    return
+  }
+
+  echo
+  echo -ne "${yellow}🎮 Enter game name: ${nc}"
+  read game
+
+  dns_list=()
+  while IFS= read -r line; do
+    [[ -n "$line" ]] && dns_list+=("$line")
+  done < <(curl -fsSL "$DNS_GAMING_URL")
+
+  if [[ ${#dns_list[@]} -eq 0 ]]; then
+    echo -e "${red}❌ No DNS found!${nc}"
     return
   fi
 
-  echo -e "🌍 Choose Region:"
-  select region in "Iran" "UAE" "Turkey" "Other"; do
-    [[ -n "$region" ]] && break
-  done
-
-  echo -e "${GREEN}Recommended DNS for ${game} (${region}):${NC}"
-  random_dns_from_file "$DNS_GAMING_FILE"
   echo
-  read -p "Press Enter to return..."
+  pick_random_dns "${dns_list[@]}"
 }
 
-download_dns() {
-  show_title
-  echo -e "🌍 Choose Region for Fast Download DNS:"
-  select region in "Iran" "UAE" "Turkey" "Other"; do
-    [[ -n "$region" ]] && break
-  done
+# بخش دانلود
+dns_download_section() {
+  dns_list=()
+  while IFS= read -r line; do
+    [[ -n "$line" ]] && dns_list+=("$line")
+  done < <(curl -fsSL "$DNS_DOWNLOAD_URL")
 
-  echo -e "${GREEN}Best DNS for Download (${region}):${NC}"
-  random_dns_from_file "$DNS_DOWNLOAD_FILE"
+  if [[ ${#dns_list[@]} -eq 0 ]]; then
+    echo -e "${red}❌ No DNS found!${nc}"
+    return
+  fi
+
   echo
-  read -p "Press Enter to return..."
+  pick_random_dns "${dns_list[@]}"
 }
 
-gaming_dns() {
-  show_title
-  echo -e "🌍 Choose Region for Gaming DNS:"
-  select region in "Iran" "UAE" "Turkey" "Other"; do
-    [[ -n "$region" ]] && break
+# منو اصلی
+main_menu() {
+  while true; do
+    clear
+    show_title
+    echo -e "${blue}1) DNS for Gaming${nc}"
+    echo -e "${blue}2) DNS for Download${nc}"
+    echo -e "${red}0) Exit${nc}"
+    echo
+    echo -ne "${yellow}Select an option: ${nc}"
+    read choice
+
+    case $choice in
+      1) dns_gaming_section ;;
+      2) dns_download_section ;;
+      0) echo -e "${red}Bye!${nc}"; exit ;;
+      *) echo -e "${red}Invalid!${nc}"; sleep 1 ;;
+    esac
+    echo
+    read -p "Press Enter to continue..."
   done
-
-  echo -e "${GREEN}Best Gaming DNS (${region}):${NC}"
-  random_dns_from_file "$DNS_GAMING_FILE"
-  echo
-  read -p "Press Enter to return..."
 }
-# =======================================
 
-# ==========[ Main Menu ]===============
-while true; do
-  show_title
-  echo -e "${GREEN}Select an option:${NC}"
-  echo "1️⃣  DNS for Gaming"
-  echo "2️⃣  DNS for Download"
-  echo "3️⃣  Search Game DNS (🆕)"
-  echo "4️⃣  Ping a DNS"
-  echo "0️⃣  Exit"
-  echo
-  read -p "Enter your choice: " opt
-
-  case $opt in
-    1) gaming_dns ;;
-    2) download_dns ;;
-    3) search_game_dns ;;
-    4) ping_dns ;;
-    0) exit ;;
-    *) echo "Invalid option!"; sleep 1 ;;
-  esac
-done
-# =======================================
+# اجرای منو
+main_menu
