@@ -1,206 +1,207 @@
-#!/bin/bash
+try:
+    from colorama import init, Fore, Style
+except ImportError:
+    import subprocess
+    import sys
+    subprocess.check_call([sys.executable, "-m", "pip", "install", "colorama"])
+    from colorama import init, Fore, Style
 
-VERSION="1.2.3"
+import time
+import random
+import os
+import platform
+import subprocess as sp
 
-COLORS=(31 32 33 34 35 36 91 92 93 94 95 96 97)
+init(autoreset=True)
 
-# انیمیشن تایپ
-type_animation() {
-  text=$1
-  delay=0.008
-  for ((i=0; i<${#text}; i++)); do
-    echo -ne "${text:$i:1}"
-    sleep $delay
-  done
-  echo
-}
+def clear(): os.system("cls" if platform.system() == "Windows" else "clear")
 
-random_color() {
-  echo "${COLORS[$RANDOM % ${#COLORS[@]}]}"
-}
+def fast_type(text, delay=0.008):
+    for char in text:
+        print(char, end='', flush=True)
+        time.sleep(delay)
+    print()
 
-show_title() {
-  clear
-  color=$(random_color)
-  echo -e "\e[1;${color}m"
-  type_animation "╔════════════════════════════════════════╗"
-  type_animation "║         Gaming DNS Manager v$VERSION         ║"
-  type_animation "╠════════════════════════════════════════╣"
-  type_animation "║ Telegram: @Academi_vpn                 ║"
-  type_animation "║ Admin:    @MahdiAGM0                   ║"
-  type_animation "╚════════════════════════════════════════╝"
-  echo -e "\e[0m"
-}
+def animated_title():
+    colors = [Fore.CYAN, Fore.MAGENTA, Fore.YELLOW, Fore.GREEN, Fore.RED, Fore.LIGHTBLUE_EX]
+    color = random.choice(colors)
+    print(color + Style.BRIGHT + "╔" + "═" * 38 + "╗")
+    print(color + Style.BRIGHT + "║" + " " * 10 + "Gaming DNS Tool v1.2.3" + " " * 9 + "║")
+    print(color + Style.BRIGHT + "╚" + "═" * 38 + "╝")
+    print()
 
-# تست پینگ
-ping_dns() {
-  read -p "Enter DNS to test: " dns
-  echo -e "\nTesting ping to $dns..."
-  ping -c 4 "$dns"
-  echo -e "\nPress Enter to return to main menu..."
-  read
-}
+def header_box():
+    print(Fore.WHITE + Style.BRIGHT + "┌" + "─" * 40 + "┐")
+    print("│  Admin: @MahdiAGM0".ljust(42) + "│")
+    print("│  Telegram: @Academi_vpn".ljust(42) + "│")
+    print("└" + "─" * 40 + "┘\n")
 
-get_premium_dns() {
-  dns_list=(
-    "94.140.14.14,94.140.15.15"
-    "91.239.100.100,89.233.43.71"
-    "185.228.168.9,185.228.169.9"
-    "45.90.28.0,45.90.30.0"
-  )
-  dns_pair=${dns_list[$RANDOM % ${#dns_list[@]}]}
-  dns1=$(echo "$dns_pair" | cut -d',' -f1)
-  dns2=$(echo "$dns_pair" | cut -d',' -f2)
-  echo -e "\nYour Premium DNS:"
-  echo "Primary:   $dns1"
-  echo "Secondary: $dns2"
-  echo -e "\nPress Enter to return..."
-  read
-}
+def get_ping(dns):
+    try:
+        result = sp.run(['ping', '-c', '1', dns], capture_output=True, text=True)
+        for line in result.stdout.splitlines():
+            if "time=" in line:
+                return line.split("time=")[-1].split(" ")[0]
+        return "Timeout"
+    except:
+        return "Error"
 
-download_dns_by_country() {
-  countries=("Iran" "Germany" "France" "Singapore" "USA" "Netherlands")
-  echo -e "\nChoose Country:"
-  for i in "${!countries[@]}"; do
-    echo "  [$((i+1))] ${countries[$i]}"
-  done
-  read -p "Enter country number: " country_num
-  case $country_num in
-    1) dns1="10.202.10.11"; dns2="10.202.10.10" ;;
-    2) dns1="64.6.64.6"; dns2="64.6.65.6" ;;
-    3) dns1="156.154.70.2"; dns2="156.154.71.2" ;;
-    4) dns1="159.250.35.250"; dns2="159.250.35.251" ;;
-    5) dns1="8.8.8.8"; dns2="8.8.4.4" ;;
-    6) dns1="1.1.1.1"; dns2="1.0.0.1" ;;
-    *) echo "Invalid."; return ;;
-  esac
-  echo -e "\nDownload DNS:"
-  echo "Primary:   $dns1"
-  echo "Secondary: $dns2"
-  echo -e "\nPress Enter to return..."
-  read
-}
+def get_random_dns_pair():
+    dns_pool = [
+        ("94.140.14.14", "94.140.15.15"),
+        ("9.9.9.9", "149.112.112.112"),
+        ("1.1.1.1", "1.0.0.1"),
+        ("185.51.200.2", "178.22.122.100"),
+        ("10.202.10.11", "10.202.10.10"),
+        ("185.55.103.8", "185.55.103.9"),
+        ("185.55.225.25", "185.55.226.26"),
+        ("156.154.70.2", "156.154.71.2")
+    ]
+    return random.choice(dns_pool)
 
-games=(
-  "Call of Duty"
-  "PUBG"
-  "Fortnite"
-  "Apex Legends"
-  "Valorant"
-  "League of Legends"
-  "Dota 2"
-  "CS:GO"
-  "Overwatch"
-  "Minecraft"
-  "Warzone"
-  "Rocket League"
-  "Free Fire"
-  "GTA Online"
-  "Rainbow Six Siege"
-  "Mobile Legends"
-  "Clash of Clans"
-  "Clash Royale"
-  "Brawl Stars"
-  "FIFA"
-  "PES"
-  "Battlefield"
-  "Roblox"
-  "World of Tanks"
-  "World of Warcraft"
-  "Destiny 2"
-  "Arena Breakout (New)"
-  "Rust"
-  "Paladins"
-  "Smite"
-  "Escape from Tarkov"
-)
+def dns_output(primary, secondary):
+    print(Fore.LIGHTBLUE_EX + "\n╔═════════════ 🎯 DNS RESULT ═════════════╗")
+    ping1 = get_ping(primary)
+    ping2 = get_ping(secondary)
+    print(f"║ Primary:   {primary}   (Ping: {ping1}ms)".ljust(40) + "║")
+    print(f"║ Secondary: {secondary}   (Ping: {ping2}ms)".ljust(40) + "║")
+    print("╚" + "═" * 42 + "╝\n")
 
-countries=("Iran" "Turkey" "UAE" "Qatar" "Iraq" "Jordan")
+def get_game_list():
+    games = [
+        "Call of Duty Mobile", "PUBG Mobile", "Free Fire", "Fortnite", "Valorant",
+        "Apex Legends", "League of Legends", "Dota 2", "Overwatch", "Minecraft",
+        "CS:GO", "Rocket League", "FIFA Online", "Warzone", "Rainbow Six",
+        "Arena Breakout", "Mobile Legends", "Clash of Clans", "Clash Royale",
+        "Brawl Stars", "Genshin Impact", "Wild Rift", "Roblox", "ARK", "Rust",
+        "Battlefield", "Elden Ring", "Destiny 2", "Diablo IV", "Honkai Impact", "Palworld"
+    ]
+    return games
 
-random_dns() {
-  echo "Primary:   185.55.$((RANDOM%100+100)).$((RANDOM%100+1))"
-  echo "Secondary: 185.55.$((RANDOM%100+100)).$((RANDOM%100+1))"
-}
+def list_countries():
+    return ["Iran", "Turkey", "UAE", "Saudi Arabia", "Qatar", "Jordan", "Iraq"]
 
-gaming_dns_menu() {
-  echo -e "\nChoose Game:"
-  for i in "${!games[@]}"; do
-    num=$((i+1))
-    if [[ "${games[$i]}" == *"Arena Breakout"* ]]; then
-      echo -e "  [$num] \e[1;34m${games[$i]}\e[0m"
-    else
-      echo "  [$num] ${games[$i]}"
-    fi
-  done
-  read -p "Enter game number: " game_index
-  [[ $game_index -lt 1 || $game_index -gt ${#games[@]} ]] && echo "Invalid game." && return
-  game="${games[$((game_index-1))]}"
-  echo -e "\nSelect Country:"
-  for i in "${!countries[@]}"; do
-    echo "  [$((i+1))] ${countries[$i]}"
-  done
-  read -p "Enter country number: " country_index
-  country="${countries[$((country_index-1))]}"
-  echo -e "\nDNS for $game - $country:"
-  random_dns
-  echo -e "\nPress Enter to return..."
-  read
-}
+def show_game_menu():
+    clear()
+    animated_title()
+    header_box()
+    games = get_game_list()
+    for idx, game in enumerate(games, 1):
+        mark = " [NEW]" if game == "Arena Breakout" else ""
+        print(Fore.LIGHTYELLOW_EX + f"{idx}. {game}{mark}")
+    print(Fore.LIGHTCYAN_EX + f"\n{len(games)+1}. Back")
+    choice = input(Fore.YELLOW + "\nSelect your game: ")
+    if choice.isdigit() and 1 <= int(choice) <= len(games):
+        country_menu(games[int(choice)-1])
+    elif choice == str(len(games)+1):
+        main_menu()
+    else:
+        input(Fore.RED + "Invalid choice! Press Enter...")
+        show_game_menu()
 
-search_game() {
-  read -p "Search Game: " query
-  found_index=-1
-  for i in "${!games[@]}"; do
-    if [[ "${games[$i],,}" == *"${query,,}"* ]]; then
-      found_index=$i
-      break
-    fi
-  done
+def country_menu(game):
+    clear()
+    animated_title()
+    header_box()
+    countries = list_countries()
+    for idx, country in enumerate(countries, 1):
+        print(Fore.LIGHTMAGENTA_EX + f"{idx}. {country}")
+    print(Fore.LIGHTCYAN_EX + f"\n{len(countries)+1}. Back")
+    choice = input(Fore.YELLOW + "\nSelect country: ")
+    if choice.isdigit() and 1 <= int(choice) <= len(countries):
+        primary, secondary = get_random_dns_pair()
+        clear()
+        animated_title()
+        header_box()
+        print(Fore.GREEN + f"🎮 DNS for {game} in {countries[int(choice)-1]}:\n")
+        dns_output(primary, secondary)
+        input(Fore.LIGHTWHITE_EX + "\nPress Enter to return...")
+        main_menu()
+    else:
+        input(Fore.RED + "Invalid choice! Press Enter...")
+        country_menu(game)
 
-  if [[ $found_index -eq -1 ]]; then
-    echo -e "\e[1;32m\n❌ Game not found!\e[0m"
-    echo -e "\nPress Enter to return..."
-    read
-    return
-  fi
+def download_dns():
+    clear()
+    animated_title()
+    header_box()
+    countries = ["Iran", "Germany", "USA", "Singapore"]
+    for idx, c in enumerate(countries, 1):
+        print(Fore.LIGHTGREEN_EX + f"{idx}. {c}")
+    print(Fore.LIGHTCYAN_EX + f"\n{len(countries)+1}. Back")
+    choice = input(Fore.YELLOW + "\nSelect country: ")
+    if choice.isdigit() and 1 <= int(choice) <= len(countries):
+        primary, secondary = get_random_dns_pair()
+        clear()
+        animated_title()
+        header_box()
+        print(Fore.GREEN + f"⬇️ Download/Unblock DNS ({countries[int(choice)-1]}):\n")
+        dns_output(primary, secondary)
+        input(Fore.LIGHTWHITE_EX + "\nPress Enter to return...")
+        main_menu()
+    else:
+        input(Fore.RED + "Invalid choice! Press Enter...")
+        download_dns()
 
-  game="${games[$found_index]}"
-  echo -e "\nFound: $game"
-  echo -e "Select Country:"
-  for i in "${!countries[@]}"; do
-    echo "  [$((i+1))] ${countries[$i]}"
-  done
-  read -p "Enter country number: " country_index
-  country="${countries[$((country_index-1))]}"
-  echo -e "\nDNS for $game - $country:"
-  random_dns
-  echo -e "\nPress Enter to return..."
-  read
-}
+def ping_test_menu():
+    clear()
+    animated_title()
+    header_box()
+    dns = input(Fore.YELLOW + "Enter a DNS to test: ")
+    if dns:
+        ping = get_ping(dns)
+        print(Fore.GREEN + f"\nPing to {dns}: {ping} ms\n")
+    else:
+        print(Fore.RED + "Invalid input!")
+    input(Fore.LIGHTWHITE_EX + "\nPress Enter to return...")
+    main_menu()
 
-main_menu() {
-  while true; do
-    show_title
-    type_animation "Version: $VERSION"
-    echo
-    echo "  [1] Gaming DNS 🎮"
-    echo "  [2] Download DNS ⬇️"
-    echo "  [3] Premium DNS 💎"
-    echo "  [4] Ping a DNS 📡"
-    echo "  [5] Search Game 🔍"
-    echo "  [0] Exit ❌"
-    echo
-    read -p "Choose an option: " opt
-    case $opt in
-      1) gaming_dns_menu ;;
-      2) download_dns_by_country ;;
-      3) get_premium_dns ;;
-      4) ping_dns ;;
-      5) search_game ;;
-      0) echo -e "\nGoodbye 👋"; exit ;;
-      *) echo "Invalid option." ;;
-    esac
-  done
-}
+def dns_search():
+    clear()
+    animated_title()
+    header_box()
+    query = input(Fore.YELLOW + "Search game: ").strip().lower()
+    matches = [g for g in get_game_list() if query in g.lower()]
+    if not matches:
+        input(Fore.GREEN + "\nNo match found. Press Enter...")
+        main_menu()
+    else:
+        for idx, g in enumerate(matches, 1):
+            print(Fore.LIGHTYELLOW_EX + f"{idx}. {g}")
+        choice = input(Fore.YELLOW + "\nSelect game: ")
+        if choice.isdigit() and 1 <= int(choice) <= len(matches):
+            country_menu(matches[int(choice)-1])
+        else:
+            input(Fore.RED + "Invalid choice. Press Enter...")
+            main_menu()
 
-main_menu
+def main_menu():
+    clear()
+    animated_title()
+    header_box()
+    fast_type(Fore.CYAN + """
+1. 🎮 Gaming DNS
+2. ⬇️ Download/Unblock DNS
+3. 🔍 Search Game DNS
+4. 📡 Ping Test DNS
+5. ❌ Exit
+""", delay=0.001)
+    choice = input(Fore.YELLOW + "\nSelect an option: ")
+    if choice == "1":
+        show_game_menu()
+    elif choice == "2":
+        download_dns()
+    elif choice == "3":
+        dns_search()
+    elif choice == "4":
+        ping_test_menu()
+    elif choice == "5":
+        clear()
+        print(Fore.LIGHTGREEN_EX + "Goodbye!")
+        exit()
+    else:
+        input(Fore.RED + "Invalid choice. Press Enter...")
+        main_menu()
+
+if __name__ == "__main__":
+    main_menu()
