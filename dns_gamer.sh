@@ -103,7 +103,7 @@ function show_header() {
   echo -e "\e[1;${color}m+--------------------------------------+"
   echo -e "| Telegram: @Academi_vpn               |"
   echo -e "| Admin by: Mahdi                      |"
-  echo -e "| Version: 1.2.4                       |"
+  echo -e "| Version: 1.2.4 Initial update test                        |"
   echo -e "+--------------------------------------+\e[0m"
 }
 
