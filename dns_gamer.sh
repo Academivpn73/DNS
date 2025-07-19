@@ -1,9 +1,22 @@
 #!/bin/bash
 
-# ANSI رنگ‌ها
+# 🎨 رنگ‌های ANSI
 colors=('\e[1;31m' '\e[1;32m' '\e[1;33m' '\e[1;34m' '\e[1;35m' '\e[1;36m' '\e[1;37m')
 
-# عنوان با انیمیشن تایپی
+# 🧠 لیست بازی‌ها (30 عدد)
+games=(
+"Call of Duty" "Valorant" "PUBG" "Fortnite" "CS:GO"
+"FIFA" "League of Legends" "Dota 2" "Minecraft" "Warzone"
+"Overwatch" "Apex Legends" "Rainbow Six" "Free Fire" "Roblox"
+"Rocket League" "Mobile Legends" "Arena of Valor" "Clash Royale" "Brawl Stars"
+"World of Tanks" "Battlefield" "Rust" "Genshin Impact" "EFootball"
+"Fall Guys" "Escape from Tarkov" "Smite" "Team Fortress 2" "Arena Breakout (NEW)"
+)
+
+# 🌍 لیست کشورهای منطقه خاورمیانه
+countries=("Iran" "Turkey" "UAE" "Saudi Arabia" "Qatar" "Iraq" "Jordan" "Israel" "Lebanon" "Kuwait")
+
+# ⏱️ تایپ انیمیشنی
 animated_text() {
     local text="$1"
     local delay="$2"
@@ -13,26 +26,20 @@ animated_text() {
     done
 }
 
+# 🖼️ چاپ عنوان زیبا با رنگ متغیر
 print_title() {
     clear
     color=${colors[$RANDOM % ${#colors[@]}]}
-    box_top="╔══════════════════════════════════════════════════════╗"
-    box_bottom="╚══════════════════════════════════════════════════════╝"
-    echo -e "$color$box_top"
-    echo -ne "$color║ "
-    animated_text "⚡ Gaming DNS Script | Version 1.2.3 ⚡" 0.00008
-    echo -e " ║"
-    echo -e "$color║   Admin: @MahdiAGM0        Telegram: @Academi_vpn    ║"
-    echo -e "$color$box_bottom\n"
+    echo -e "$color"
+    echo "╔════════════════════════════════════════════════════════════════╗"
+    echo -n "║ "; animated_text "⚡ Gaming DNS Script - Version 1.2.3 ⚡" 0.00008; echo " ║"
+    echo "╠════════════════════════════════════════════════════════════════╣"
+    echo "║ Admin: @MahdiAGM0         Telegram: @Academi_vpn              ║"
+    echo "╚════════════════════════════════════════════════════════════════╝"
     echo -e "\e[0m"
 }
 
-# بازی‌ها و کشورها
-games=("Call of Duty" "Valorant" "PUBG" "Fortnite" "CS:GO" "FIFA" "League of Legends" "Dota 2" "Minecraft" "Warzone" "Overwatch" "Apex Legends" "Rainbow Six" "Free Fire" "Roblox" "Rocket League" "Mobile Legends" "Arena of Valor" "Clash Royale" "Brawl Stars" "World of Tanks" "Battlefield" "Rust" "Genshin Impact" "EFootball" "Fall Guys" "Escape from Tarkov" "Smite" "Team Fortress 2" "Arena Breakout (NEW)")
-
-countries=("Iran" "Turkey" "UAE" "Saudi Arabia" "Qatar" "Iraq" "Jordan" "Israel" "Lebanon" "Kuwait")
-
-# تابع تولید DNS رندوم (پولی و واقعی نمونه‌ای)
+# 📡 تولید DNS رندوم (واقعی نمایشی)
 generate_dns() {
     primary="185.$((RANDOM % 255)).$((RANDOM % 255)).$((RANDOM % 255))"
     secondary="185.$((RANDOM % 255)).$((RANDOM % 255)).$((RANDOM % 255))"
@@ -40,7 +47,7 @@ generate_dns() {
     echo -e "Secondary DNS: $secondary"
 }
 
-# تابع گرفتن پینگ DNS از کاربر
+# 📶 پینگ DNS واردشده توسط کاربر
 ping_custom_dns() {
     read -p $'\nEnter DNS IP to ping: ' dns_ip
     echo -e "\nPinging $dns_ip...\n"
@@ -48,7 +55,7 @@ ping_custom_dns() {
     read -p $'\nPress Enter to return to menu...'
 }
 
-# فیلتر بازی‌ها
+# 🔎 جستجوی بازی
 search_game() {
     read -p $'\nSearch game name: ' keyword
     found=false
@@ -64,6 +71,7 @@ search_game() {
     read -p $'\nPress Enter to return...'
 }
 
+# 🧠 منوی اصلی
 main_menu() {
     while true; do
         print_title
@@ -86,23 +94,24 @@ main_menu() {
     done
 }
 
+# 🎮 انتخاب بازی و کشور
 gaming_dns() {
     print_title
     echo -e "🎮 Select your game:"
     for ((i=0; i<${#games[@]}; i++)); do
         if [[ "${games[i]}" == *"Arena Breakout"* ]]; then
-            echo -e "[${i+1}] \e[1;34m${games[i]}\e[0m"
+            echo -e "[ $((i+1)) ] \e[1;34m${games[i]}\e[0m"
         else
-            echo -e "[$((i+1))] ${games[i]}"
+            echo -e "[ $((i+1)) ] ${games[i]}"
         fi
     done
     echo -e "[0] Back"
     read -p $'\nChoose your game: ' game_index
-    if [[ "$game_index" == "0" ]]; then return; fi
+    [[ "$game_index" == "0" ]] && return
     selected_game="${games[$((game_index-1))]}"
     echo -e "\n🌍 Select region for $selected_game:"
     for ((i=0; i<${#countries[@]}; i++)); do
-        echo -e "[$((i+1))] ${countries[i]}"
+        echo -e "[ $((i+1)) ] ${countries[i]}"
     done
     echo -e "[0] Back"
     read -p $'\nChoose region: ' region_index
@@ -112,20 +121,22 @@ gaming_dns() {
     read -p $'\nPress Enter to return...'
 }
 
+# ⬇️ DNS مخصوص دانلود
 download_dns() {
     print_title
     echo -e "🌐 Select region:"
     for ((i=0; i<${#countries[@]}; i++)); do
-        echo -e "[$((i+1))] ${countries[i]}"
+        echo -e "[ $((i+1)) ] ${countries[i]}"
     done
     echo -e "[0] Back"
     read -p $'\nChoose region: ' region_index
     [[ "$region_index" == "0" ]] && return
-    echo -e "\n⬇️ Premium DNS for Downloads & Censorship Bypass (${countries[$((region_index-1))]}):"
+    echo -e "\n⬇️ Premium DNS for Downloads & Bypass (${countries[$((region_index-1))]}):"
     generate_dns
     read -p $'\nPress Enter to return...'
 }
 
+# 🌍 DNS جهانی
 global_dns() {
     print_title
     echo -e "🌍 Global Premium DNS:"
@@ -133,5 +144,5 @@ global_dns() {
     read -p $'\nPress Enter to return...'
 }
 
-# اجرای اسکریپت
+# ▶️ اجرای منو
 main_menu
