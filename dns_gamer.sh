@@ -1,108 +1,37 @@
+
 #!/bin/bash
 
-# -------- URLs (REPLACE these with your actual GitHub raw URLs) -------- #
-BASE_URL="https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main"
-GAMES_URL="$BASE_URL/games_list.txt"
-COUNTRIES_URL="$BASE_URL/countries_list.txt"
-DNS_URL="$BASE_URL/dns_data.txt"
-PREMIUM_DNS_URL="$BASE_URL/premium_dns.txt"
+GAMES_URL="https://raw.githubusercontent.com/Academivpn73/DNS/main/games_list.txt"
+COUNTRIES_URL="https://raw.githubusercontent.com/Academivpn73/DNS/main/countries_list.txt"
+DNS_URL="https://raw.githubusercontent.com/Academivpn73/DNS/main/dns_data.txt"
+PREMIUM_URL="https://raw.githubusercontent.com/Academivpn73/DNS/main/premium_dns.txt"
 
-# -------- Colors -------- #
-RED='\033[0;31m'
-GREEN='\033[0;32m'
-CYAN='\033[0;36m'
-NC='\033[0m'
+clear
 
-# -------- Menu Function -------- #
-show_menu() {
-    echo -e "${CYAN}📋 Choose an option:${NC}"
-    echo "1) 🎮 Gaming DNS"
-    echo "2) 🌍 Country-specific DNS"
-    echo "3) 💎 Premium DNS"
-    echo "4) 📶 Ping a DNS"
-    echo "5) 🔍 Search a Game"
-    echo "0) ❌ Exit"
-}
+# دریافت آنلاین فایل‌ها
+curl -fsSL "$GAMES_URL" -o games_list.txt || { echo "❌ Failed to load games list."; exit 1; }
+curl -fsSL "$COUNTRIES_URL" -o countries_list.txt || { echo "❌ Failed to load countries list."; exit 1; }
+curl -fsSL "$DNS_URL" -o dns_data.txt || { echo "❌ Failed to load DNS data."; exit 1; }
+curl -fsSL "$PREMIUM_URL" -o premium_dns.txt || { echo "❌ Failed to load Premium DNS list."; exit 1; }
 
-# -------- Helper Functions -------- #
-get_list_from_url() {
-    curl -fsSL "$1" || echo ""
-}
+echo "📋 Select your game:"
+cat games_list.txt
 
-get_dns_by_game_country() {
-    local game="$1"
-    local country="$2"
-    local dns=$(grep -i "^$game|$country|" <<< "$dns_list" | shuf -n 2)
-    if [[ -z "$dns" ]]; then
-        echo -e "${RED}❌ DNS not found for this game/country${NC}"
-    else
-        echo "$dns" | while IFS='|' read -r game_name country_name primary secondary ping; do
-            echo -e "${GREEN}🎮 Game: $game_name - 🌍 Country: $country_name${NC}"
-            echo "🟢 Primary DNS: $primary"
-            echo "🔵 Secondary DNS: $secondary"
-            echo "📶 Ping: $ping"
-            echo ""
-        done
-    fi
-}
+echo ""
+echo "🌍 Select your country:"
+cat countries_list.txt
 
-# -------- Load Data -------- #
-games_list=$(get_list_from_url "$GAMES_URL")
-countries_list=$(get_list_from_url "$COUNTRIES_URL")
-dns_list=$(get_list_from_url "$DNS_URL")
-premium_list=$(get_list_from_url "$PREMIUM_DNS_URL")
+echo ""
+read -p "Enter game number: " game_num
+read -p "Enter country number: " country_num
 
-if [[ -z "$games_list" || -z "$countries_list" || -z "$dns_list" ]]; then
-    echo -e "${RED}❌ Failed to load one or more lists from GitHub${NC}"
-    exit 1
-fi
+game_name=$(sed -n "${game_num}p" games_list.txt | sed 's/^[0-9]*) *//')
+country_name=$(sed -n "${country_num}p" countries_list.txt | sed 's/^[0-9]*) *//')
 
-# -------- Main Loop -------- #
-while true; do
-    show_menu
-    read -rp "#? " option
-    case "$option" in
-        1)
-            echo -e "${CYAN}🎮 Select a Game:${NC}"
-            echo "$games_list"
-            read -rp "Enter game number: " game_num
-            selected_game=$(echo "$games_list" | sed -n "${game_num}p" | cut -d')' -f2 | xargs)
-            echo -e "${CYAN}🌍 Select a Country:${NC}"
-            echo "$countries_list"
-            read -rp "Enter country number: " country_num
-            selected_country=$(echo "$countries_list" | sed -n "${country_num}p" | cut -d')' -f2 | xargs)
-            get_dns_by_game_country "$selected_game" "$selected_country"
-            read -rp "Press Enter to return..."
-            ;;
-        2)
-            echo -e "${CYAN}🌍 Select a Country:${NC}"
-            echo "$countries_list"
-            read -rp "Enter country number: " country_num
-            selected_country=$(echo "$countries_list" | sed -n "${country_num}p" | cut -d')' -f2 | xargs)
-            get_dns_by_game_country "Default" "$selected_country"
-            read -rp "Press Enter to return..."
-            ;;
-        3)
-            echo -e "${CYAN}💎 Premium DNS Servers:${NC}"
-            echo "$premium_list"
-            read -rp "Press Enter to return..."
-            ;;
-        4)
-            read -rp "Enter DNS to ping: " dns_ip
-            ping -c 3 "$dns_ip"
-            read -rp "Press Enter to return..."
-            ;;
-        5)
-            read -rp "Enter game name to search: " search_query
-            echo "$games_list" | grep -i "$search_query"
-            read -rp "Press Enter to return..."
-            ;;
-        0)
-            echo "Goodbye!"
-            exit 0
-            ;;
-        *)
-            echo -e "${RED}❌ Invalid option${NC}"
-            ;;
-    esac
-done
+echo ""
+echo "🔍 DNS for $game_name - $country_name:"
+grep -A2 "$game_name - $country_name" dns_data.txt || echo "❌ DNS not found for this game/country."
+
+echo ""
+echo "🌟 Premium DNS List:"
+cat premium_dns.txt
