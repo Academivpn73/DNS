@@ -1,73 +1,70 @@
-1) GameName1
-2) GameName2
-3) GameName3
-4) GameName4
-5) GameName5
-6) GameName6
-7) GameName7 (New)
-8) GameName8
-9) GameName9
-10) GameName10
-11) GameName11
-12) GameName12
-13) GameName13
-14) GameName14 (New)
-15) GameName15
-16) GameName16
-17) GameName17
-18) GameName18
-19) GameName19
-20) GameName20
-21) GameName21 (New)
-22) GameName22
-23) GameName23
-24) GameName24
-25) GameName25
-26) GameName26
-27) GameName27
-28) GameName28 (New)
-29) GameName29
-30) GameName30
-31) GameName31
-32) GameName32
-33) GameName33
-34) GameName34
-35) GameName35 (New)
-36) GameName36
-37) GameName37
-38) GameName38
-39) GameName39
-40) GameName40
-41) GameName41
-42) GameName42 (New)
-43) GameName43
-44) GameName44
-45) GameName45
-46) GameName46
-47) GameName47
-48) GameName48
-49) GameName49 (New)
-50) GameName50
-51) GameName51
-52) GameName52
-53) GameName53
-54) GameName54
-55) GameName55
-56) GameName56 (New)
-57) GameName57
-58) GameName58
-59) GameName59
-60) GameName60
-61) GameName61
-62) GameName62
-63) GameName63 (New)
-64) GameName64
-65) GameName65
-66) GameName66
-67) GameName67
-68) GameName68
-69) GameName69
-70) GameName70 (New)
-71) GameName71
-72) GameName72
-73) GameName73
+1) Call of Duty Mobile
+2) PUBG Mobile
+3) Free Fire
+4) Fortnite
+5) Apex Legends Mobile
+6) Brawl Stars
+7) Arena Breakout (جدید)
+8) Warzone Mobile (جدید)
+9) Mobile Legends: Bang Bang
+10) Clash Royale
+11) Clash of Clans
+12) League of Legends: Wild Rift
+13) Valorant Mobile (جدید)
+14) Diablo Immortal
+15) Genshin Impact
+16) Rocket League Sideswipe
+17) Modern Combat Versus
+18) Critical Ops
+19) Battle Prime
+20) Crossfire Legends
+21) Shadowgun Legends
+22) Cyber Hunter
+23) Rules of Survival
+24) Bullet Echo
+25) Tacticool
+26) Modern Warships
+27) Dead by Daylight Mobile
+28) Standoff 2
+29) Infinity Ops
+30) N.O.V.A. Legacy
+31) Into the Dead 2
+32) ZombsRoyale.io
+33) Last Day on Earth
+34) World War Heroes
+35) World of Tanks Blitz
+36) Heroes Evolved
+37) Marvel Super War
+38) Mobile Royale
+39) Auto Chess
+40) Art of War: Legions
+41) Boom Beach
+42) Castle Clash
+43) Samurai vs Zombies
+44) Monster Legends
+45) Dragon City
+46) State of Survival
+47) Age of Origins
+48) Rise of Kingdoms
+49) Lords Mobile
+50) AFK Arena
+51) Summoners War
+52) Mythic Heroes
+53) Soul Knight
+54) Badlanders
+55) Naruto x Boruto Ninja Voltage
+56) Bleach Brave Souls
+57) Epic Seven
+58) Cookie Run: Kingdom
+59) Dragon Ball Legends
+60) One Piece Bounty Rush
+61) Honkai Impact 3rd
+62) Honkai: Star Rail (جدید)
+63) Farlight 84
+64) War Robots
+65) Frag Pro Shooter
+66) Sky: Children of the Light
+67) WWE Mayhem
+68) Sniper 3D
+69) Zombie Frontier 4
+70) GRID Autosport
