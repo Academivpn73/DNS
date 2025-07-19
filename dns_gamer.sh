@@ -1,143 +1,175 @@
 #!/bin/bash
 
-# --- تنظیمات فایل آنلاین ---
+# --- URLs to fetch data ---
 GAMES_URL="https://raw.githubusercontent.com/Academivpn73/DNS/main/games_list.txt"
 COUNTRIES_URL="https://raw.githubusercontent.com/Academivpn73/DNS/main/countries.txt"
 DNS_DATA_URL="https://raw.githubusercontent.com/Academivpn73/DNS/main/dns_data.txt"
 
-# --- تابع برای رنگ دهی ---
-color() {
-  echo -e "\033[1;36m$1\033[0m"
-}
+# --- Random color for title ---
+colors=(31 32 33 34 35 36 91 92 93 94 95 96)
+RANDOM_COLOR=${colors[$RANDOM % ${#colors[@]}]}
 
-# --- تایتل ---
-show_title() {
+# --- Title with random color ---
+title() {
   clear
-  echo -e "\033[1;35m╔═══════════════════════════════════════════╗"
-  echo -e "║      🔰 DNS Management Script v1.2.3       ║"
-  echo -e "║      💬 Telegram: @Academi_vpn             ║"
-  echo -e "║      👤 Admin: @MahdiAGM0                  ║"
-  echo -e "╚═══════════════════════════════════════════╝\033[0m"
+  echo -e "\033[1;${RANDOM_COLOR}m"
+  echo "╔═══════════════════════════════════════════╗"
+  echo "║      🔰 DNS Management Script v1.2.3       ║"
+  echo "║      💬 Telegram: @Academi_vpn             ║"
+  echo "║      👤 Admin: @MahdiAGM0                  ║"
+  echo "╚═══════════════════════════════════════════╝"
+  echo -e "\033[0m"
 }
 
-# --- دانلود فایل آنلاین ---
+# --- Typing animation ---
+type_effect() {
+  text="$1"
+  for ((i=0; i<${#text}; i++)); do
+    echo -n "${text:$i:1}"
+    sleep 0.01
+  done
+  echo ""
+}
+
+# --- Fetch and cache file temporarily ---
 fetch_file() {
   curl -fsSL "$1"
 }
 
-# --- لیست گیم ---
+# --- Ping function ---
+ping_dns() {
+  ping -c 1 -W 1 "$1" | grep "time=" | awk -F"time=" '{print $2}' | cut -d' ' -f1
+}
+
+# --- Show Games ---
 list_games() {
-  fetch_file "$GAMES_URL" | nl -w2 -s'. '
+  fetch_file "$GAMES_URL"
 }
 
-# --- لیست کشور ---
+# --- Show Countries ---
 list_countries() {
-  fetch_file "$COUNTRIES_URL" | nl -w2 -s'. '
+  fetch_file "$COUNTRIES_URL"
 }
 
-# --- دریافت DNS ---
-get_dns() {
+# --- Get DNS by game & country ---
+get_dns_by_game_country() {
   game="$1"
   country="$2"
-  fetch_file "$DNS_DATA_URL" | grep -i "$game" | grep -i "$country" | shuf -n 2
-}
+  line=$(fetch_file "$DNS_DATA_URL" | grep -i "^$game|$country|" | shuf -n 1)
 
-# --- گزینه DNS گیمینگ ---
-dns_gaming() {
-  show_title
-  echo "🎮 Game List:"
-  games=$(fetch_file "$GAMES_URL")
-  select game in $games; do
-    [ -n "$game" ] || continue
-    break
-  done
+  if [[ -n "$line" ]]; then
+    IFS='|' read -r g c dns1 dns2 <<< "$line"
+    ping1=$(ping_dns "$dns1")
+    ping2=$(ping_dns "$dns2")
+    avg_ping=$(echo "($ping1 + $ping2) / 2" | bc)
 
-  show_title
-  echo "🌍 Select Country:"
-  countries=$(fetch_file "$COUNTRIES_URL")
-  select country in $countries; do
-    [ -n "$country" ] || continue
-    break
-  done
-
-  show_title
-  echo "🔗 DNS for $game in $country:"
-  get_dns "$game" "$country"
-  read -p $'\nPress Enter to return...'
-}
-
-# --- گزینه DNS مخصوص دانلود ---
-dns_download() {
-  show_title
-  echo "🌍 Select Country for Download DNS:"
-  countries=$(fetch_file "$COUNTRIES_URL")
-  select country in $countries; do
-    [ -n "$country" ] || continue
-    break
-  done
-
-  show_title
-  echo "⬇️ Download DNS for $country:"
-  get_dns "download" "$country"
-  read -p $'\nPress Enter to return...'
-}
-
-# --- DNS پرمیوم ---
-premium_dns() {
-  show_title
-  echo "🏆 Premium DNS (Random):"
-  fetch_file "$DNS_DATA_URL" | shuf -n 2
-  read -p $'\nPress Enter to return...'
-}
-
-# --- پینگ DNS ---
-ping_dns() {
-  show_title
-  read -p "📥 Enter DNS to ping: " dns
-  echo -e "\n⏱ Ping result:"
-  ping -c 3 "$dns" | tail -2
-  read -p $'\nPress Enter to return...'
-}
-
-# --- جستجوی گیم ---
-search_game() {
-  show_title
-  read -p "🔍 Enter game name to search: " search_term
-  results=$(fetch_file "$GAMES_URL" | grep -i "$search_term")
-
-  if [ -z "$results" ]; then
-    echo -e "\n⚠️ Game not found!"
+    echo ""
+    echo "🎮 Game: $g - 🌍 $c"
+    echo "DNS 1: $dns1"
+    echo "DNS 2: $dns2"
+    echo "Ping: ${avg_ping}ms"
   else
-    echo -e "\n✅ Game found!"
-    echo "$results"
+    echo "❌ DNS not found for this game/country"
+  fi
+}
 
-    read -p $'\nSelect country (name): ' country
-    show_title
-    echo "📡 DNS for $search_term in $country:"
-    get_dns "$search_term" "$country"
+# --- Premium DNS ---
+premium_dns() {
+  title
+  echo "🏆 Premium DNS (random):"
+  line=$(fetch_file "$DNS_DATA_URL" | shuf -n 1)
+  IFS='|' read -r g c dns1 dns2 <<< "$line"
+  ping1=$(ping_dns "$dns1")
+  ping2=$(ping_dns "$dns2")
+  avg_ping=$(echo "($ping1 + $ping2) / 2" | bc)
+
+  echo "DNS 1: $dns1"
+  echo "DNS 2: $dns2"
+  echo "Ping: ${avg_ping}ms"
+  read -p $'\nPress Enter to return...'
+}
+
+# --- Ping DNS manually ---
+ping_manual() {
+  title
+  read -p "Enter DNS IP: " dns
+  ping_result=$(ping_dns "$dns")
+  if [ -n "$ping_result" ]; then
+    echo "Ping: ${ping_result}ms"
+  else
+    echo "❌ Unable to ping DNS."
   fi
   read -p $'\nPress Enter to return...'
 }
 
-# --- منوی اصلی ---
-while true; do
-  show_title
-  echo -e "\n📋 Select an option:"
-  echo "1. 🎮 Gaming DNS"
-  echo "2. ⬇️ Download DNS"
-  echo "3. 🏆 Premium DNS (New)"
-  echo "4. 📶 Ping a DNS (New)"
-  echo "5. 🔍 Search Game (New)"
-  echo "0. ❌ Exit"
-  read -p "➤ " choice
+# --- Gaming DNS ---
+dns_gaming() {
+  title
+  echo "🎮 Select a game:"
+  games=($(fetch_file "$GAMES_URL"))
+  select game in "${games[@]}"; do
+    [ -n "$game" ] && break
+  done
 
-  case "$choice" in
+  title
+  echo "🌍 Select country:"
+  countries=($(fetch_file "$COUNTRIES_URL"))
+  select country in "${countries[@]}"; do
+    [ -n "$country" ] && break
+  done
+
+  get_dns_by_game_country "$game" "$country"
+  read -p $'\nPress Enter to return...'
+}
+
+# --- Download DNS ---
+dns_download() {
+  title
+  echo "🌍 Select country for Download DNS:"
+  countries=($(fetch_file "$COUNTRIES_URL"))
+  select country in "${countries[@]}"; do
+    [ -n "$country" ] && break
+  done
+
+  get_dns_by_game_country "download" "$country"
+  read -p $'\nPress Enter to return...'
+}
+
+# --- Search Game ---
+search_game() {
+  title
+  read -p "🔍 Enter game name: " search_term
+  matched=$(fetch_file "$GAMES_URL" | grep -i "$search_term")
+
+  if [[ -z "$matched" ]]; then
+    echo "❌ Game not found!"
+  else
+    echo "✅ Found: $matched"
+    read -p "Enter country name: " country
+    get_dns_by_game_country "$search_term" "$country"
+  fi
+  read -p $'\nPress Enter to return...'
+}
+
+# --- Main Menu ---
+while true; do
+  title
+  echo "📋 Menu:"
+  echo "1) 🎮 Gaming DNS"
+  echo "2) ⬇️ Download DNS"
+  echo "3) 🏆 Premium DNS (New)"
+  echo "4) 📶 Ping a DNS (New)"
+  echo "5) 🔍 Search Game (New)"
+  echo "0) ❌ Exit"
+  read -p "➤ Choose option: " opt
+
+  case "$opt" in
     1) dns_gaming ;;
     2) dns_download ;;
     3) premium_dns ;;
-    4) ping_dns ;;
+    4) ping_manual ;;
     5) search_game ;;
-    0) echo "Bye!"; exit ;;
-    *) echo "Invalid option!"; sleep 1 ;;
+    0) exit ;;
+    *) echo "❌ Invalid option!" ;;
   esac
 done
