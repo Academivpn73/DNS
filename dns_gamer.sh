@@ -1,152 +1,148 @@
 #!/bin/bash
 
-# ------------ Config ------------ #
-VERSION="1.2.3"
-ADMIN="@MahdiAGM0"
-TELEGRAM="@Academi_vpn"
-DNS_FILE="dns_list.txt"
-GAMES_FILE="games_list.txt"
-COUNTRIES=("Iran" "Turkey" "UAE" "Qatar" "Saudi" "Other")
-COLORS=(31 32 33 34 35 36)
+# Auto-fetch files if not exist
+[[ ! -f "dns_list.txt" ]] && curl -fsSLO https://raw.githubusercontent.com/Academivpn73/DNS/main/dns_list.txt
+[[ ! -f "games_list.txt" ]] && curl -fsSLO https://raw.githubusercontent.com/Academivpn73/DNS/main/games_list.txt
 
-# ------------ Functions ------------ #
+# Clear screen
+clear
 
-function title() {
-  COLOR=${COLORS[$RANDOM % ${#COLORS[@]}]}
-  clear
-  echo -e "\e[1;${COLOR}m+------------------------------------------+"
-  echo -e "|           DNS Service Menu               |"
-  echo -e "+------------------------------------------+"
-  echo -e "| Admin:   $ADMIN"
-  echo -e "| Telegram: $TELEGRAM"
-  echo -e "| Version:  $VERSION"
-  echo -e "+------------------------------------------+\e[0m"
-  echo
+# Function: Show title
+show_title() {
+    clear
+    colors=(31 32 33 34 35 36)
+    rand_color=${colors[$RANDOM % ${#colors[@]}]}
+    echo -e "\e[1;${rand_color}m+------------------------------------------+"
+    echo -e "|       DNS Tool | Version: 1.2.3           |"
+    echo -e "| Telegram: @Academi_vpn                   |"
+    echo -e "| Admin:    @MahdiAGM0                     |"
+    echo -e "+------------------------------------------+\e[0m"
+    echo ""
 }
 
-function pause() {
-  echo
-  read -p "Press Enter to return to menu..."
-  main_menu
+# Function: Show main menu
+main_menu() {
+    show_title
+    echo "🔹 Choose an option:"
+    echo "1. 🎮 Gaming DNS"
+    echo "2. ⬇️  Download DNS"
+    echo "3. 💎 Premium DNS (New)"
+    echo "4. 📶 Ping a DNS (New)"
+    echo "5. 🔍 Search Game (New)"
+    echo "6. ❌ Exit"
+    echo ""
+    read -p "Enter your choice: " choice
+    case $choice in
+        1) dns_gaming ;;
+        2) dns_download ;;
+        3) premium_dns ;;
+        4) ping_dns ;;
+        5) search_game ;;
+        6) exit 0 ;;
+        *) echo "❌ Invalid choice."; sleep 1; main_menu ;;
+    esac
 }
 
-function list_games() {
-  echo "📱 Game List:"
-  local count=1
-  while IFS= read -r game; do
-    echo "$count. $game"
-    ((count++))
-  done < "$GAMES_FILE"
+# Function: DNS for gaming
+dns_gaming() {
+    show_title
+    echo "📱 Game List:"
+    nl -w2 -s'. ' games_list.txt
+    echo ""
+    read -p "Choose game number: " game_number
+    selected_game=$(sed -n "${game_number}p" games_list.txt)
+    echo ""
+    echo "🌍 Select Region:"
+    echo "1. Iran"
+    echo "2. UAE"
+    echo "3. Turkey"
+    echo "4. Other"
+    read -p "Region number: " region
+
+    # Random DNS from file
+    dns=$(shuf -n 2 dns_list.txt)
+    echo ""
+    echo "Recommended DNS for $selected_game:"
+    echo -e "🟢 Primary DNS: $(echo "$dns" | sed -n 1p)"
+    echo -e "🟢 Secondary DNS: $(echo "$dns" | sed -n 2p)"
+    echo ""
+    read -p "Press Enter to return..." 
+    main_menu
 }
 
-function list_countries() {
-  echo "🌍 Choose a region:"
-  for i in "${!COUNTRIES[@]}"; do
-    echo "$((i+1)). ${COUNTRIES[$i]}"
-  done
+# Function: DNS for downloads
+dns_download() {
+    show_title
+    echo "🌍 Select Region:"
+    echo "1. Iran"
+    echo "2. UAE"
+    echo "3. Turkey"
+    echo "4. Other"
+    read -p "Region number: " region
+
+    dns=$(shuf -n 2 dns_list.txt)
+    echo ""
+    echo "Recommended DNS for Download:"
+    echo -e "🟢 Primary DNS: $(echo "$dns" | sed -n 1p)"
+    echo -e "🟢 Secondary DNS: $(echo "$dns" | sed -n 2p)"
+    echo ""
+    read -p "Press Enter to return..."
+    main_menu
 }
 
-function get_random_dns() {
-  shuf -n 1 "$DNS_FILE"
+# Function: Premium DNS
+premium_dns() {
+    show_title
+    dns=$(shuf -n 2 dns_list.txt)
+    echo "💎 Premium DNS:"
+    echo -e "🟢 Primary DNS: $(echo "$dns" | sed -n 1p)"
+    echo -e "🟢 Secondary DNS: $(echo "$dns" | sed -n 2p)"
+    echo ""
+    read -p "Press Enter to return..."
+    main_menu
 }
 
-function show_dns() {
-  DNS=$(get_random_dns)
-  IP1=$(echo "$DNS" | cut -d',' -f1)
-  IP2=$(echo "$DNS" | cut -d',' -f2)
-  echo -e "\nPrimary DNS: $IP1"
-  echo "Secondary DNS: $IP2"
-  ping -c 1 -W 1 "$IP1" &>/dev/null && PING=$(ping -c 1 "$IP1" | grep time= | awk -F'time=' '{print $2}' | cut -d' ' -f1) || PING="Timeout"
-  echo "Ping: $PING ms"
+# Function: Ping DNS
+ping_dns() {
+    show_title
+    read -p "Enter DNS to ping: " user_dns
+    ping_result=$(ping -c 1 "$user_dns" | grep 'time=' | awk -F'time=' '{print $2}' | cut -d' ' -f1)
+    if [ -n "$ping_result" ]; then
+        echo "📶 Ping: ${ping_result} ms"
+    else
+        echo "❌ Ping failed."
+    fi
+    echo ""
+    read -p "Press Enter to return..."
+    main_menu
 }
 
-# ------------ Options ------------ #
-
-function dns_gaming() {
-  title
-  echo "🎮 Gaming DNS"
-  echo
-  list_games
-  echo
-  read -p "Enter game number: " game_choice
-  GAME=$(sed "${game_choice}q;d" "$GAMES_FILE")
-  echo
-  list_countries
-  echo
-  read -p "Enter country number: " country_choice
-  COUNTRY=${COUNTRIES[$((country_choice-1))]}
-  echo -e "\nRecommended DNS for $GAME in $COUNTRY:"
-  show_dns
-  pause
+# Function: Search Game
+search_game() {
+    show_title
+    read -p "🔍 Enter game name: " search
+    result=$(grep -i "$search" games_list.txt)
+    if [ -z "$result" ]; then
+        echo -e "\e[33m⚠️  Game not found.\e[0m"
+    else
+        echo "🎯 Found: $result"
+        echo ""
+        echo "🌍 Choose Region:"
+        echo "1. Iran"
+        echo "2. UAE"
+        echo "3. Turkey"
+        echo "4. Other"
+        read -p "Region number: " region
+        dns=$(shuf -n 2 dns_list.txt)
+        echo ""
+        echo "Recommended DNS for $result:"
+        echo -e "🟢 Primary DNS: $(echo "$dns" | sed -n 1p)"
+        echo -e "🟢 Secondary DNS: $(echo "$dns" | sed -n 2p)"
+    fi
+    echo ""
+    read -p "Press Enter to return..."
+    main_menu
 }
 
-function dns_download() {
-  title
-  echo "🚀 Download Optimized DNS"
-  echo
-  list_countries
-  echo
-  read -p "Enter country number: " country_choice
-  COUNTRY=${COUNTRIES[$((country_choice-1))]}
-  echo -e "\nBest Download DNS for $COUNTRY:"
-  show_dns
-  pause
-}
-
-function dns_premium() {
-  title
-  echo "⚡ Premium DNS"
-  show_dns
-  pause
-}
-
-function ping_dns() {
-  title
-  echo "📡 Ping a DNS"
-  read -p "Enter DNS IP: " IP
-  ping -c 1 "$IP"
-  pause
-}
-
-function search_game() {
-  title
-  echo "🔍 Search Game"
-  read -p "Enter game name: " name
-  if grep -iq "$name" "$GAMES_FILE"; then
-    echo -e "\n✅ Game Found!"
-    list_countries
-    read -p "Enter country number: " country_choice
-    COUNTRY=${COUNTRIES[$((country_choice-1))]}
-    echo -e "\nDNS for $name in $COUNTRY:"
-    show_dns
-  else
-    echo -e "\e[33m❌ Game Not Found.\e[0m"
-  fi
-  pause
-}
-
-# ------------ Main Menu ------------ #
-
-function main_menu() {
-  title
-  echo "Choose an option:"
-  echo "1. 🎮 DNS for Gaming"
-  echo "2. 🚀 DNS for Download"
-  echo "3. ⚡ Premium DNS (New)"
-  echo "4. 📡 Ping DNS (New)"
-  echo "5. 🔍 Search Game (New)"
-  echo "0. Exit"
-  echo
-  read -p "Enter your choice: " choice
-  case $choice in
-    1) dns_gaming ;;
-    2) dns_download ;;
-    3) dns_premium ;;
-    4) ping_dns ;;
-    5) search_game ;;
-    0) exit ;;
-    *) echo "Invalid option"; sleep 1; main_menu ;;
-  esac
-}
-
+# Start program
 main_menu
