@@ -1,10 +1,10 @@
-Iran
-Turkey
-United Arab Emirates
-Saudi Arabia
-Qatar
-Iraq
-India
-Russia
-Germany
-United States
+1. Iran
+2. Turkey
+3. UAE
+4. Saudi Arabia
+5. Iraq
+6. Qatar
+7. Jordan
+8. Lebanon
+9. Israel
+10. Egypt

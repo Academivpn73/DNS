@@ -1,70 +1,70 @@
-1. Call of Duty
+1. PUBG
 2. Fortnite
-3. PUBG Mobile
-4. Apex Legends
-5. Valorant
-6. League of Legends
+3. Call of Duty
+4. Valorant
+5. Apex Legends
+6. CS:GO
 7. Dota 2
-8. Free Fire
-9. Minecraft
-10. GTA V
-11. Counter Strike: Global Offensive
-12. World of Warcraft
-13. Overwatch
+8. League of Legends
+9. Free Fire
+10. Minecraft
+11. Roblox
+12. Overwatch
+13. GTA V
 14. Rocket League
-15. Rainbow Six Siege
-16. Battlefield V
-17. Destiny 2
-18. Warzone
-19. Elden Ring
-20. Roblox
-21. Clash of Clans
-22. Clash Royale
-23. Brawl Stars
-24. Mobile Legends
-25. Arena of Valor
-26. Genshin Impact
-27. Among Us
-28. FIFA 24
-29. PES eFootball
-30. Cyberpunk 2077 (Online)
-31. Red Dead Online
-32. The Division 2
-33. Sea of Thieves
-34. Dead by Daylight
-35. Monster Hunter: World
-36. Paladins
-37. Warframe
-38. Star Wars: Battlefront II
-39. Black Desert Online
-40. Lost Ark
-41. The Elder Scrolls Online
-42. NBA 2K24
-43. Team Fortress 2
-44. Ark: Survival Evolved
-45. Rust
-46. Fall Guys
-47. SpellBreak
-48. Hyper Scape
-49. Scavengers
-50. Enlisted
-51. Hunt: Showdown
-52. Phasmophobia
-53. Valheim
-54. Crossfire
-55. Blade & Soul
-56. Lineage 2
-57. TERA
-58. MapleStory
-59. Ragnarok Online
-60. War Thunder
-61. Heroes & Generals
-62. World of Tanks
-63. World of Warships
-64. Path of Exile
-65. Diablo IV
-66. Hearthstone
-67. Magic: The Gathering Arena
-68. Yu-Gi-Oh! Master Duel
-69. FIFA Online 4
-70. Project Zomboid
+15. Warzone
+16. Rainbow Six Siege
+17. Battlefield V
+18. FIFA 24
+19. PES 2023
+20. Destiny 2
+21. The Division 2
+22. Warframe
+23. Mobile Legends
+24. Clash Royale
+25. Clash of Clans
+26. Brawl Stars
+27. Arena of Valor
+28. World of Tanks
+29. World of Warships
+30. Crossfire
+31. Paladins
+32. Smite
+33. Among Us
+34. Team Fortress 2
+35. Halo Infinite
+36. Escape from Tarkov
+37. Dead by Daylight
+38. DayZ
+39. Rust
+40. Cyberpunk 2077 (Online)
+41. Elden Ring (Online)
+42. Fall Guys
+43. Genshin Impact
+44. Honkai Star Rail
+45. Diablo IV
+46. New World
+47. Lost Ark
+48. Ark: Survival Evolved
+49. FIFA Mobile
+50. Apex Mobile
+51. War Robots
+52. Tank Stars
+53. 8 Ball Pool
+54. Modern Combat 5
+55. Critical Ops
+56. PUBG New State
+57. Hyper Front
+58. Sausage Man
+59. Zula
+60. Point Blank
+61. Lineage 2
+62. TERA
+63. Blade and Soul
+64. Black Desert Online
+65. MapleStory
+66. Ragnarok Online
+67. MU Online
+68. Albion Online
+69. Heroes of the Storm
+70. Starcraft II
