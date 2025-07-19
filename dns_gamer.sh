@@ -1,114 +1,126 @@
 #!/bin/bash
 
-# Title box function
+# ==========[ Configuration ]============
+DNS_GAMING_FILE="dns_gaming.txt"
+DNS_DOWNLOAD_FILE="dns_download.txt"
+GAMES_LIST_FILE="games_list.txt"
+VERSION="1.2.3"
+ADMIN="@MahdiAGM0"
+TELEGRAM="@Academi_vpn"
+# =======================================
+
+# ==========[ Color Setup ]=============
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+NC='\033[0m' # No Color
+# =======================================
+
+# ==========[ Functions ]===============
 show_title() {
-  colors=(31 32 33 34 35 36)
-  color=${colors[$RANDOM % ${#colors[@]}]}
   clear
-  echo -e "\e[1;${color}m"
-  echo "╔═══════════════════════════════════════════════╗"
-  echo "║         DNS Management Script v1.2.3         ║"
-  echo "║         Admin: @MahdiAGM0                    ║"
-  echo "║         Telegram: @Academi_vpn               ║"
-  echo "╚═══════════════════════════════════════════════╝"
-  echo -e "\e[0m"
+  COLOR=$((31 + RANDOM % 7))
+  echo -e "\033[1;${COLOR}m"
+  echo "╔═══════════════════════════════════╗"
+  echo "║           DNS TOOL MENU           ║"
+  echo "╚═══════════════════════════════════╝"
+  echo -e "\033[0m"
+  echo -e "+---------------------------------------------+"
+  echo -e "| Telegram: ${TELEGRAM}"
+  echo -e "| Admin:    ${ADMIN}"
+  echo -e "| Version:  ${VERSION}"
+  echo -e "+---------------------------------------------+"
 }
 
-# Show main menu
-show_menu() {
-  show_title
-  echo "📌 Choose an option:"
-  echo "1️⃣  Premium DNS (New)"
-  echo "2️⃣  Ping a DNS"
-  echo "3️⃣  Search Game DNS (New)"
-  echo "4️⃣  Gaming DNS"
-  echo "5️⃣  Download DNS"
-  echo "0️⃣  Exit"
-  echo -n "👉 Enter your choice: "
-  read choice
-  case $choice in
-    1) premium_dns ;;
-    2) ping_dns ;;
-    3) search_game ;;
-    4) show_dns "dns_gaming.txt" ;;
-    5) show_dns "dns_download.txt" ;;
-    0) exit 0 ;;
-    *) echo "❌ Invalid choice."; sleep 1; show_menu ;;
-  esac
+random_dns_from_file() {
+  file="$1"
+  total=$(wc -l < "$file")
+  line1=$((RANDOM % total + 1))
+  line2=$((RANDOM % total + 1))
+  dns1=$(sed -n "${line1}p" "$file")
+  dns2=$(sed -n "${line2}p" "$file")
+  echo "$dns1"
+  echo "$dns2"
 }
 
-# Read and show 2 random DNS from file
-show_dns() {
-  show_title
-  file=$1
-  if [[ ! -f "$file" ]]; then
-    echo "❌ DNS list file '$file' not found!"
-    read -p "Press Enter to return..." ; show_menu
-    return
-  fi
-  echo "📡 DNS Suggestions:"
-  shuf -n 2 "$file" | while read dns; do
-    ping_time=$(ping -c 1 -W 1 "$dns" | grep time= | awk -F"time=" '{print $2}' | cut -d' ' -f1)
-    echo -e "🔹 $dns  (Ping: ${ping_time:-Fail})"
-  done
-  echo ""
-  read -p "Press Enter to return..." ; show_menu
-}
-
-# Premium DNS (from both files)
-premium_dns() {
-  show_title
-  echo "✨ Premium DNS:"
-  (cat dns_gaming.txt; cat dns_download.txt) 2>/dev/null | shuf -n 2 | while read dns; do
-    ping_time=$(ping -c 1 -W 1 "$dns" | grep time= | awk -F"time=" '{print $2}' | cut -d' ' -f1)
-    echo -e "⭐ $dns  (Ping: ${ping_time:-Fail})"
-  done
-  echo ""
-  read -p "Press Enter to return..." ; show_menu
-}
-
-# Ping a custom DNS
 ping_dns() {
-  show_title
-  read -p "🌐 Enter DNS to ping: " user_dns
-  echo ""
-  echo "⏱️ Pinging $user_dns..."
-  ping -c 3 -W 1 "$user_dns"
-  echo ""
-  read -p "Press Enter to return..." ; show_menu
+  read -p "Enter DNS to test: " dns
+  echo -e "${YELLOW}Pinging $dns...${NC}"
+  ping -c 3 "$dns"
+  echo
+  read -p "Press Enter to return..."
 }
 
-# Search game and show DNS
-search_game() {
+search_game_dns() {
   show_title
-  if [[ ! -f "games_list.txt" ]]; then
-    echo "❌ 'games_list.txt' not found."
-    read -p "Press Enter to return..." ; show_menu
+  echo -e "📱 ${GREEN}Game List:${NC}"
+  nl "$GAMES_LIST_FILE"
+  echo
+  read -p "Enter game name to search: " game
+
+  found=$(grep -i "^$game\$" "$GAMES_LIST_FILE")
+  if [[ -z "$found" ]]; then
+    echo -e "${YELLOW}Game not found!${NC}"
+    read -p "Press Enter to return..."
     return
   fi
-  read -p "🎮 Enter game name to search: " game
-  found=$(grep -i "$game" games_list.txt)
-  if [[ -z "$found" ]]; then
-    echo -e "\e[1;33m⚠️ Game not found.\e[0m"
-  else
-    echo -e "\n📍 Game Found: $found"
-    echo "🌍 Choose Region:"
-    select region in Iran UAE Turkey Other; do
-      case $region in
-        Iran|UAE|Turkey|Other)
-          echo -e "\n🌐 DNS for $found ($region):"
-          shuf -n 2 dns_gaming.txt | while read dns; do
-            ping_time=$(ping -c 1 -W 1 "$dns" | grep time= | awk -F"time=" '{print $2}' | cut -d' ' -f1)
-            echo -e "🔹 $dns  (Ping: ${ping_time:-Fail})"
-          done
-          break ;;
-        *) echo "❌ Invalid option." ;;
-      esac
-    done
-  fi
-  echo ""
-  read -p "Press Enter to return..." ; show_menu
+
+  echo -e "🌍 Choose Region:"
+  select region in "Iran" "UAE" "Turkey" "Other"; do
+    [[ -n "$region" ]] && break
+  done
+
+  echo -e "${GREEN}Recommended DNS for ${game} (${region}):${NC}"
+  random_dns_from_file "$DNS_GAMING_FILE"
+  echo
+  read -p "Press Enter to return..."
 }
 
-# Start script
-show_menu
+download_dns() {
+  show_title
+  echo -e "🌍 Choose Region for Fast Download DNS:"
+  select region in "Iran" "UAE" "Turkey" "Other"; do
+    [[ -n "$region" ]] && break
+  done
+
+  echo -e "${GREEN}Best DNS for Download (${region}):${NC}"
+  random_dns_from_file "$DNS_DOWNLOAD_FILE"
+  echo
+  read -p "Press Enter to return..."
+}
+
+gaming_dns() {
+  show_title
+  echo -e "🌍 Choose Region for Gaming DNS:"
+  select region in "Iran" "UAE" "Turkey" "Other"; do
+    [[ -n "$region" ]] && break
+  done
+
+  echo -e "${GREEN}Best Gaming DNS (${region}):${NC}"
+  random_dns_from_file "$DNS_GAMING_FILE"
+  echo
+  read -p "Press Enter to return..."
+}
+# =======================================
+
+# ==========[ Main Menu ]===============
+while true; do
+  show_title
+  echo -e "${GREEN}Select an option:${NC}"
+  echo "1️⃣  DNS for Gaming"
+  echo "2️⃣  DNS for Download"
+  echo "3️⃣  Search Game DNS (🆕)"
+  echo "4️⃣  Ping a DNS"
+  echo "0️⃣  Exit"
+  echo
+  read -p "Enter your choice: " opt
+
+  case $opt in
+    1) gaming_dns ;;
+    2) download_dns ;;
+    3) search_game_dns ;;
+    4) ping_dns ;;
+    0) exit ;;
+    *) echo "Invalid option!"; sleep 1 ;;
+  esac
+done
+# =======================================
