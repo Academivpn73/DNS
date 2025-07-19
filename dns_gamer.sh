@@ -1,7 +1,7 @@
 #!/bin/bash
 
-# -------- URLs (replace with your actual GitHub username/repo) -------- #
-BASE_URL="https://raw.githubusercontent.com/yourusername/DNS-Project/main"
+# -------- URLs (REPLACE these with your actual GitHub raw URLs) -------- #
+BASE_URL="https://raw.githubusercontent.com/YOUR_USERNAME/YOUR_REPO/main"
 GAMES_URL="$BASE_URL/games_list.txt"
 COUNTRIES_URL="$BASE_URL/countries_list.txt"
 DNS_URL="$BASE_URL/dns_data.txt"
@@ -13,21 +13,7 @@ GREEN='\033[0;32m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
-# -------- Banner -------- #
-clear
-TITLE_COLORS=("\033[0;34m" "\033[0;32m" "\033[0;35m" "\033[0;36m")
-RANDOM_COLOR=${TITLE_COLORS[$RANDOM % ${#TITLE_COLORS[@]}]}
-echo -e "${RANDOM_COLOR}"
-echo "██████╗ ███╗   ██╗███████╗     ██████╗ ███╗   ██╗███████╗██████╗"
-echo "██╔══██╗████╗  ██║██╔════╝    ██╔═══██╗████╗  ██║██╔════╝██╔══██╗"
-echo "██████╔╝██╔██╗ ██║█████╗      ██║   ██║██╔██╗ ██║█████╗  ██████╔╝"
-echo "██╔═══╝ ██║╚██╗██║██╔══╝      ██║   ██║██║╚██╗██║██╔══╝  ██╔══██╗"
-echo "██║     ██║ ╚████║███████╗    ╚██████╔╝██║ ╚████║███████╗██║  ██║"
-echo "╚═╝     ╚═╝  ╚═══╝╚══════╝     ╚═════╝ ╚═╝  ╚═══╝╚══════╝╚═╝  ╚═╝"
-echo -e "${NC}"
-
-# -------- Functions -------- #
-
+# -------- Menu Function -------- #
 show_menu() {
     echo -e "${CYAN}📋 Choose an option:${NC}"
     echo "1) 🎮 Gaming DNS"
@@ -38,6 +24,7 @@ show_menu() {
     echo "0) ❌ Exit"
 }
 
+# -------- Helper Functions -------- #
 get_list_from_url() {
     curl -fsSL "$1" || echo ""
 }
@@ -59,9 +46,7 @@ get_dns_by_game_country() {
     fi
 }
 
-# -------- Main Loop -------- #
-
-# Load all lists
+# -------- Load Data -------- #
 games_list=$(get_list_from_url "$GAMES_URL")
 countries_list=$(get_list_from_url "$COUNTRIES_URL")
 dns_list=$(get_list_from_url "$DNS_URL")
@@ -72,6 +57,7 @@ if [[ -z "$games_list" || -z "$countries_list" || -z "$dns_list" ]]; then
     exit 1
 fi
 
+# -------- Main Loop -------- #
 while true; do
     show_menu
     read -rp "#? " option
