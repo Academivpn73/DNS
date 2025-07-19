@@ -1,18 +1,20 @@
 #!/bin/bash
 
-# ------------ Header Box ------------
-colors=(31 32 33 34 35 36 91 92 93 94 95 96)
+# فایل DNS
+DNS_FILE="dns_list.txt"
+
+# رنگ‌ها برای عنوان
+colors=(31 32 33 34 35 36)
 random_color=${colors[$RANDOM % ${#colors[@]}]}
 
-clear
+# اطلاعات ابتدای برنامه
 echo -e "\e[${random_color}m+---------------------------------------+\e[0m"
 echo -e "\e[${random_color}m|  Telegram: @Academi_vpn               |\e[0m"
 echo -e "\e[${random_color}m|  Admin by: Mahdi                      |\e[0m"
 echo -e "\e[${random_color}m|  Version: 1.2.4                       |\e[0m"
 echo -e "\e[${random_color}m+---------------------------------------+\e[0m"
-echo ""
 
-# ------------ Static Game List ------------
+# گیم‌ها
 games=(
 "Call of Duty"
 "Free Fire"
@@ -34,134 +36,125 @@ games=(
 "eFootball"
 "Brawl Stars"
 "World of Tanks"
+"Warzone"
+"Rainbow Six Siege"
+"Battlefield"
+"Escape from Tarkov"
+"New State (New)"
+"Diablo Immortal"
+"Team Fortress 2"
+"Naraka Bladepoint"
+"Dead by Daylight"
+"SMITE"
+"Albion Online"
+"Destiny 2"
+"Lost Ark"
+"Fall Guys"
+"Paladins"
+"Dota 2"
+"Among Us"
+"World War Heroes"
+"Zula"
+"Knives Out"
+"Rules of Survival"
+"Modern Combat"
+"Standoff 2"
+"Crossfire"
+"Combat Master"
+"Cyber Hunter"
+"Hyper Front"
+"Critical Ops"
+"War Robots"
+"Pixel Gun 3D"
+"Sky: Children of the Light"
+"Real Racing 3"
+"Asphalt 9"
+"NBA Live"
+"Mortal Kombat"
+"Injustice 2"
+"Warhammer 40k"
+"Bleach Brave Souls"
+"Pokemon Unite"
+"Yu-Gi-Oh! Duel Links"
+"Dragon Ball Legends"
+"Shadowgun Legends"
+"Modern Strike"
+"NOVA Legacy"
+"Infinity Ops"
+"Gunfire Reborn"
+"Undawn"
+"PUBG Lite"
+"Mini Militia"
+"Surviv.io"
+"Tacticool"
 )
 
-# ------------ Static Country List ------------
-countries=(
-"Iran"
-"Turkey"
-"Saudi Arabia"
-"Iraq"
-"Qatar"
-"UAE"
-"Egypt"
-"Jordan"
-"Germany"
-"United States"
-)
+# کشورها
+countries=("Iran" "Turkey" "Germany" "USA" "France" "Qatar" "UAE" "Russia" "India" "Brazil")
 
-# ------------ Fake DNS Bank (per Game/Country) ------------
-declare -A dns_database
-for game in "${games[@]}"; do
-  for country in "${countries[@]}"; do
-    dns_list=()
-    for i in {1..30}; do
-      ip1=$((RANDOM % 255)).$((RANDOM % 255)).$((RANDOM % 255)).$((RANDOM % 255))
-      dns_list+=("$ip1")
-    done
-    dns_database["$game|$country"]="${dns_list[*]}"
-  done
-done
-
-# ------------ Show Game List ------------
+# نمایش لیست بازی‌ها
 show_games() {
   echo -e "\n🎮 Select a Game:"
-  index=1
-  for game in "${games[@]}"; do
+  for i in "${!games[@]}"; do
+    num=$((i + 1))
+    game="${games[$i]}"
     if [[ "$game" == *"(New)"* ]]; then
-      echo -e "$index) \e[34m$game\e[0m"
+      echo -e "$num) \e[34m$game\e[0m"
     else
-      echo "$index) $game"
+      echo "$num) $game"
     fi
-    ((index++))
   done
 }
 
-# ------------ Show Country List ------------
+# نمایش لیست کشورها
 show_countries() {
-  echo -e "\n📋 Select your country:"
-  index=1
-  for country in "${countries[@]}"; do
-    echo "$index) $country"
-    ((index++))
+  echo -e "\n🌍 Select Country:"
+  for i in "${!countries[@]}"; do
+    echo "$((i + 1))) ${countries[$i]}"
   done
 }
 
-# ------------ Get DNS ------------
-get_dns() {
+# گرفتن DNS از فایل
+get_dns_from_file() {
   show_games
-  read -p "Game Number: " game_index
+  read -p "Enter game number: " game_num
   show_countries
-  read -p "Country Number: " country_index
+  read -p "Enter country number: " country_num
 
-  game="${games[$((game_index-1))]}"
-  country="${countries[$((country_index-1))]}"
+  selected_game="${games[$((game_num - 1))]}"
+  selected_country="${countries[$((country_num - 1))]}"
 
-  dns_key="$game|$country"
-  dns_string="${dns_database[$dns_key]}"
-  IFS=' ' read -r -a dns_array <<< "$dns_string"
+  echo -e "\n📡 Searching DNS for $selected_game in $selected_country..."
 
-  if [ ${#dns_array[@]} -lt 2 ]; then
-    echo "❌ No DNS found for $game in $country"
+  dns_lines=$(grep "^$selected_game | $selected_country |" "$DNS_FILE")
+
+  if [ -z "$dns_lines" ]; then
+    echo "❌ No DNS found for $selected_game in $selected_country"
     return
   fi
 
-  primary_dns=${dns_array[$RANDOM % ${#dns_array[@]}]}
-  secondary_dns=${dns_array[$RANDOM % ${#dns_array[@]}]}
-  ping_time=$((20 + RANDOM % 40))
+  mapfile -t dns_list <<< "$dns_lines"
+  total=${#dns_list[@]}
+  random_index=$((RANDOM % total))
+  primary_dns=$(echo "${dns_list[$random_index]}" | cut -d'|' -f3 | xargs)
 
-  echo -e "\n🌐 DNS for \e[33m$game\e[0m - \e[32m$country\e[0m:"
+  second_index=$(( (random_index + 1) % total ))
+  secondary_dns=$(echo "${dns_list[$second_index]}" | cut -d'|' -f3 | xargs)
+
   echo -e "🟢 Primary DNS: $primary_dns"
   echo -e "🔵 Secondary DNS: $secondary_dns"
-  echo -e "📶 Ping: ${ping_time}ms"
+  echo -e "📶 Estimated Ping: $((20 + RANDOM % 40)) ms"
 }
 
-# ------------ DNS Premium ------------
-dns_premium() {
-  dns1="9.9.9.9"
-  dns2="1.1.1.2"
-  echo -e "\n👑 Premium DNS:"
-  echo "🟢 Primary: $dns1"
-  echo "🔵 Secondary: $dns2"
-  echo "📶 Ping: 23ms"
-}
-
-# ------------ Ping Custom DNS ------------
-ping_dns() {
-  read -p "Enter DNS IP to ping: " ip
-  echo -e "\n📡 Pinging $ip..."
-  ping -c 3 $ip | tail -2
-}
-
-# ------------ Search Game ------------
-search_game() {
-  read -p "Enter keyword to search: " keyword
-  echo -e "\n🔍 Search Results:"
-  index=1
-  for game in "${games[@]}"; do
-    if [[ "$game" == *"$keyword"* ]]; then
-      echo "$index) $game"
-    fi
-    ((index++))
-  done
-}
-
-# ------------ Main Menu ------------
+# منو
 while true; do
   echo -e "\n📘 Menu:"
   echo "1) Get Gaming DNS"
-  echo "2) Premium DNS"
-  echo "3) Ping a DNS"
-  echo "4) Search Game"
   echo "0) Exit"
   read -p "Choose: " opt
-
   case $opt in
-    1) get_dns ;;
-    2) dns_premium ;;
-    3) ping_dns ;;
-    4) search_game ;;
-    0) exit ;;
-    *) echo "Invalid option!" ;;
+    1) get_dns_from_file ;;
+    0) break ;;
+    *) echo "Invalid option" ;;
   esac
 done
