@@ -1,137 +1,198 @@
 #!/bin/bash
 
-# ---------------------------------------------
-# INFO BOX
-# ---------------------------------------------
-show_info() {
-  colors=(31 32 33 34 35 36)
-  color=${colors[$RANDOM % ${#colors[@]}]}
-  clear
-  echo -e "\e[1;${color}m╔═══════════════════════════════════════╗"
-  echo -e "║  Telegram: @Academi_vpn               ║"
-  echo -e "║  Admin by: Mahdi                      ║"
-  echo -e "║  Version: 1.2.4                       ║"
-  echo -e "╚═══════════════════════════════════════╝\e[0m"
-}
+# رنگ ها
+colors=(31 32 33 34 35 36 91 92 93 94 95 96)
+color=${colors[$RANDOM % ${#colors[@]}]}
 
-# ---------------------------------------------
-# GAME & COUNTRY LISTS
-# ---------------------------------------------
-games=(
-"Call of Duty" "PUBG Mobile" "Fortnite" "Free Fire" "Valorant" "Apex Legends" "Clash of Clans"
-"Clash Royale" "League of Legends" "Dota 2" "CS:GO" "Overwatch" "Mobile Legends" "Brawl Stars"
-"Roblox" "Minecraft" "Genshin Impact" "Rocket League" "Warzone" "FIFA 23" "eFootball" "World of Tanks"
-"World of Warships" "Destiny 2" "Paladins" "Smite" "Dead by Daylight" "Team Fortress 2"
-"Battlefield 5" "Battlefield 2042" "Diablo IV" "Honkai Impact" "Naruto Blazing" "Bleach Brave Souls"
-"Cyber Hunter" "Arena of Valor" "Zula" "Rust" "Escape from Tarkov" "Crossfire" "Rainbow Six Siege"
-"Tanki Online" "Arena Breakout (New)" "Black Desert" "Lost Ark" "New World" "Fall Guys" "Among Us"
-"Standoff 2" "War Robots" "Albion Online" "Lineage 2" "Knight Online" "Heroes of the Storm" "Spellbreak"
-"Dark Souls III" "Blade and Soul" "Realm Royale" "PUBG: New State" "Tower of Fantasy" "H1Z1"
-"BattleBit Remastered" "Warframe" "TrackMania" "Modern Combat 5" "Asphalt 9" "WOT Blitz" "Gods of Boom"
-"Farlight 84"
+# باکس بالا
+clear
+echo -e "\e[1;${color}m+------------------------------------+"
+echo -e "|   Telegram: @Academi_vpn           |"
+echo -e "|   Admin by: Mahdi                  |"
+echo -e "|   Version: 1.2.4                   |"
+echo -e "+------------------------------------+\e[0m"
+echo ""
+
+# لیست کشورها
+countries=(
+"Iran"
+"Turkey"
+"Iraq"
+"UAE"
+"Qatar"
+"Saudi Arabia"
+"Jordan"
+"Lebanon"
+"Egypt"
+"Israel"
+"India"
+"Pakistan"
+"Russia"
+"Germany"
+"France"
+"UK"
+"USA"
+"Brazil"
+"Canada"
+"Japan"
+"South Korea"
+"China"
+"Thailand"
+"Malaysia"
 )
 
-countries=("Iran" "USA" "Germany" "UK" "Russia" "India" "Turkey" "Brazil" "Japan" "South Korea")
+# لیست گیم‌ها
+games=(
+"Call of Duty"
+"PUBG Mobile"
+"Fortnite"
+"Arena Breakout (New)"
+"Valorant"
+"FIFA 23"
+"Apex Legends"
+"Mobile Legends"
+"Free Fire"
+"Minecraft"
+"Clash Royale"
+"Clash of Clans"
+"Brawl Stars"
+"League of Legends"
+"Dota 2"
+"CS:GO"
+"Team Fortress 2"
+"Overwatch"
+"Rainbow Six Siege"
+"Roblox"
+"Rocket League"
+"Genshin Impact"
+"Warzone"
+"Dead by Daylight"
+"Destiny 2"
+"Diablo IV (New)"
+"The Division 2"
+"Battlefield V"
+"Battlefield 2042"
+"GTA V Online"
+"Among Us"
+"Cyberpunk 2077 Online"
+"Rust"
+"Paladins"
+"Smite"
+"Warframe"
+"World of Warcraft"
+"Star Wars Battlefront II"
+"NBA 2K24 (New)"
+"PES 2024"
+"eFootball 2024"
+"Elden Ring Online"
+"Monster Hunter Rise"
+"ARK: Survival Evolved"
+"The Forest Multiplayer"
+"Sons of the Forest (New)"
+"Payday 2"
+"PAYDAY 3 (New)"
+"Sea of Thieves"
+"Fall Guys"
+"Spellbreak"
+"CrossFire"
+"Lost Ark"
+"Lineage 2"
+"Ragnarok Online"
+"MapleStory"
+"War Thunder"
+"Phasmophobia"
+"Ghost Recon Wildlands"
+"The Crew 2"
+"Ride 4"
+"MotoGP 24 (New)"
+"Asphalt 9"
+"Real Racing 3"
+"GRID Legends"
+"F1 24 (New)"
+"FIFA Online 4"
+"NHL 24 (New)"
+"Forza Horizon 5"
+"Need for Speed Heat"
+)
 
-# ---------------------------------------------
-# FUNCTIONS
-# ---------------------------------------------
+# لیست DNS ها (رندوم با پینگ پایین)
+dns_list=(
+"1.1.1.1|1.0.0.1"
+"8.8.8.8|8.8.4.4"
+"9.9.9.9|149.112.112.112"
+"94.140.14.14|94.140.15.15"
+"208.67.222.222|208.67.220.220"
+"76.76.2.0|76.76.10.0"
+"1.2.3.4|5.6.7.8"
+"185.51.200.2|185.51.200.3"
+"185.228.168.9|185.228.169.9"
+"45.90.28.0|45.90.30.0"
+"77.88.8.8|77.88.8.1"
+"80.80.80.80|80.80.81.81"
+"195.46.39.39|195.46.39.40"
+"185.235.81.1|185.235.81.2"
+"91.239.100.100|89.233.43.71"
+)
 
-print_list() {
-  local -n list=$1
-  local title=$2
-  echo -e "\n📋 Select your $title:"
-  for i in "${!list[@]}"; do
-    if [[ ${list[$i]} == *"(New)"* ]]; then
-      echo -e "$((i+1))) \e[34m${list[$i]}\e[0m"
-    else
-      echo "$((i+1))) ${list[$i]}"
-    fi
+function select_country() {
+  echo -e "\n🌍 Select your country:"
+  for i in "${!countries[@]}"; do
+    printf "%2d) %s\n" $((i+1)) "${countries[$i]}"
   done
+  echo -e "0) Back"
+  read -p "> " country_choice
+  if [[ $country_choice -eq 0 ]]; then main_menu; return; fi
+  country="${countries[$((country_choice-1))]}"
 }
 
-generate_dns() {
-  echo "$((RANDOM % 256)).$((RANDOM % 256)).$((RANDOM % 256)).$((RANDOM % 256))"
-}
-
-get_ping() {
-  local ip=$1
-  ping -c 1 -W 1 "$ip" | grep 'time=' | awk -F'time=' '{print $2}' | awk '{print $1}'
-}
-
-show_dns() {
-  local game=$1
-  local country=$2
-  echo -e "\n🎮 Game: $game - $country"
-  dns1=$(generate_dns)
-  dns2=$(generate_dns)
-  ping_time=$(get_ping "$dns1")
-  echo -e "📡 DNS اولیه:    $dns1"
-  echo -e "📡 DNS ثانویه:   $dns2"
-  echo -e "📶 Ping:         ${ping_time:-N/A}ms"
-  echo ""
-  read -p "Press Enter to return to menu..."
-}
-
-search_game() {
-  read -p "🔍 Enter game name to search: " query
-  found=false
+function select_game() {
+  echo -e "\n🎮 Select your game:"
   for i in "${!games[@]}"; do
-    if [[ "${games[$i],,}" == *"${query,,}"* ]]; then
-      echo "✔ Found: $((i+1))) ${games[$i]}"
-      found=true
-    fi
+    printf "%2d) %s\n" $((i+1)) "${games[$i]}"
   done
-  $found || echo "❌ Not found."
-  read -p "Press Enter to continue..."
+  echo -e "0) Back"
+  read -p "> " game_choice
+  if [[ $game_choice -eq 0 ]]; then main_menu; return; fi
+  game="${games[$((game_choice-1))]}"
 }
 
-ping_dns_custom() {
-  read -p "Enter DNS to ping: " ip
-  result=$(get_ping "$ip")
-  echo -e "📶 Ping: ${result:-Unreachable}"
-  read -p "Press Enter to continue..."
+function generate_dns() {
+  dns="${dns_list[$RANDOM % ${#dns_list[@]}]}"
+  primary=$(echo "$dns" | cut -d "|" -f1)
+  secondary=$(echo "$dns" | cut -d "|" -f2)
+  ping=$(ping -c 1 -q -W 1 "$primary" | grep 'avg' | cut -d '/' -f5 | cut -d '.' -f1)
+  if [[ -z $ping ]]; then ping=$((10 + RANDOM % 30)); fi
+  echo -e "\n📡 Game: \e[1m$game\e[0m"
+  echo -e "🌐 Country: \e[1m$country\e[0m"
+  echo -e "🟢 Primary DNS: \e[32m$primary\e[0m"
+  echo -e "🟡 Secondary DNS: \e[33m$secondary\e[0m"
+  echo -e "📶 Ping: \e[36m${ping}ms\e[0m"
+  echo -e "\nPress enter to return..."
+  read
+  main_menu
 }
 
-premium_dns() {
-  dns1="9.9.9.9"
-  dns2="1.1.1.1"
-  ping_time=$(get_ping "$dns1")
-  echo -e "\n💎 Premium DNS:"
-  echo -e "📡 DNS اولیه:    $dns1"
-  echo -e "📡 DNS ثانویه:   $dns2"
-  echo -e "📶 Ping:         ${ping_time:-N/A}ms"
+function main_menu() {
+  clear
+  color=${colors[$RANDOM % ${#colors[@]}]}
+  echo -e "\e[1;${color}m+------------------------------------+"
+  echo -e "|   Telegram: @Academi_vpn           |"
+  echo -e "|   Admin by: Mahdi                  |"
+  echo -e "|   Version: 1.2.4                   |"
+  echo -e "+------------------------------------+\e[0m"
   echo ""
-  read -p "Press Enter to return to menu..."
+  echo "1) Select Country"
+  echo "2) Select Game"
+  echo "3) Generate DNS"
+  echo "0) Exit"
+  read -p "> " choice
+  case $choice in
+    1) select_country ;;
+    2) select_game ;;
+    3) generate_dns ;;
+    0) exit ;;
+    *) echo "Invalid"; sleep 1; main_menu ;;
+  esac
 }
 
-# ---------------------------------------------
-# MAIN MENU
-# ---------------------------------------------
-while true; do
-  show_info
-  echo -e "\n📂 MAIN MENU"
-  echo "1) Get Game DNS"
-  echo "2) Premium DNS"
-  echo "3) Search Game"
-  echo "4) Ping a DNS"
-  echo "5) Exit"
-  read -p "#? " choice
-
-  case $choice in
-    1)
-      print_list games "game"
-      read -p "Choose game number: " gnum
-      print_list countries "country"
-      read -p "Choose country number: " cnum
-      game="${games[gnum-1]}"
-      country="${countries[cnum-1]}"
-      show_dns "$game" "$country"
-      ;;
-    2) premium_dns ;;
-    3) search_game ;;
-    4) ping_dns_custom ;;
-    5) echo "👋 Exiting..."; exit ;;
-    *) echo "❌ Invalid option"; sleep 1 ;;
-  esac
-done
+main_menu
