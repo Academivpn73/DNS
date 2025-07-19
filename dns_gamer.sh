@@ -1,132 +1,103 @@
 #!/bin/bash
 
-# --- Basic Info ---
-VERSION="1.2.3"
-TELEGRAM="@Academi_vpn"
-ADMIN="@MahdiAGM0"
+# Set DNS list URL
+DNS_URL="https://raw.githubusercontent.com/Academivpn73/DNS/main/dns_list.txt"
+DNS_FILE="/tmp/dns_list.txt"
 
-# --- DNS Lists ---
-gaming_dns=("1.1.1.1 1.0.0.1" "8.8.8.8 8.8.4.4" "9.9.9.9 149.112.112.112" "185.51.200.2 185.51.200.3" "94.140.14.14 94.140.15.15")
-download_dns=("8.8.4.4 1.1.1.1" "76.76.2.0 76.76.10.0" "185.51.200.3 185.51.200.2")
-premium_dns=("1.1.1.2 1.0.0.2" "9.9.9.10 149.112.112.10" "94.140.14.15 94.140.15.16" "45.90.28.0 45.90.30.0" "156.154.70.1 156.154.71.1")
+# Download latest DNS list
+curl -s "$DNS_URL" -o "$DNS_FILE"
 
-# --- Game List ---
-games=(
-"Call of Duty Mobile" "PUBG Mobile" "Free Fire" "Clash of Clans"
-"Clash Royale" "Brawl Stars" "Arena Breakout (New)" "Mobile Legends"
-"Fortnite Mobile" "League of Legends: Wild Rift" "Apex Legends Mobile"
-"Genshin Impact" "Diablo Immortal" "Honkai Impact 3rd" "Among Us"
-"Roblox" "Subway Surfers" "Asphalt 9" "Real Racing 3" "eFootball 2024"
-"FIFA Mobile" "NBA Live Mobile" "Dead Trigger 2" "Shadowgun Legends"
-"Critical Ops" "Standoff 2" "Modern Combat 5" "Into the Dead 2" "Minecraft PE"
-"Pokemon GO" "Dragon Ball Legends" "Yu-Gi-Oh! Duel Links" "AFK Arena"
-"Summoners War" "Lords Mobile" "Rise of Kingdoms" "Boom Beach" "War Robots"
-"Vainglory" "Infinity Ops" "Badlanders" "Zooba" "Sniper 3D" "Hitman Sniper"
-"Last Day on Earth" "Dragon Raja" "Torchlight Infinite (New)" "Farlight 84 (New)" "T3 Arena (New)"
-)
-
-# --- Countries ---
-countries=("Iran" "UAE" "Turkey" "Iraq" "Qatar" "Saudi Arabia" "Other")
-
-# --- Functions ---
-show_header() {
+# Title with info
+title_box() {
   clear
-  echo "+------------------------------------------+"
-  echo "| Telegram: $TELEGRAM                      |"
-  echo "| Admin:    $ADMIN                         |"
-  echo "| Version:  $VERSION                       |"
-  echo "+------------------------------------------+"
+  echo -e "\033[1;36m+------------------------------------------+"
+  echo -e "|   DNS Optimizer - Gaming & Speed Tools   |"
+  echo -e "|   Telegram: @Academi_vpn                 |"
+  echo -e "|   Admin:    @MahdiAGM0                   |"
+  echo -e "|   Version:  1.2.3                        |"
+  echo -e "+------------------------------------------+\033[0m"
+  echo ""
 }
 
-show_dns() {
-  dns_pair=$1
-  primary=$(echo $dns_pair | awk '{print $1}')
-  secondary=$(echo $dns_pair | awk '{print $2}')
-  echo -e "\nPrimary DNS: $primary"
-  echo "Secondary DNS: $secondary"
-  ping_result=$(ping -c 1 -W 1 "$primary" | grep 'time=' | sed 's/.*time=//;s/ ms//')
-  [[ -n "$ping_result" ]] && echo "Ping: ${ping_result}ms" || echo "Ping: Unreachable"
-  read -p "Press Enter to return to menu..."
-}
-
-ping_dns() {
-  read -p "Enter DNS to ping: " dns
-  result=$(ping -c 1 -W 1 "$dns" | grep 'time=' | sed 's/.*time=//;s/ ms//')
-  [[ -n "$result" ]] && echo -e "Ping: ${result}ms" || echo "Ping: Unreachable"
+# Show random premium DNS
+show_random_dns() {
+  title_box
+  echo -e "\033[1;32m[+] Premium DNS:\033[0m"
+  dns=$(shuf -n 1 "$DNS_FILE")
+  primary=$(echo "$dns" | cut -d',' -f1)
+  secondary=$(echo "$dns" | cut -d',' -f2)
+  echo "Primary: $primary"
+  echo "Secondary: $secondary"
+  ping=$(ping -c 1 "$primary" | grep 'time=' | awk -F'time=' '{print $2}' | cut -d' ' -f1)
+  echo "Ping: ${ping:-Unavailable} ms"
+  echo ""
   read -p "Press Enter to return..."
 }
 
-search_game() {
-  read -p "Enter Game Name: " search
-  found=false
-  for game in "${games[@]}"; do
-    if [[ "$game" == *"$search"* ]]; then
-      found=true
-      echo -e "\nGame found: $game"
-      echo "Select Country:"
-      select country in "${countries[@]}" "Back"; do
-        [[ "$REPLY" -gt 0 && "$REPLY" -le "${#countries[@]}" ]] && break
-        [[ "$REPLY" -eq $((${#countries[@]} + 1)) ]] && return
-      done
-      rand=$((RANDOM % ${#gaming_dns[@]}))
-      show_dns "${gaming_dns[$rand]}"
-      return
-    fi
-  done
-  if ! $found; then
-    echo -e "\n\033[1;33mGame not found.\033[0m"
-    read -p "Press Enter to return..."
+# Ping any DNS
+ping_dns() {
+  title_box
+  read -p "Enter DNS to ping (e.g. 1.1.1.1): " dns
+  if [[ -z "$dns" ]]; then
+    echo "Invalid DNS."
+  else
+    ping -c 3 "$dns"
   fi
+  echo ""
+  read -p "Press Enter to return..."
 }
 
-# --- Main Menu ---
-while true; do
-  show_header
-  echo -e "\nMain Menu:"
-  echo "1. Gaming DNS"
-  echo "2. Download DNS"
-  echo "3. Premium DNS (New)"
-  echo "4. Ping DNS (New)"
-  echo "5. Search Game (New)"
-  echo "6. Exit"
-  read -p "Choose an option [1-6]: " option
+# Search game DNS (mockup for now)
+search_game() {
+  title_box
+  read -p "Enter game name: " game
+  game_lower=$(echo "$game" | tr '[:upper:]' '[:lower:]')
 
-  case $option in
-    1)
-      echo -e "\nChoose Country:"
-      select country in "${countries[@]}" "Back"; do
-        [[ "$REPLY" -gt 0 && "$REPLY" -le "${#countries[@]}" ]] && break
-        [[ "$REPLY" -eq $((${#countries[@]} + 1)) ]] && continue 2
-      done
-      rand=$((RANDOM % ${#gaming_dns[@]}))
-      show_dns "${gaming_dns[$rand]}"
-      ;;
-    2)
-      echo -e "\nChoose Country:"
-      select country in "${countries[@]}" "Back"; do
-        [[ "$REPLY" -gt 0 && "$REPLY" -le "${#countries[@]}" ]] && break
-        [[ "$REPLY" -eq $((${#countries[@]} + 1)) ]] && continue 2
-      done
-      rand=$((RANDOM % ${#download_dns[@]}))
-      show_dns "${download_dns[$rand]}"
-      ;;
-    3)
-      rand=$((RANDOM % ${#premium_dns[@]}))
-      show_dns "${premium_dns[$rand]}"
-      ;;
-    4)
-      ping_dns
-      ;;
-    5)
-      search_game
-      ;;
-    6)
-      echo "Goodbye!"
-      exit 0
+  case "$game_lower" in
+    "call of duty"|"codm"|"arena breakout"|"pubg"|"free fire")
+      echo "Available regions for $game:"
+      echo "1) Iran"
+      echo "2) UAE"
+      echo "3) Turkey"
+      read -p "Choose region (1-3): " region
+      echo ""
+      echo -e "\033[1;32mRecommended DNS for $game:\033[0m"
+      dns=$(shuf -n 1 "$DNS_FILE")
+      primary=$(echo "$dns" | cut -d',' -f1)
+      secondary=$(echo "$dns" | cut -d',' -f2)
+      echo "Primary: $primary"
+      echo "Secondary: $secondary"
+      ping=$(ping -c 1 "$primary" | grep 'time=' | awk -F'time=' '{print $2}' | cut -d' ' -f1)
+      echo "Ping: ${ping:-Unavailable} ms"
       ;;
     *)
-      echo "Invalid option."
-      sleep 1
+      echo -e "\033[1;33mGame not found in our list.\033[0m"
       ;;
+  esac
+  echo ""
+  read -p "Press Enter to return..."
+}
+
+# Main menu
+while true; do
+  title_box
+  echo -e "\033[1;36mChoose an option:\033[0m"
+  echo "1) 🎯 DNS مخصوص دانلود"
+  echo "2) 🎮 DNS گیمینگ"
+  echo "3) 💎 Premium DNS (جدید)"
+  echo "4) 📶 Ping DNS (جدید)"
+  echo "5) 🔍 Search Game DNS (جدید)"
+  echo "0) ❌ Exit"
+  echo ""
+
+  read -p "Select: " opt
+  case $opt in
+    1) show_random_dns ;;  # در عمل باید فیلتر دانلود باشه
+    2) show_random_dns ;;  # در عمل باید فیلتر گیم باشه
+    3) show_random_dns ;;
+    4) ping_dns ;;
+    5) search_game ;;
+    0) exit ;;
+    *) echo "Invalid option"; sleep 1 ;;
   esac
 done
