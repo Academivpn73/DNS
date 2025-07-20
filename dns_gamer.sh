@@ -11,125 +11,88 @@ show_banner() {
     echo -e "+--------------------------------------------------+\\e[0m"
 }
 
-# List of games (70 + Arena Breakout marked NEW)
-declare -A games
+# Games list (70 games + Arena Breakout marked NEW)
 games=(
-    ["PUBG"]="true"
-    ["Call of Duty"]="true"
-    ["Fortnite"]="true"
-    ["Minecraft"]="true"
-    ["Apex Legends"]="true"
-    ["Valorant"]="true"
-    ["GTA V"]="true"
-    ["League of Legends"]="true"
-    ["Dota 2"]="true"
-    ["Rainbow Six Siege"]="true"
-    ["Rocket League"]="true"
-    ["Overwatch"]="true"
-    ["Among Us"]="true"
-    ["CS:GO"]="true"
-    ["FIFA 21"]="true"
-    ["World of Warcraft"]="true"
-    ["Battlefield V"]="true"
-    ["Clash of Clans"]="true"
-    ["Roblox"]="true"
-    ["Minecraft Dungeons"]="true"
-    ["Sea of Thieves"]="true"
-    ["Destiny 2"]="true"
-    ["Diablo III"]="true"
-    ["Monster Hunter"]="true"
-    ["Hearthstone"]="true"
-    ["PUBG Mobile"]="true"
-    ["Clash Royale"]="true"
-    ["Genshin Impact"]="true"
-    ["ARK: Survival Evolved"]="true"
-    ["Fall Guys"]="true"
-    ["Starcraft II"]="true"
-    ["Cyberpunk 2077"]="true"
-    ["Terraria"]="true"
-    ["World of Tanks"]="true"
-    ["The Witcher 3"]="true"
-    ["Valorant Mobile"]="true"
-    ["Halo Infinite"]="true"
-    ["Animal Crossing"]="true"
-    ["Pokemon GO"]="true"
-    ["League of Legends: Wild Rift"]="true"
-    ["Brawl Stars"]="true"
-    ["Mobile Legends"]="true"
-    ["Among Trees"]="true"
-    ["Magic: The Gathering"]="true"
-    ["F1 2021"]="true"
-    ["Fallout 76"]="true"
-    ["Destiny 2 Mobile"]="true"
-    ["Subnautica"]="true"
-    ["The Division 2"]="true"
-    ["Cyber Hunter"]="true"
-    ["Dying Light"]="true"
-    ["Watch Dogs: Legion"]="true"
-    ["Call of Duty Mobile"]="true"
-    ["Apex Legends Mobile"]="true"
-    ["Valorant Mobile"]="true"
-    ["Arena Breakout"]="NEW"
-    ["Minecraft Earth"]="true"
-    ["PUBG Lite"]="true"
-    ["Rainbow Six Extraction"]="true"
-    ["Forza Horizon 5"]="true"
-    ["Robocraft"]="true"
-    ["GTA Online"]="true"
-    ["Black Desert Online"]="true"
-    ["Rust"]="true"
-    ["Fall Guys Ultimate Knockout"]="true"
-    ["Dead by Daylight"]="true"
-    ["Path of Exile"]="true"
-    ["Among Us Mobile"]="true"
-    ["Terraria Mobile"]="true"
-    ["Minecraft PE"]="true"
-    ["League of Legends Mobile"]="true"
+    "PUBG" "Call of Duty" "Fortnite" "Minecraft" "Apex Legends" "Valorant" "GTA V"
+    "League of Legends" "Dota 2" "Rainbow Six Siege" "Rocket League" "Overwatch"
+    "Among Us" "CS:GO" "FIFA 21" "World of Warcraft" "Battlefield V" "Clash of Clans"
+    "Roblox" "Minecraft Dungeons" "Sea of Thieves" "Destiny 2" "Diablo III"
+    "Monster Hunter" "Hearthstone" "PUBG Mobile" "Clash Royale" "Genshin Impact"
+    "ARK: Survival Evolved" "Fall Guys" "Starcraft II" "Cyberpunk 2077" "Terraria"
+    "World of Tanks" "The Witcher 3" "Valorant Mobile" "Halo Infinite" "Animal Crossing"
+    "Pokemon GO" "League of Legends: Wild Rift" "Brawl Stars" "Mobile Legends"
+    "Among Trees" "Magic: The Gathering" "F1 2021" "Fallout 76" "Destiny 2 Mobile"
+    "Subnautica" "The Division 2" "Cyber Hunter" "Dying Light" "Watch Dogs: Legion"
+    "Call of Duty Mobile" "Apex Legends Mobile" "Valorant Mobile" "Arena Breakout (NEW)"
+    "Minecraft Earth" "PUBG Lite" "Rainbow Six Extraction" "Forza Horizon 5"
+    "Robocraft" "GTA Online" "Black Desert Online" "Rust" "Fall Guys Ultimate Knockout"
+    "Dead by Daylight" "Path of Exile" "Among Us Mobile" "Terraria Mobile" "Minecraft PE"
+    "League of Legends Mobile"
 )
 
-# Countries list
-countries=(
-    "USA"
-    "UK"
-    "Germany"
-    "France"
-    "Japan"
-    "South Korea"
-    "China"
-    "India"
-    "Iran"
-    "Brazil"
+# Countries
+countries=("USA" "UK" "Germany" "France" "Japan" "South Korea" "China" "India" "Iran" "Brazil")
+
+# DNS lists for different sections (sample DNS addresses, add more real ones)
+declare -A dns_gaming=(
+    ["USA"]="1.1.1.1 1.0.0.1 8.8.8.8 8.8.4.4 9.9.9.9 149.112.112.112"
+    ["UK"]="208.67.222.222 208.67.220.220 1.1.1.1 1.0.0.1 8.8.8.8 8.8.4.4"
+    ["Iran"]="9.9.9.9 149.112.112.112 1.1.1.1 1.0.0.1 8.8.8.8 8.8.4.4"
 )
 
-# DNS database: games -> countries -> list of DNS pairs (primary secondary)
-# For brevity, 3 DNS pairs per game per country (sample), real one should have more
-declare -A dns_db
+declare -A dns_download=(
+    ["USA"]="94.140.14.14 94.140.15.15 77.88.8.8 77.88.8.1"
+    ["UK"]="176.103.130.130 176.103.130.131 94.140.14.15 94.140.14.16"
+    ["Iran"]="89.233.43.71 89.233.43.71 94.140.14.15 94.140.14.16"
+)
 
-# Sample DNS entries (replace/add more real DNS as needed)
-dns_db["PUBG,USA"]="1.1.1.1 1.0.0.1 8.8.8.8 8.8.4.4 9.9.9.9 149.112.112.112"
-dns_db["PUBG,UK"]="1.1.1.1 1.0.0.1 208.67.222.222 208.67.220.220 8.8.8.8 8.8.4.4"
-dns_db["Arena Breakout,Iran"]="9.9.9.9 149.112.112.112 1.1.1.1 1.0.0.1 8.8.8.8 8.8.4.4"
+declare -A dns_premium=(
+    ["USA"]="64.6.64.6 64.6.65.6 209.244.0.3 209.244.0.4"
+    ["UK"]="64.6.64.6 64.6.65.6 209.244.0.3 209.244.0.4"
+    ["Iran"]="64.6.64.6 64.6.65.6 209.244.0.3 209.244.0.4"
+)
 
-# Function to get random DNS pair (primary secondary) for given game and country
+# Select function for games or countries
+select_from_list() {
+    local prompt="$1"
+    shift
+    local list=("$@")
+    echo "$prompt"
+    for i in "${!list[@]}"; do
+        echo "$((i+1))) ${list[$i]}"
+    done
+    read -p "Enter choice number: " choice
+    if (( choice > 0 && choice <= ${#list[@]} )); then
+        echo "${list[$((choice-1))]}"
+    else
+        echo ""
+    fi
+}
+
+# Get random DNS pair from dns array for a country
 get_random_dns() {
-    local game="$1"
+    local section="$1"  # dns_gaming, dns_download, dns_premium
     local country="$2"
-    local key="${game},${country}"
-    local dns_list="${dns_db[$key]}"
+    local dns_str
 
-    if [[ -z "$dns_list" ]]; then
-        echo "❌ No DNS found for $game in $country"
+    case $section in
+        gaming) dns_str="${dns_gaming[$country]}" ;;
+        download) dns_str="${dns_download[$country]}" ;;
+        premium) dns_str="${dns_premium[$country]}" ;;
+        *) echo "Invalid DNS section"; return 1 ;;
+    esac
+
+    if [[ -z "$dns_str" ]]; then
+        echo "No DNS found for $country in $section"
         return 1
     fi
 
-    # split dns_list into array
-    IFS=' ' read -r -a dns_array <<< "$dns_list"
-    local count=$(( ${#dns_array[@]} / 2 ))
-    local rand_index=$(( RANDOM % count ))
-
+    # DNS list is space separated, pairs are 2 DNS addresses
+    read -r -a dns_array <<< "$dns_str"
+    local pairs_count=$((${#dns_array[@]} / 2))
+    local rand_index=$(( RANDOM % pairs_count ))
     local primary=${dns_array[$((rand_index*2))]}
     local secondary=${dns_array[$((rand_index*2+1))]}
-
     echo "$primary $secondary"
 }
 
@@ -138,49 +101,38 @@ ping_dns() {
     ping -c 1 -W 1 "$ip" | grep 'time=' | awk -F'time=' '{print $2}' | cut -d' ' -f1
 }
 
-select_game() {
-    echo "Select a game:"
-    local i=1
-    for g in "${!games[@]}"; do
-        if [[ "${games[$g]}" == "NEW" ]]; then
-            echo -e "$i) \e[34m$g (NEW)\e[0m"
-        else
-            echo "$i) $g"
-        fi
-        ((i++))
-    done
-    read -p "Enter choice number: " choice
-    local index=1
-    for g in "${!games[@]}"; do
-        if [[ $index -eq $choice ]]; then
-            echo "$g"
+show_dns_section() {
+    local section="$1"
+    local section_name
+    case $section in
+        gaming) section_name="Gaming DNS" ;;
+        download) section_name="Download/Bypass DNS" ;;
+        premium) section_name="Premium DNS" ;;
+    esac
+
+    echo "=== $section_name ==="
+    local game=""
+    if [[ "$section" == "gaming" ]]; then
+        game=$(select_from_list "Select a game:" "${games[@]}")
+        if [[ -z "$game" ]]; then
+            echo "Invalid game selection."
             return
         fi
-        ((index++))
-    done
-    echo ""
-}
-
-select_country() {
-    echo "Select a country:"
-    local i=1
-    for c in "${countries[@]}"; do
-        echo "$i) $c"
-        ((i++))
-    done
-    read -p "Enter choice number: " choice
-    if ((choice > 0 && choice <= ${#countries[@]})); then
-        echo "${countries[$((choice-1))]}"
-    else
-        echo ""
     fi
-}
 
-show_dns_for_game_country() {
-    local game="$1"
-    local country="$2"
+    local country=$(select_from_list "Select a country:" "${countries[@]}")
+    if [[ -z "$country" ]]; then
+        echo "Invalid country selection."
+        return
+    fi
+
+    echo ""
+    if [[ "$section" == "gaming" ]]; then
+        echo "Game: $game"
+    fi
+
     local dns_pair
-    dns_pair=$(get_random_dns "$game" "$country")
+    dns_pair=$(get_random_dns "$section" "$country")
     if [[ $? -ne 0 ]]; then
         echo "$dns_pair"
         return
@@ -188,8 +140,7 @@ show_dns_for_game_country() {
     local primary=$(echo $dns_pair | cut -d' ' -f1)
     local secondary=$(echo $dns_pair | cut -d' ' -f2)
     local ping_p=$(ping_dns "$primary")
-    echo "Game: $game"
-    echo "Country: $country"
+
     echo "Primary DNS: $primary (Ping: ${ping_p:-timeout} ms)"
     echo "Secondary DNS: $secondary"
 }
@@ -200,8 +151,8 @@ while true; do
     echo ""
     echo "Menu:"
     echo "1) Gaming DNS"
-    echo "2) Download/Bypass DNS (Coming Soon)"
-    echo "3) Premium DNS (Coming Soon)"
+    echo "2) Download/Bypass DNS"
+    echo "3) Premium DNS"
     echo "4) Search Game DNS"
     echo "5) Ping DNS"
     echo "0) Exit"
@@ -209,28 +160,17 @@ while true; do
 
     case $option in
         1)
-            game=$(select_game)
-            country=$(select_country)
-            if [[ -n "$game" && -n "$country" ]]; then
-                show_dns_for_game_country "$game" "$country"
-            else
-                echo "Invalid selection."
-            fi
+            show_dns_section "gaming"
             ;;
         2)
-            echo "Download/Bypass DNS not implemented yet."
+            show_dns_section "download"
             ;;
         3)
-            echo "Premium DNS not implemented yet."
+            show_dns_section "premium"
             ;;
         4)
-            game=$(select_game)
-            country=$(select_country)
-            if [[ -n "$game" && -n "$country" ]]; then
-                show_dns_for_game_country "$game" "$country"
-            else
-                echo "Invalid selection."
-            fi
+            # Search game DNS is same as Gaming DNS here
+            show_dns_section "gaming"
             ;;
         5)
             read -p "Enter DNS IP to ping: " dns_ip
