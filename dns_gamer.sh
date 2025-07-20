@@ -1,6 +1,5 @@
 #!/bin/bash
 
-# نسخه اسکریپت
 version="1.2.4"
 
 # Colors
@@ -13,10 +12,8 @@ white="\e[1;37m"
 reset="\e[0m"
 bold="\e[1m"
 
-# لیست کشورها
 countries=("Iran" "UAE" "Turkey" "Qatar" "Saudi Arabia")
 
-# لیست بازی‌های گیمینگ (بازی‌های جدید با رنگ نارنجی و "جدید")
 game_list=(
   "Call of Duty Mobile"
   "PUBG Mobile"
@@ -70,7 +67,6 @@ game_list=(
   "Cyberpunk 2077"
 )
 
-# لیست بازی‌های کنسول (شماره 1 شروع، اسامی سفید، متن جدید نارنجی)
 console_game_list=(
   "FIFA 24"
   "Call of Duty: Modern Warfare III"
@@ -125,12 +121,8 @@ console_game_list=(
   "Persona 5 Royal"
 )
 
-# داده DNS ها برای هر بازی و کشور
-# کلید: "GameName|Country"
-# مقدار: "PrimaryDNS|SecondaryDNS PrimaryDNS2|SecondaryDNS2"
 declare -A dns_data
 
-# نمونه DNS ها - قابل توسعه
 dns_data["Call of Duty Mobile|Iran"]="10.202.10.10|10.202.10.11 195.158.58.101|195.158.58.102"
 dns_data["Call of Duty Mobile|UAE"]="64.6.64.6|64.6.65.6"
 dns_data["PUBG Mobile|Iran"]="185.51.200.2|178.22.122.100"
@@ -139,18 +131,14 @@ dns_data["Arena Breakout|Iran"]="195.142.195.100|195.142.195.101"
 dns_data["Cyberpunk 2077|Saudi Arabia"]="203.158.96.10|203.158.96.11"
 dns_data["FIFA 24|Qatar"]="92.247.192.7|92.247.192.8"
 dns_data["FIFA 24|Iran"]="10.202.10.10|10.202.10.11"
-
-# نمونه DNS کنسول
 dns_data["FIFA 24|Iran"]="10.202.10.10|10.202.10.11"
 dns_data["Call of Duty: Modern Warfare III|Iran"]="195.158.58.101|195.158.58.102"
 dns_data["Elden Ring|Turkey"]="78.157.42.101|78.157.42.100"
 
-# تولید عدد پینگ تصادفی بین 20 تا 39
 generate_ping() {
   echo $((20 + RANDOM % 20))
 }
 
-# نمایش DNS بر اساس بازی و کشور انتخاب شده
 show_dns_for_game_and_country() {
   local game="$1"
   echo -e "${bold}${green}Select a country to see DNS for ${game}:${reset}"
@@ -193,14 +181,12 @@ show_dns_for_game_and_country() {
   done
 }
 
-# منوی DNS گیمینگ
 gaming_dns_menu() {
   clear
   echo -e "${bold}${green}Gaming DNS - Version ${version}${reset}"
   for i in "${!game_list[@]}"; do
     local idx=$((i+1))
     local game_name="${game_list[$i]}"
-    # بازی‌های جدید: Arena Breakout و بازی‌های از شماره 22 به بعد (شماره 23 در index 22)
     if [[ "$game_name" == "Arena Breakout" || $i -ge 22 ]]; then
       echo -e "[$idx] ${game_name} ${orange}(جدید)${reset}"
     else
@@ -221,13 +207,11 @@ gaming_dns_menu() {
   read
 }
 
-# منوی DNS کنسول
 console_dns_menu() {
   clear
   echo -e "${bold}${green}Console DNS - Version ${version}${reset}"
   for i in "${!console_game_list[@]}"; do
     local idx=$((i+1))
-    # همه کنسول‌ها جدید هستند
     echo -e "[$idx] ${white}${console_game_list[$i]}${reset} ${orange}(جدید)${reset}"
   done
   echo -ne "\n${green}Choose console game number: ${reset}"
@@ -244,25 +228,58 @@ console_dns_menu() {
   read
 }
 
-# منوی اصلی
+# لیست اصلی گذینه‌ها
 main_menu() {
   while true; do
     clear
     echo -e "${bold}${green}Main Menu - Version ${version}${reset}"
-    echo -e "1) Gaming DNS"
-    echo -e "2) Console DNS"
-    echo -e "3) Exit"
+    echo -e "1) Download DNS ${orange}(جدید)${reset}"
+    echo -e "2) Best DNS Finder ${orange}(جدید)${reset}"
+    echo -e "3) Ping Custom DNS"
+    echo -e "4) Search Game DNS"
+    echo -e "5) Gaming DNS"
+    echo -e "6) Console DNS"
+    echo -e "7) Exit"
     echo -ne "${green}Choose an option: ${reset}"
     read opt
 
     case $opt in
-      1) gaming_dns_menu ;;
-      2) console_dns_menu ;;
-      3) echo -e "${red}Exiting...${reset}"; exit 0 ;;
-      *) echo -e "${red}Invalid option!${reset}"; sleep 1 ;;
+      1)
+        echo -e "${blue}Download DNS option selected.${reset}"
+        # اینجا کد دانلود DNS اضافه شود
+        read -p "Press Enter to return..."
+        ;;
+      2)
+        echo -e "${blue}Best DNS Finder option selected.${reset}"
+        # اینجا کد بهترین DNS پیدا کردن اضافه شود
+        read -p "Press Enter to return..."
+        ;;
+      3)
+        echo -e "${blue}Ping Custom DNS option selected.${reset}"
+        # کد پینگ DNS سفارشی
+        read -p "Press Enter to return..."
+        ;;
+      4)
+        echo -e "${blue}Search Game DNS option selected.${reset}"
+        # کد جستجو DNS برای بازی‌ها
+        read -p "Press Enter to return..."
+        ;;
+      5)
+        gaming_dns_menu
+        ;;
+      6)
+        console_dns_menu
+        ;;
+      7)
+        echo -e "${red}Exiting...${reset}"
+        exit 0
+        ;;
+      *)
+        echo -e "${red}Invalid option!${reset}"
+        sleep 1
+        ;;
     esac
   done
 }
 
-# اجرای برنامه
 main_menu
