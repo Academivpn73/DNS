@@ -1,0 +1,7 @@
+Country: United States
+Primary: 94.140.14.14
+Secondary: 94.140.15.15
+
+Country: Germany
+Primary: 176.103.130.130
+Secondary: 176.103.130.131

@@ -1,113 +1,137 @@
 #!/bin/bash
+clear
 
-# Color setup
-colors=("\033[1;31m" "\033[1;32m" "\033[1;34m" "\033[1;35m" "\033[1;36m")
-NC='\033[0m'
-
-random_color() {
-    echo -e "${colors[$RANDOM % ${#colors[@]}]}"
+show_banner() {
+  local text="Admin: Mahdi | Version: 1.2.4"
+  local colors=(31 32 33 34 35 36)
+  local color=${colors[$RANDOM % ${#colors[@]}]}
+  echo -e "\e[1;${color}m+----------------------------------------------+"
+  echo -e "| ${text} |"
+  echo -e "+----------------------------------------------+\e[0m"
 }
 
-print_box() {
-    color=$(random_color)
-    echo -e "${color}┌────────────────────────────────────────────┐"
-    echo -e "│ Telegram: @Academi_vpn                    │"
-    echo -e "│ Admin by: Mahdi                           │"
-    echo -e "│ Version: 1.2.4                            │"
-    echo -e "└────────────────────────────────────────────┘${NC}"
+ping_dns() {
+  ping -c1 -W1 "$1" 2>/dev/null | grep -oP '(?<=time=)[0-9.]+'
 }
 
-declare -a games
-load_games() {
-    games=()
-    while IFS= read -r game; do
-        games+=("$game")
-    done < games.txt
+select_from_file() {
+  echo "📋 $1"
+  local line index=1
+  while IFS= read -r line; do
+    printf "%2d) %s\n" "$index" "$line"
+    ((index++))
+  done < "$2"
 }
 
-declare -a countries
-load_countries() {
-    countries=()
-    while IFS= read -r country; do
-        countries+=("$country")
-    done < countries.txt
+load_game_dns() {
+  local game="$1" country="$2"
+  local block=$(awk -v g="$game" -v c="$country" '
+    BEGIN { RS=""; FS="\n" }
+    tolower($0) ~ tolower("Game: " g) && tolower($0) ~ tolower("Country: " c) { print; exit }
+  ' dns_gaming.txt)
+
+  if [[ -z "$block" ]]; then
+    echo "❌ Not found: $game | $country"
+    return
+  fi
+
+  local prim=$(grep -i "Primary:" <<<"$block" | awk '{print $2}')
+  local sec=$(grep -i "Secondary:" <<<"$block" | awk '{print $2}')
+  local latency=$(ping_dns "$prim")
+  echo "✅ Primary: $prim"
+  echo "✅ Secondary: $sec"
+  echo "📶 Ping: ${latency:-timeout} ms"
 }
 
-declare -a dns_entries
-load_dns() {
-    dns_entries=()
-    while IFS= read -r line; do
-        dns_entries+=("$line")
-    done < Dns_new77.txt
+load_bypass_dns() {
+  local country="$1"
+  local block=$(awk -v c="$country" '
+    BEGIN { RS=""; FS="\n" }
+    tolower($0) ~ tolower("Country: " c) { print; exit }
+  ' dns_bypass.txt)
+
+  if [[ -z "$block" ]]; then
+    echo "❌ No DNS found for: $country"
+    return
+  fi
+
+  local prim=$(grep -i "Primary:" <<<"$block" | awk '{print $2}')
+  local sec=$(grep -i "Secondary:" <<<"$block" | awk '{print $2}')
+  local latency=$(ping_dns "$prim")
+  echo "✅ Primary: $prim"
+  echo "✅ Secondary: $sec"
+  echo "📶 Ping: ${latency:-timeout} ms"
 }
 
-select_country() {
-    clear
-    print_box
-    echo -e "$(random_color)🌍 Select your country:${NC}"
-    for i in "${!countries[@]}"; do
-        printf "%2d) %s\n" $((i + 1)) "${countries[$i]}"
-    done
-    echo "0) Back"
-    read -p "> " choice
-    [[ "$choice" == "0" ]] && return
-    selected_country="${countries[$((choice - 1))]}"
+load_premium_dns() {
+  local country="$1"
+  local block=$(awk -v c="$country" '
+    BEGIN { RS=""; FS="\n" }
+    tolower($0) ~ tolower("Country: " c) { print; exit }
+  ' dns_premium.txt)
+
+  if [[ -z "$block" ]]; then
+    echo "❌ No premium DNS found for: $country"
+    return
+  fi
+
+  local prim=$(grep -i "Primary:" <<<"$block" | awk '{print $2}')
+  local sec=$(grep -i "Secondary:" <<<"$block" | awk '{print $2}')
+  local latency=$(ping_dns "$prim")
+  echo "💎 Primary: $prim"
+  echo "💎 Secondary: $sec"
+  echo "📶 Ping: ${latency:-timeout} ms"
 }
 
-select_game() {
-    clear
-    print_box
-    echo -e "$(random_color)🎮 Select a game:${NC}"
-    for i in "${!games[@]}"; do
-        printf "%2d) %s\n" $((i + 1)) "${games[$i]}"
-    done
-    echo "0) Back"
-    read -p "> " choice
-    [[ "$choice" == "0" ]] && return
-    selected_game="${games[$((choice - 1))]}"
+search_game_dns() {
+  select_from_file "Select a game:" games.txt
+  read -p "> " gi
+  game=$(sed -n "${gi}p" games.txt)
+
+  select_from_file "Select a country:" countries.txt
+  read -p "> " ci
+  country=$(sed -n "${ci}p" countries.txt)
+
+  echo ""
+  load_game_dns "$game" "$country"
 }
 
-generate_dns() {
-    count=0
-    clear
-    print_box
-    echo -e "$(random_color)🔎 DNS for $selected_game - $selected_country:${NC}"
-    for entry in "${dns_entries[@]}"; do
-        if [[ "$entry" == *"$selected_game"* && "$entry" == *"$selected_country"* ]]; then
-            ip1=$(echo "$entry" | cut -d ',' -f3)
-            ip2=$(echo "$entry" | cut -d ',' -f4)
-            ping=$(shuf -i 14-38 -n 1)
-            echo -e "Primary DNS  : $ip1"
-            echo -e "Secondary DNS: $ip2"
-            echo -e "Ping         : ${ping}ms"
-            echo ""
-            ((count++))
-            break
-        fi
-    done
-    [[ $count -eq 0 ]] && echo -e "❌ No DNS found for $selected_game in $selected_country"
-    echo -e "\nPress Enter to return..."
-    read
-}
+while true; do
+  clear; show_banner
+  echo ""
+  echo "1) Gaming DNS 🎮"
+  echo "2) Download/Bypass DNS 📥"
+  echo "3) Premium DNS 💎"
+  echo "4) Search Game 🔍"
+  echo "5) Ping a DNS 📶"
+  echo "0) Exit ❌"
+  echo ""
+  read -p "> " choice
+  echo ""
 
-main_menu() {
-    load_games
-    load_countries
-    load_dns
-    while true; do
-        clear
-        print_box
-        echo -e "$(random_color)🚀 Main Menu:${NC}"
-        echo "1) Gaming DNS"
-        echo "0) Exit"
-        read -p "> " option
+  case $choice in
+    1) search_game_dns ;;
+    2)
+       select_from_file "Select country for bypass use:" countries.txt
+       read -p "> " ci
+       country=$(sed -n "${ci}p" countries.txt)
+       load_bypass_dns "$country"
+       ;;
+    3)
+       select_from_file "Select country for Premium DNS:" countries.txt
+       read -p "> " ci
+       country=$(sed -n "${ci}p" countries.txt)
+       load_premium_dns "$country"
+       ;;
+    4) search_game_dns ;;
+    5)
+       read -p "Enter DNS or IP to ping: " ip
+       latency=$(ping_dns "$ip")
+       echo "📶 Ping: ${latency:-timeout} ms"
+       ;;
+    0) echo "Goodbye!"; break ;;
+    *) echo "⚠️ Invalid option. Try again." ;;
+  esac
 
-        case $option in
-            1) select_game; select_country; generate_dns ;;
-            0) exit ;;
-            *) echo "Invalid option. Try again."; sleep 1 ;;
-        esac
-    done
-}
-
-main_menu
+  echo ""; read -p "Press Enter to return to menu..." _
+done

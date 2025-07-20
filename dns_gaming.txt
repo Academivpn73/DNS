@@ -1,0 +1,14 @@
+Game: Arena Breakout
+Country: United States
+Primary: 1.1.1.1
+Secondary: 1.0.0.1
+
+Game: PUBG Mobile
+Country: Germany
+Primary: 8.8.8.8
+Secondary: 8.8.4.4
+
+Game: Valorant
+Country: Singapore
+Primary: 9.9.9.9
+Secondary: 149.112.112.112
