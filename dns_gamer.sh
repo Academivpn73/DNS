@@ -50,6 +50,13 @@ pc_games=(
 
 console_games=(
   "Fortnite (Console)" "Warzone (Console)" "FIFA 24 (Console)" "Rocket League (Console)"
+  "Apex Legends (Console)" "Minecraft (Console)" "GTA V Online (Console)" "Red Dead Online"
+  "Battlefield 2042" "Destiny 2 (Console)" "Overwatch 2 (Console)" "NBA 2K24" "NHL 24"
+  "Forza Horizon 5" "Need for Speed Heat" "Rainbow Six Siege (Console)" "Call of Duty MW2"
+  "Call of Duty Cold War" "The Division 2" "Sea of Thieves (Console)" "Fall Guys (Console)"
+  "Halo Infinite (Console)" "Paladins (Console)" "Diablo IV (Console)" "Smite (Console)"
+  "ARK (Console)" "Roblox (Console)" "Genshin Impact (Console)" "World of Tanks"
+  "World of Warships"
 )
 
 countries=("Iran" "Turkey" "UAE" "Saudi Arabia" "Qatar" "Iraq" "Jordan")
@@ -81,8 +88,8 @@ dns_pool_download=(
   "78.157.42.101 78.157.42.100"
   "185.55.225.25 185.55.226.26"
   "91.239.100.100 89.223.43.71"
-  "185.228.168.9 185.228.169.9"  # Anti-Censorship
-  "94.140.14.14 94.140.15.15"    # AdGuard
+  "185.228.168.9 185.228.169.9"
+  "94.140.14.14 94.140.15.15"
 )
 
 # Ping Test Function
