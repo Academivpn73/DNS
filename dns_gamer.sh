@@ -51,9 +51,7 @@ games=(
   "Naraka Bladepoint (New)" "Starfield (New)" "Blue Protocol (New)"
 )
 
-countries=("Iran" "Turkey" "UAE" "Saudi Arabia" "Qatar" "Iraq" "Jordan")
-
-# DNS Pools (add real DNS related to new games in real use)
+# Expanded DNS pool
 dns_pool_game=(
   "10.202.10.10 10.202.10.11"
   "78.157.42.101 78.157.42.100"
@@ -66,6 +64,14 @@ dns_pool_game=(
   "208.67.222.222 208.67.220.220"
   "1.1.1.1 1.0.0.1"
   "8.8.8.8 8.8.4.4"
+  "94.140.14.14 94.140.15.15"
+  "77.88.8.8 77.88.8.1"
+  "1.2.3.4 5.6.7.8"
+  "45.90.28.0 45.90.30.0"
+  "76.76.2.0 76.76.10.0"
+  "38.132.106.139 38.132.106.139"
+  "76.223.122.150 139.178.84.217"
+  "194.195.242.194 194.195.240.194"
 )
 
 # Ping Test Function
@@ -87,7 +93,7 @@ gaming_dns_menu() {
     game_name="${games[$i]}"
     if [[ "$game_name" == *"(New)"* ]]; then
       name_no_new="${game_name%% (*}"
-      printf "${red}[%2d]${reset} %s ${orange}(جدید)${reset}\n" $((i+1)) "$name_no_new"
+      printf "${red}[%2d]${reset} %s ${orange}(New)${reset}\n" $((i+1)) "$name_no_new"
     else
       printf "${blue}[%2d]${reset} %s\n" $((i+1)) "$game_name"
     fi
@@ -108,26 +114,24 @@ gaming_dns_menu() {
   echo -e "\n${green}Press Enter to return...${reset}"; read
 }
 
-# ... other functions go here (Best DNS, Search, Custom Ping, etc.)
-
 # Main Menu
 main_menu() {
   while true; do
     show_title
     echo -e "${blue}[1]${reset} Gaming DNS 🎮"
     echo -e "${blue}[2]${reset} Download DNS ⬇️"
-    echo -e "${blue}[3]${reset} Best DNS (جدید)"
-    echo -e "${blue}[4]${reset} Ping Custom DNS (جدید)"
-    echo -e "${blue}[5]${reset} Search Game DNS (جدید)"
+    echo -e "${blue}[3]${reset} Best DNS ${orange}(New)${reset}"
+    echo -e "${blue}[4]${reset} Ping Custom DNS ${orange}(New)${reset}"
+    echo -e "${blue}[5]${reset} Search Game DNS ${orange}(New)${reset}"
     echo -e "${blue}[0]${reset} Exit ❌"
     echo -ne "\n${green}Choose an option: ${reset}"; read opt
     case $opt in
       1) gaming_dns_menu ;;
-      2) download_dns_menu ;;
-      3) best_dns_menu ;;  # placeholder
-      4) ping_custom_dns ;;  # placeholder
-      5) search_game_dns ;;  # placeholder
-      0) echo -e "${green}Goodbye 🙏🏻${reset}"; exit ;;
+      2) echo "Download DNS feature coming soon..." && read ;;
+      3) echo "Best DNS feature coming soon..." && read ;;
+      4) echo "Ping Custom DNS feature coming soon..." && read ;;
+      5) echo "Search Game DNS feature coming soon..." && read ;;
+      0) echo -e "${green}Goodbye!${reset}"; exit ;;
       *) echo -e "${red}Invalid input!${reset}"; sleep 1 ;;
     esac
   done
