@@ -1,6 +1,7 @@
 #!/bin/bash
 
-# Version 1.3.0 | Telegram: @Academi_vpn | Admin: @MahdiAGM0
+# نسخه اسکریپت
+version="1.2.4"
 
 # Colors
 green="\e[1;32m"
@@ -8,48 +9,14 @@ blue="\e[1;34m"
 cyan="\e[1;36m"
 red="\e[1;31m"
 orange="\e[38;5;208m"
+white="\e[1;37m"
 reset="\e[0m"
 bold="\e[1m"
 
-# Fast Typing (for title animation)
-fast_type_text() {
-    text="$1"
-    delay="${2:-0.00005}"
-    for ((i=0; i<${#text}; i++)); do
-        echo -ne "${text:$i:1}"
-        sleep $delay
-    done
-    echo
-}
-
-# Title
-show_title() {
-    colors=("\e[1;31m" "\e[1;32m" "\e[1;34m" "\e[1;35m" "\e[1;36m")
-    rand_color=${colors[$RANDOM % ${#colors[@]}]}
-    clear
-    echo -e "${rand_color}"
-    fast_type_text "╔══════════════════════════════════════╗" 0.00002
-    fast_type_text "║         DNS MANAGEMENT TOOL         ║" 0.00002
-    fast_type_text "╠══════════════════════════════════════╣" 0.00002
-    fast_type_text "║  Version: 1.3.0                      ║" 0.00002
-    fast_type_text "║  Telegram: @Academi_vpn             ║" 0.00002
-    fast_type_text "║  Admin: @MahdiAGM0                  ║" 0.00002
-    fast_type_text "╚══════════════════════════════════════╝" 0.00002
-    echo -e "${reset}"
-}
-
-# Countries and their DNS lists (for example, real DNS addresses with ping under 40)
+# لیست کشورها
 countries=("Iran" "UAE" "Turkey" "Qatar" "Saudi Arabia")
 
-# For each country, multiple DNS pairs (Primary|Secondary)
-declare -A dns_data
-dns_data["Iran"]="10.202.10.10|10.202.10.11 195.158.58.101|195.158.58.102 185.51.200.2|178.22.122.100"
-dns_data["UAE"]="64.6.64.6|64.6.65.6 185.55.225.25|185.55.226.26 209.88.198.133|209.88.198.134"
-dns_data["Turkey"]="78.157.42.101|78.157.42.100 212.156.192.5|212.156.192.6 195.142.195.100|195.142.195.101"
-dns_data["Qatar"]="92.247.192.7|92.247.192.8 203.117.44.7|203.117.44.8 197.247.236.89|197.247.236.90"
-dns_data["Saudi Arabia"]="203.158.96.10|203.158.96.11 62.67.70.1|62.67.70.2 154.70.126.14|154.70.126.15"
-
-# Gaming games list (50 games, with "Arena Breakout" and games 40+ as New)
+# لیست بازی‌های گیمینگ (بازی‌های جدید با رنگ نارنجی و "جدید")
 game_list=(
   "Call of Duty Mobile"
   "PUBG Mobile"
@@ -103,7 +70,7 @@ game_list=(
   "Cyberpunk 2077"
 )
 
-# Console games list (realistic names, 50 games, all marked as New)
+# لیست بازی‌های کنسول (شماره 1 شروع، اسامی سفید، متن جدید نارنجی)
 console_game_list=(
   "FIFA 24"
   "Call of Duty: Modern Warfare III"
@@ -158,146 +125,144 @@ console_game_list=(
   "Persona 5 Royal"
 )
 
-# Generate a random DNS for a given country
-generate_dns_for_country() {
-  country=$1
-  dns_pairs=(${dns_data[$country]})
-  rand_index=$((RANDOM % ${#dns_pairs[@]}))
-  IFS='|' read -r primary secondary <<< "${dns_pairs[$rand_index]}"
-  ping_val=$((20 + RANDOM % 20)) # simulate ping 20-39ms
-  echo -e "${cyan}Country: $country\nPrimary DNS: $primary\nSecondary DNS: $secondary\nPing: ${ping_val}ms${reset}"
+# داده DNS ها برای هر بازی و کشور
+# کلید: "GameName|Country"
+# مقدار: "PrimaryDNS|SecondaryDNS PrimaryDNS2|SecondaryDNS2"
+declare -A dns_data
+
+# نمونه DNS ها - قابل توسعه
+dns_data["Call of Duty Mobile|Iran"]="10.202.10.10|10.202.10.11 195.158.58.101|195.158.58.102"
+dns_data["Call of Duty Mobile|UAE"]="64.6.64.6|64.6.65.6"
+dns_data["PUBG Mobile|Iran"]="185.51.200.2|178.22.122.100"
+dns_data["Arena Breakout|Turkey"]="78.157.42.101|78.157.42.100"
+dns_data["Arena Breakout|Iran"]="195.142.195.100|195.142.195.101"
+dns_data["Cyberpunk 2077|Saudi Arabia"]="203.158.96.10|203.158.96.11"
+dns_data["FIFA 24|Qatar"]="92.247.192.7|92.247.192.8"
+dns_data["FIFA 24|Iran"]="10.202.10.10|10.202.10.11"
+
+# نمونه DNS کنسول
+dns_data["FIFA 24|Iran"]="10.202.10.10|10.202.10.11"
+dns_data["Call of Duty: Modern Warfare III|Iran"]="195.158.58.101|195.158.58.102"
+dns_data["Elden Ring|Turkey"]="78.157.42.101|78.157.42.100"
+
+# تولید عدد پینگ تصادفی بین 20 تا 39
+generate_ping() {
+  echo $((20 + RANDOM % 20))
 }
 
-# Show DNS list by country after game selection
-show_dns_by_country() {
-  echo -e "${bold}${green}Available DNS by Country:${reset}"
+# نمایش DNS بر اساس بازی و کشور انتخاب شده
+show_dns_for_game_and_country() {
+  local game="$1"
+  echo -e "${bold}${green}Select a country to see DNS for ${game}:${reset}"
+
+  local available_countries=()
   for c in "${countries[@]}"; do
-    generate_dns_for_country "$c"
-    echo
+    local key="${game}|${c}"
+    if [[ -n "${dns_data[$key]}" ]]; then
+      available_countries+=("$c")
+    fi
+  done
+
+  if [ ${#available_countries[@]} -eq 0 ]; then
+    echo -e "${red}No DNS data available for this game.${reset}"
+    return
+  fi
+
+  for i in "${!available_countries[@]}"; do
+    echo -e "[$((i+1))] ${available_countries[$i]}"
+  done
+
+  echo -ne "${green}Choose country number: ${reset}"
+  read cnum
+  if ! [[ "$cnum" =~ ^[0-9]+$ ]] || [ "$cnum" -lt 1 ] || [ "$cnum" -gt "${#available_countries[@]}" ]; then
+    echo -e "${red}Invalid choice!${reset}"
+    return
+  fi
+
+  local selected_country="${available_countries[$((cnum-1))]}"
+  local key="${game}|${selected_country}"
+  local dns_list=(${dns_data[$key]})
+
+  echo -e "\n${cyan}DNS servers for ${game} in ${selected_country}:${reset}"
+  for dns_pair in "${dns_list[@]}"; do
+    IFS='|' read -r primary secondary <<< "$dns_pair"
+    local ping_val=$(generate_ping)
+    echo -e "Primary DNS: ${primary}"
+    echo -e "Secondary DNS: ${secondary}"
+    echo -e "Ping: ${ping_val}ms\n"
   done
 }
 
-# Gaming DNS Menu
+# منوی DNS گیمینگ
 gaming_dns_menu() {
   clear
-  echo -e "${bold}${green}Gaming DNS${reset}"
+  echo -e "${bold}${green}Gaming DNS - Version ${version}${reset}"
   for i in "${!game_list[@]}"; do
-    # Mark games from index 40+ and Arena Breakout as New
-    if [[ "${game_list[$i]}" == "Arena Breakout" || $i -ge 40 ]]; then
-      echo -e "[${i}] ${red}${game_list[$i]}${reset} ${orange}(New)${reset}"
+    local idx=$((i+1))
+    local game_name="${game_list[$i]}"
+    # بازی‌های جدید: Arena Breakout و بازی‌های از شماره 22 به بعد (شماره 23 در index 22)
+    if [[ "$game_name" == "Arena Breakout" || $i -ge 22 ]]; then
+      echo -e "[$idx] ${game_name} ${orange}(جدید)${reset}"
     else
-      echo -e "[${i}] ${game_list[$i]}"
+      echo -e "[$idx] ${game_name}"
     fi
   done
-  echo -ne "\n${green}Choose game number: ${reset}"; read gnum
-  if [[ $gnum =~ ^[0-9]+$ ]] && [ $gnum -ge 0 ] && [ $gnum -lt ${#game_list[@]} ]; then
-    echo -e "\n${blue}Selected Game: ${game_list[$gnum]}${reset}\n"
-    show_dns_by_country
-  else
+  echo -ne "\n${green}Choose game number: ${reset}"
+  read gnum
+  if ! [[ "$gnum" =~ ^[0-9]+$ ]] || [ "$gnum" -lt 1 ] || [ "$gnum" -gt "${#game_list[@]}" ]; then
     echo -e "${red}Invalid choice!${reset}"
+    sleep 1
+    return
   fi
-  echo -ne "\n${green}Press Enter to return...${reset}"; read
+  local game="${game_list[$((gnum-1))]}"
+  echo -e "\n${blue}Selected Game: ${game}${reset}\n"
+  show_dns_for_game_and_country "$game"
+  echo -ne "${green}Press Enter to return...${reset}"
+  read
 }
 
-# Console DNS Menu
+# منوی DNS کنسول
 console_dns_menu() {
   clear
-  echo -e "${bold}${green}Console DNS (New)${reset}"
+  echo -e "${bold}${green}Console DNS - Version ${version}${reset}"
   for i in "${!console_game_list[@]}"; do
-    echo -e "[${i}] ${red}${console_game_list[$i]}${reset} ${orange}(New)${reset}"
+    local idx=$((i+1))
+    # همه کنسول‌ها جدید هستند
+    echo -e "[$idx] ${white}${console_game_list[$i]}${reset} ${orange}(جدید)${reset}"
   done
-  echo -ne "\n${green}Choose console game number: ${reset}"; read gnum
-  if [[ $gnum =~ ^[0-9]+$ ]] && [ $gnum -ge 0 ] && [ $gnum -lt ${#console_game_list[@]} ]; then
-    echo -e "\n${blue}Selected Console Game: ${console_game_list[$gnum]}${reset}\n"
-    show_dns_by_country
-  else
+  echo -ne "\n${green}Choose console game number: ${reset}"
+  read gnum
+  if ! [[ "$gnum" =~ ^[0-9]+$ ]] || [ "$gnum" -lt 1 ] || [ "$gnum" -gt "${#console_game_list[@]}" ]; then
     echo -e "${red}Invalid choice!${reset}"
+    sleep 1
+    return
   fi
-  echo -ne "\n${green}Press Enter to return...${reset}"; read
+  local game="${console_game_list[$((gnum-1))]}"
+  echo -e "\n${blue}Selected Console Game: ${game}${reset}\n"
+  show_dns_for_game_and_country "$game"
+  echo -ne "${green}Press Enter to return...${reset}"
+  read
 }
 
-# Download DNS Menu (Unblocker & Proxy)
-download_dns_menu() {
-  clear
-  echo -e "${bold}${green}Download DNS (Unblocker & Proxy)${reset}"
-  for c in "${countries[@]}"; do
-    dns_pairs=(${dns_data[$c]})
-    for pair in "${dns_pairs[@]}"; do
-      IFS='|' read -r primary secondary <<< "$pair"
-      ping_val=$((20 + RANDOM % 20))
-      echo -e "${cyan}Country: $c\nPrimary DNS: $primary\nSecondary DNS: $secondary\nPing: ${ping_val}ms${reset}\n"
-    done
-  done
-  echo -ne "\n${green}Press Enter to return...${reset}"; read
-}
-
-# Best DNS Menu
-best_dns_menu() {
-  clear
-  echo -e "${bold}${green}Best DNS List${reset}"
-  for c in "${countries[@]}"; do
-    generate_dns_for_country "$c"
-    echo
-  done
-  echo -ne "\n${green}Press Enter to return...${reset}"; read
-}
-
-# Ping Custom DNS Menu
-ping_custom_dns_menu() {
-  clear
-  echo -ne "${green}Enter a DNS server IP to ping: ${reset}"; read dns_ip
-  if [[ -z "$dns_ip" ]]; then
-    echo -e "${red}No IP entered!${reset}"
-  else
-    echo -e "${cyan}Pinging $dns_ip...${reset}"
-    ping -c 4 "$dns_ip"
-  fi
-  echo -ne "\n${green}Press Enter to return...${reset}"; read
-}
-
-# Search Game DNS Menu
-search_game_dns_menu() {
-  clear
-  echo -ne "${green}Enter game name to search DNS: ${reset}"; read game_search
-  found=0
-  for i in "${!game_list[@]}"; do
-    if [[ "${game_list[$i],,}" == *"${game_search,,}"* ]]; then
-      echo -e "[${i}] ${game_list[$i]}"
-      found=1
-    fi
-  done
-  if [ $found -eq 0 ]; then
-    echo -e "${red}No games found matching \"$game_search\".${reset}"
-  fi
-  echo -ne "\n${green}Press Enter to return...${reset}"; read
-}
-
-# Main menu
+# منوی اصلی
 main_menu() {
   while true; do
-    show_title
-    echo -e "${bold}${green}Main Menu:${reset}"
+    clear
+    echo -e "${bold}${green}Main Menu - Version ${version}${reset}"
     echo -e "1) Gaming DNS"
     echo -e "2) Console DNS"
-    echo -e "3) Download DNS"
-    echo -e "4) Best DNS"
-    echo -e "5) Ping Custom DNS"
-    echo -e "6) Search Game DNS"
-    echo -e "7) Exit"
-    echo -ne "\n${green}Choose an option: ${reset}"; read opt
+    echo -e "3) Exit"
+    echo -ne "${green}Choose an option: ${reset}"
+    read opt
 
     case $opt in
       1) gaming_dns_menu ;;
       2) console_dns_menu ;;
-      3) download_dns_menu ;;
-      4) best_dns_menu ;;
-      5) ping_custom_dns_menu ;;
-      6) search_game_dns_menu ;;
-      7) echo -e "${red}Exiting...${reset}"; exit 0 ;;
+      3) echo -e "${red}Exiting...${reset}"; exit 0 ;;
       *) echo -e "${red}Invalid option!${reset}"; sleep 1 ;;
     esac
   done
 }
 
-# Run main menu
+# اجرای برنامه
 main_menu
