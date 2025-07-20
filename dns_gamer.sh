@@ -1,203 +1,113 @@
 #!/bin/bash
 
-# Colors
-colors=(31 32 33 34 35 36 91 92 93 94 95 96)
+# Color setup
+colors=("\033[1;31m" "\033[1;32m" "\033[1;34m" "\033[1;35m" "\033[1;36m")
+NC='\033[0m'
 
-# Game list
-games=(
-"Call of Duty"
-"PUBG"
-"Fortnite"
-"Free Fire"
-"Apex Legends"
-"Valorant"
-"League of Legends"
-"Dota 2"
-"Counter-Strike: GO"
-"Overwatch"
-"Rainbow Six Siege"
-"Mobile Legends"
-"Clash Royale"
-"FIFA 24"
-"Rocket League"
-"Among Us"
-"Genshin Impact"
-"Battlefield 2042"
-"Halo Infinite"
-"Roblox"
-"Minecraft"
-"Warzone"
-"Smite"
-"Brawl Stars"
-"Destiny 2"
-"Team Fortress 2"
-"World of Tanks"
-"World of Warships"
-"Lost Ark"
-"New World"
-"Naraka Bladepoint"
-"Warframe"
-"Paladins"
-"CrossFire"
-"Zula"
-"Escape from Tarkov"
-"Diablo IV"
-"Naruto Online"
-"League of Legends: Wild Rift"
-"Clash of Clans"
-"Cyber Hunter"
-"Dead by Daylight"
-"Sea of Thieves"
-"Star Wars Battlefront"
-"Black Desert Online"
-"Blade and Soul"
-"Ark Survival"
-"Rust"
-"The Division 2"
-"Watch Dogs"
-"Far Cry 6"
-"GTA V Online"
-"Red Dead Online"
-"eFootball"
-"NBA 2K24"
-"WWE 2K24"
-"Mortal Kombat 11"
-"Tekken 7"
-"Hitman 3"
-"Honkai Impact"
-"Stumble Guys"
-"V Rising"
-"Super People"
-"Scavengers"
-"Project Zomboid"
-"Multiversus"
-"War Thunder"
-"Titanfall 2"
-"Hyper Scape"
-"Arena Breakout (New)"
-)
-
-# Generate random DNS and ping
-function generate_dns() {
-  A=$((RANDOM%256))
-  B=$((RANDOM%256))
-  C=$((RANDOM%256))
-  D=$((RANDOM%256))
-  ping=$((10 + RANDOM % 30))
-  echo -e "\n🟢 Primary DNS  : $A.$B.$C.$D"
-  echo "🔵 Secondary DNS: $D.$C.$B.$A"
-  echo "📶 Ping         : ${ping}ms"
+random_color() {
+    echo -e "${colors[$RANDOM % ${#colors[@]}]}"
 }
 
-# Animated banner
-function show_banner() {
-  clear
-  echo -e "\e[1;36m"
-  toilet -f big "DNS TOOL" --gay
-  echo -e "\e[0m"
+print_box() {
+    color=$(random_color)
+    echo -e "${color}┌────────────────────────────────────────────┐"
+    echo -e "│ Telegram: @Academi_vpn                    │"
+    echo -e "│ Admin by: Mahdi                           │"
+    echo -e "│ Version: 1.2.4                            │"
+    echo -e "└────────────────────────────────────────────┘${NC}"
 }
 
-# Colored info box
-function show_header() {
-  color=${colors[$RANDOM % ${#colors[@]}]}
-  echo -e "\e[1;${color}m+--------------------------------------+"
-  echo -e "| Telegram: @Academi_vpn               |"
-  echo -e "| Admin by: Mahdi                      |"
-  echo -e "| Version: 1.2.4 Initial update test                        |"
-  echo -e "+--------------------------------------+\e[0m"
+declare -a games
+load_games() {
+    games=()
+    while IFS= read -r game; do
+        games+=("$game")
+    done < games.txt
 }
 
-# Main Menu
-function main_menu() {
-  clear
-  show_banner
-  show_header
-  echo ""
-  echo -e "\e[1;37m╭──────────────────────────────────────╮"
-  echo -e "│ 🎮 1) Gaming DNS                     │"
-  echo -e "│ 📥 2) Download/Bypass DNS           │"
-  echo -e "│ 💎 3) Premium DNS                   │"
-  echo -e "│ 📶 4) Ping a DNS                    │"
-  echo -e "│ 🔍 5) Search Game for DNS           │"
-  echo -e "│ ❌ 0) Exit                          │"
-  echo -e "╰──────────────────────────────────────╯\e[0m"
-  read -p "#? " choice
-  case $choice in
-    1) dns_gaming ;;
-    2) dns_download ;;
-    3) dns_premium ;;
-    4) ping_dns ;;
-    5) search_game ;;
-    0) exit ;;
-    *) echo -e "\e[1;31m❌ Invalid option.\e[0m"; sleep 1; main_menu ;;
-  esac
+declare -a countries
+load_countries() {
+    countries=()
+    while IFS= read -r country; do
+        countries+=("$country")
+    done < countries.txt
 }
 
-# Static options
-function dns_gaming() {
-  clear; show_header
-  echo -e "\n🎮 \e[1;32mGaming DNS:\e[0m"
-  generate_dns
-  echo ""
-  read -p "Press Enter to return..." back
-  main_menu
+declare -a dns_entries
+load_dns() {
+    dns_entries=()
+    while IFS= read -r line; do
+        dns_entries+=("$line")
+    done < Dns_new77.txt
 }
 
-function dns_download() {
-  clear; show_header
-  echo -e "\n📥 \e[1;32mDownload / Anti-Censorship DNS:\e[0m"
-  generate_dns
-  echo ""
-  read -p "Press Enter to return..." back
-  main_menu
+select_country() {
+    clear
+    print_box
+    echo -e "$(random_color)🌍 Select your country:${NC}"
+    for i in "${!countries[@]}"; do
+        printf "%2d) %s\n" $((i + 1)) "${countries[$i]}"
+    done
+    echo "0) Back"
+    read -p "> " choice
+    [[ "$choice" == "0" ]] && return
+    selected_country="${countries[$((choice - 1))]}"
 }
 
-function dns_premium() {
-  clear; show_header
-  echo -e "\n💎 \e[1;32mPremium High-Speed DNS:\e[0m"
-  generate_dns
-  echo ""
-  read -p "Press Enter to return..." back
-  main_menu
+select_game() {
+    clear
+    print_box
+    echo -e "$(random_color)🎮 Select a game:${NC}"
+    for i in "${!games[@]}"; do
+        printf "%2d) %s\n" $((i + 1)) "${games[$i]}"
+    done
+    echo "0) Back"
+    read -p "> " choice
+    [[ "$choice" == "0" ]] && return
+    selected_game="${games[$((choice - 1))]}"
 }
 
-function ping_dns() {
-  clear; show_header
-  read -p "Enter DNS IP to ping: " dns_ip
-  echo ""
-  ping -c 3 $dns_ip | grep 'time='
-  echo ""
-  read -p "Press Enter to return..." back
-  main_menu
+generate_dns() {
+    count=0
+    clear
+    print_box
+    echo -e "$(random_color)🔎 DNS for $selected_game - $selected_country:${NC}"
+    for entry in "${dns_entries[@]}"; do
+        if [[ "$entry" == *"$selected_game"* && "$entry" == *"$selected_country"* ]]; then
+            ip1=$(echo "$entry" | cut -d ',' -f3)
+            ip2=$(echo "$entry" | cut -d ',' -f4)
+            ping=$(shuf -i 14-38 -n 1)
+            echo -e "Primary DNS  : $ip1"
+            echo -e "Secondary DNS: $ip2"
+            echo -e "Ping         : ${ping}ms"
+            echo ""
+            ((count++))
+            break
+        fi
+    done
+    [[ $count -eq 0 ]] && echo -e "❌ No DNS found for $selected_game in $selected_country"
+    echo -e "\nPress Enter to return..."
+    read
 }
 
-# Game Search
-function search_game() {
-  clear
-  show_header
-  echo -e "\n🎮 \e[1;34mGame List (70 total):\e[0m"
-  for i in "${!games[@]}"; do
-    number=$((i+1))
-    game="${games[$i]}"
-    [[ "$game" == *"(New)"* ]] && game="\e[1;34m$game\e[0m"
-    printf "%2d) %b\n" "$number" "$game"
-  done
-  echo -e "0) Return"
-  echo ""
-  read -p "Select a game by number: " game_choice
-  if [[ $game_choice == 0 ]]; then main_menu; fi
-  if [[ $game_choice -gt 0 && $game_choice -le ${#games[@]} ]]; then
-    game="${games[$((game_choice - 1))]}"
-    read -p "Enter your country: " country
-    echo -e "\n🛰️  DNS for \e[1;36m$game ($country)\e[0m:"
-    generate_dns
-  else
-    echo -e "\n❌ Invalid game number."
-  fi
-  echo ""
-  read -p "Press Enter to return..." back
-  main_menu
+main_menu() {
+    load_games
+    load_countries
+    load_dns
+    while true; do
+        clear
+        print_box
+        echo -e "$(random_color)🚀 Main Menu:${NC}"
+        echo "1) Gaming DNS"
+        echo "0) Exit"
+        read -p "> " option
+
+        case $option in
+            1) select_game; select_country; generate_dns ;;
+            0) exit ;;
+            *) echo "Invalid option. Try again."; sleep 1 ;;
+        esac
+    done
 }
 
-# Start
 main_menu
