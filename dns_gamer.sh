@@ -38,7 +38,7 @@ show_title() {
     echo -e "${reset}"
 }
 
-# Games
+# Games (PC & Mobile Gaming)
 games=(
   "Call of Duty" "PUBG" "Fortnite" "Valorant" "League of Legends"
   "Dota 2" "CS:GO" "Overwatch" "Rainbow Six Siege" "Apex Legends"
@@ -46,12 +46,15 @@ games=(
   "FIFA 24" "Warzone" "Escape from Tarkov" "War Thunder" "Destiny 2"
   "Smite" "Halo Infinite" "Fall Guys" "Paladins" "World of Warcraft"
   "Elden Ring" "Cyberpunk 2077" "ARK" "Sea of Thieves" "Diablo IV"
-  "Arena Breakout (New)" "GTA IV (New)" "The Finals (New)" "Stalker 2 (New)"
-  "Modern Warfare III (New)" "XDefiant (New)" "Hyper Front (New)"
-  "Naraka Bladepoint (New)" "Starfield (New)" "Blue Protocol (New)"
+  "Arena Breakout" "GTA IV" "The Finals" "Stalker 2"
+  "Modern Warfare III" "XDefiant" "Hyper Front"
+  "Naraka Bladepoint" "Starfield" "Blue Protocol"
 )
 
-# Expanded DNS pool
+# Countries list (common for gaming & download DNS)
+countries=("Iran" "Turkey" "UAE" "Saudi Arabia" "Qatar" "Iraq" "Jordan")
+
+# DNS Pools (Primary and Secondary) for Gaming
 dns_pool_game=(
   "10.202.10.10 10.202.10.11"
   "78.157.42.101 78.157.42.100"
@@ -64,17 +67,44 @@ dns_pool_game=(
   "208.67.222.222 208.67.220.220"
   "1.1.1.1 1.0.0.1"
   "8.8.8.8 8.8.4.4"
-  "94.140.14.14 94.140.15.15"
-  "77.88.8.8 77.88.8.1"
-  "1.2.3.4 5.6.7.8"
-  "45.90.28.0 45.90.30.0"
-  "76.76.2.0 76.76.10.0"
-  "38.132.106.139 38.132.106.139"
-  "76.223.122.150 139.178.84.217"
-  "194.195.242.194 194.195.240.194"
 )
 
-# Ping Test Function
+# Console Games List (added requested games)
+console_games=(
+  "God of War" "The Last of Us" "Halo Infinite" "Spider-Man" "FIFA 24"
+  "Call of Duty: Modern Warfare" "Gran Turismo" "Assassin's Creed" "Forza Horizon"
+  "GTA V" "Minecraft Console" "Resident Evil Village" "Final Fantasy VII Remake"
+  "Cyberpunk 2077" "Battlefield 2042" "Apex Legends Console" "Destiny 2 Console"
+  "Rocket League Console" "Fortnite Console" "NBA 2K24" "Mortal Kombat 11"
+  "Overwatch Console" "Fall Guys Console" "Street Fighter V" "Dead Space Remake"
+  "Ratchet & Clank" "Ghost of Tsushima" "Monster Hunter Rise" "Doom Eternal"
+  "Splatoon 3" "Super Smash Bros Ultimate" "Animal Crossing" "The Legend of Zelda"
+  "Bayonetta 3" "Metroid Dread" "Pokemon Scarlet" "Halo 5 Guardians"
+  "Gears 5" "Sea of Thieves Console" "Dark Souls III" "Nier Automata"
+  "Watch Dogs Legion" "Control" "Death Stranding" "Bloodborne"
+  "Persona 5 Royal" "Little Nightmares II" "Tetris Effect" "No Man's Sky"
+  "Hades" "Celeste" "Cuphead" "It Takes Two"
+  "Call of Duty Warzone" "GTA Online" "FC25"
+)
+
+# Countries for Console DNS
+console_countries=("USA" "Japan" "South Korea" "Germany" "UK" "Canada" "Australia" "France" "Brazil" "Russia")
+
+# DNS Pools for Console (Primary and Secondary)
+dns_pool_console=(
+  "45.90.28.0 45.90.28.1"
+  "84.200.69.80 84.200.70.40"
+  "208.67.220.220 208.67.222.222"
+  "8.8.8.8 8.8.4.4"
+  "9.9.9.9 149.112.112.112"
+  "77.88.8.8 77.88.8.1"
+  "64.6.64.6 64.6.65.6"
+  "156.154.70.1 156.154.71.1"
+  "45.11.45.11 45.11.45.12"
+  "185.222.222.222 185.222.222.223"
+)
+
+# Ping test function
 check_ping() {
     ip="$1"
     result=$(ping -c 1 -W 1 "$ip" 2>/dev/null | grep 'time=' | awk -F'time=' '{print $2}' | cut -d' ' -f1)
@@ -93,7 +123,7 @@ gaming_dns_menu() {
     game_name="${games[$i]}"
     if [[ "$game_name" == *"(New)"* ]]; then
       name_no_new="${game_name%% (*}"
-      printf "${red}[%2d]${reset} %s ${orange}(New)${reset}\n" $((i+1)) "$name_no_new"
+      printf "${red}[%2d]${reset} %s ${orange}(جدید)${reset}\n" $((i+1)) "$name_no_new"
     else
       printf "${blue}[%2d]${reset} %s\n" $((i+1)) "$game_name"
     fi
@@ -109,9 +139,72 @@ gaming_dns_menu() {
 
   echo -e "\n${cyan}Primary DNS:${reset} $dns1"
   echo -e "${cyan}Secondary DNS:${reset} $dns2"
-  echo -e "${blue}Ping 1:${reset} $(check_ping $dns1)"
-  echo -e "${blue}Ping 2:${reset} $(check_ping $dns2)"
+  echo -e "${blue}Ping Primary:${reset} $(check_ping $dns1)"
+  echo -e "${blue}Ping Secondary:${reset} $(check_ping $dns2)"
   echo -e "\n${green}Press Enter to return...${reset}"; read
+}
+
+# Console DNS Menu with country select
+console_dns_menu() {
+  clear
+  echo -e "${bold}${green}Select a Console Game:${reset}"
+  for i in "${!console_games[@]}"; do
+    printf "${red}[%2d]${reset} %s\n" $((i+1)) "${console_games[$i]}"
+  done
+  echo -e "${blue}[0]${reset} Back"
+  echo -ne "\n${green}Choose a console game: ${reset}"; read opt
+  [[ "$opt" == "0" ]] && return
+  [[ -z "${console_games[$((opt-1))]}" ]] && echo "Invalid!" && sleep 1 && return
+
+  # Select Country
+  clear
+  echo -e "${bold}${green}Select Your Country:${reset}"
+  for i in "${!console_countries[@]}"; do
+    printf "${blue}[%2d]${reset} %s\n" $((i+1)) "${console_countries[$i]}"
+  done
+  echo -e "${blue}[0]${reset} Back"
+  echo -ne "\n${green}Choose a country: ${reset}"; read copt
+  [[ "$copt" == "0" ]] && return
+  [[ -z "${console_countries[$((copt-1))]}" ]] && echo "Invalid!" && sleep 1 && return
+
+  pick=${dns_pool_console[$RANDOM % ${#dns_pool_console[@]}]}
+  dns1=$(echo "$pick" | awk '{print $1}')
+  dns2=$(echo "$pick" | awk '{print $2}')
+  selected_game="${console_games[$((opt-1))]}"
+  selected_country="${console_countries[$((copt-1))]}"
+
+  echo -e "\n${cyan}Selected Game:${reset} $selected_game"
+  echo -e "${cyan}Selected Country:${reset} $selected_country"
+  echo -e "${cyan}Primary DNS:${reset} $dns1"
+  echo -e "${cyan}Secondary DNS:${reset} $dns2"
+  echo -e "${blue}Ping Primary:${reset} $(check_ping $dns1)"
+  echo -e "${blue}Ping Secondary:${reset} $(check_ping $dns2)"
+  echo -e "\n${green}Press Enter to return...${reset}"; read
+}
+
+# Placeholder menus for other features
+download_dns_menu() {
+  echo -e "${green}Download DNS feature coming soon...${reset}"
+  sleep 1
+}
+
+best_dns_menu() {
+  echo -e "${green}Best DNS feature coming soon...${reset}"
+  sleep 1
+}
+
+ping_custom_dns() {
+  echo -ne "${green}Enter DNS to ping: ${reset}"; read dns
+  echo -e "${blue}Ping Result:${reset} $(check_ping $dns)"
+  echo -e "${green}Press Enter to return...${reset}"; read
+}
+
+search_game_dns() {
+  echo -ne "${green}Enter game name to search DNS: ${reset}"; read search
+  echo -e "${green}Searching DNS for game: $search ...${reset}"
+  # Just dummy message for now
+  echo -e "${blue}No DNS found for \"$search\" yet.${reset}"
+  echo -e "${green}Press Enter to return...${reset}"; read
 }
 
 # Main Menu
@@ -120,18 +213,20 @@ main_menu() {
     show_title
     echo -e "${blue}[1]${reset} Gaming DNS 🎮"
     echo -e "${blue}[2]${reset} Download DNS ⬇️"
-    echo -e "${blue}[3]${reset} Best DNS ${orange}(New)${reset}"
-    echo -e "${blue}[4]${reset} Ping Custom DNS ${orange}(New)${reset}"
-    echo -e "${blue}[5]${reset} Search Game DNS ${orange}(New)${reset}"
+    echo -e "${blue}[3]${reset} Best DNS (جدید)"
+    echo -e "${blue}[4]${reset} Ping Custom DNS (جدید)"
+    echo -e "${blue}[5]${reset} Search Game DNS (جدید)"
+    echo -e "${blue}[6]${reset} DNS کنسول 🎮"
     echo -e "${blue}[0]${reset} Exit ❌"
     echo -ne "\n${green}Choose an option: ${reset}"; read opt
     case $opt in
       1) gaming_dns_menu ;;
-      2) echo "Download DNS feature coming soon..." && read ;;
-      3) echo "Best DNS feature coming soon..." && read ;;
-      4) echo "Ping Custom DNS feature coming soon..." && read ;;
-      5) echo "Search Game DNS feature coming soon..." && read ;;
-      0) echo -e "${green}Goodbye!${reset}"; exit ;;
+      2) download_dns_menu ;;
+      3) best_dns_menu ;;
+      4) ping_custom_dns ;;
+      5) search_game_dns ;;
+      6) console_dns_menu ;;
+      0) echo -e "${green}Goodbye 🙏🏻${reset}"; exit ;;
       *) echo -e "${red}Invalid input!${reset}"; sleep 1 ;;
     esac
   done
