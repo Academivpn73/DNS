@@ -1,189 +1,167 @@
 #!/bin/bash
 
-clear
+# Version 1.2.2 | Telegram: @Academi_vpn | Admin: @MahdiAGM0
 
-# Banner with color rotation and Telegram ID
-show_banner() {
-    local colors=(31 32 33 34 35 36)
-    local color=${colors[$RANDOM % ${#colors[@]}]}
-    echo -e "\\e[1;${color}m+--------------------------------------------------+"
-    echo -e "| Telegram: @Academi_vpn | Admin: Mahdi | Version: 1.2.4 |"
-    echo -e "+--------------------------------------------------+\\e[0m"
-}
+# Colors
+green="\e[1;32m"
+blue="\e[1;34m"
+cyan="\e[1;36m"
+red="\e[1;31m"
+reset="\e[0m"
+bold="\e[1m"
 
-# Games list (70 games + Arena Breakout marked NEW)
-games=(
-    "PUBG" "Call of Duty" "Fortnite" "Minecraft" "Apex Legends" "Valorant" "GTA V"
-    "League of Legends" "Dota 2" "Rainbow Six Siege" "Rocket League" "Overwatch"
-    "Among Us" "CS:GO" "FIFA 21" "World of Warcraft" "Battlefield V" "Clash of Clans"
-    "Roblox" "Minecraft Dungeons" "Sea of Thieves" "Destiny 2" "Diablo III"
-    "Monster Hunter" "Hearthstone" "PUBG Mobile" "Clash Royale" "Genshin Impact"
-    "ARK: Survival Evolved" "Fall Guys" "Starcraft II" "Cyberpunk 2077" "Terraria"
-    "World of Tanks" "The Witcher 3" "Valorant Mobile" "Halo Infinite" "Animal Crossing"
-    "Pokemon GO" "League of Legends: Wild Rift" "Brawl Stars" "Mobile Legends"
-    "Among Trees" "Magic: The Gathering" "F1 2021" "Fallout 76" "Destiny 2 Mobile"
-    "Subnautica" "The Division 2" "Cyber Hunter" "Dying Light" "Watch Dogs: Legion"
-    "Call of Duty Mobile" "Apex Legends Mobile" "Valorant Mobile" "Arena Breakout (NEW)"
-    "Minecraft Earth" "PUBG Lite" "Rainbow Six Extraction" "Forza Horizon 5"
-    "Robocraft" "GTA Online" "Black Desert Online" "Rust" "Fall Guys Ultimate Knockout"
-    "Dead by Daylight" "Path of Exile" "Among Us Mobile" "Terraria Mobile" "Minecraft PE"
-    "League of Legends Mobile"
-)
-
-# Countries
-countries=("USA" "UK" "Germany" "France" "Japan" "South Korea" "China" "India" "Iran" "Brazil")
-
-# DNS lists for different sections (sample DNS addresses, add more real ones)
-declare -A dns_gaming=(
-    ["USA"]="1.1.1.1 1.0.0.1 8.8.8.8 8.8.4.4 9.9.9.9 149.112.112.112"
-    ["UK"]="208.67.222.222 208.67.220.220 1.1.1.1 1.0.0.1 8.8.8.8 8.8.4.4"
-    ["Iran"]="9.9.9.9 149.112.112.112 1.1.1.1 1.0.0.1 8.8.8.8 8.8.4.4"
-)
-
-declare -A dns_download=(
-    ["USA"]="94.140.14.14 94.140.15.15 77.88.8.8 77.88.8.1"
-    ["UK"]="176.103.130.130 176.103.130.131 94.140.14.15 94.140.14.16"
-    ["Iran"]="89.233.43.71 89.233.43.71 94.140.14.15 94.140.14.16"
-)
-
-declare -A dns_premium=(
-    ["USA"]="64.6.64.6 64.6.65.6 209.244.0.3 209.244.0.4"
-    ["UK"]="64.6.64.6 64.6.65.6 209.244.0.3 209.244.0.4"
-    ["Iran"]="64.6.64.6 64.6.65.6 209.244.0.3 209.244.0.4"
-)
-
-# Select function for games or countries
-select_from_list() {
-    local prompt="$1"
-    shift
-    local list=("$@")
-    echo "$prompt"
-    for i in "${!list[@]}"; do
-        echo "$((i+1))) ${list[$i]}"
+# Typing animation
+type_text() {
+    text="$1"
+    delay="${2:-0.0007}"
+    for ((i=0; i<${#text}; i++)); do
+        echo -ne "${text:$i:1}"
+        sleep $delay
     done
-    read -p "Enter choice number: " choice
-    if (( choice > 0 && choice <= ${#list[@]} )); then
-        echo "${list[$((choice-1))]}"
-    else
-        echo ""
-    fi
+    echo
 }
 
-# Get random DNS pair from dns array for a country
-get_random_dns() {
-    local section="$1"  # dns_gaming, dns_download, dns_premium
-    local country="$2"
-    local dns_str
-
-    case $section in
-        gaming) dns_str="${dns_gaming[$country]}" ;;
-        download) dns_str="${dns_download[$country]}" ;;
-        premium) dns_str="${dns_premium[$country]}" ;;
-        *) echo "Invalid DNS section"; return 1 ;;
-    esac
-
-    if [[ -z "$dns_str" ]]; then
-        echo "No DNS found for $country in $section"
-        return 1
-    fi
-
-    # DNS list is space separated, pairs are 2 DNS addresses
-    read -r -a dns_array <<< "$dns_str"
-    local pairs_count=$((${#dns_array[@]} / 2))
-    local rand_index=$(( RANDOM % pairs_count ))
-    local primary=${dns_array[$((rand_index*2))]}
-    local secondary=${dns_array[$((rand_index*2+1))]}
-    echo "$primary $secondary"
-}
-
-ping_dns() {
-    local ip="$1"
-    ping -c 1 -W 1 "$ip" | grep 'time=' | awk -F'time=' '{print $2}' | cut -d' ' -f1
-}
-
-show_dns_section() {
-    local section="$1"
-    local section_name
-    case $section in
-        gaming) section_name="Gaming DNS" ;;
-        download) section_name="Download/Bypass DNS" ;;
-        premium) section_name="Premium DNS" ;;
-    esac
-
-    echo "=== $section_name ==="
-    local game=""
-    if [[ "$section" == "gaming" ]]; then
-        game=$(select_from_list "Select a game:" "${games[@]}")
-        if [[ -z "$game" ]]; then
-            echo "Invalid game selection."
-            return
-        fi
-    fi
-
-    local country=$(select_from_list "Select a country:" "${countries[@]}")
-    if [[ -z "$country" ]]; then
-        echo "Invalid country selection."
-        return
-    fi
-
-    echo ""
-    if [[ "$section" == "gaming" ]]; then
-        echo "Game: $game"
-    fi
-
-    local dns_pair
-    dns_pair=$(get_random_dns "$section" "$country")
-    if [[ $? -ne 0 ]]; then
-        echo "$dns_pair"
-        return
-    fi
-    local primary=$(echo $dns_pair | cut -d' ' -f1)
-    local secondary=$(echo $dns_pair | cut -d' ' -f2)
-    local ping_p=$(ping_dns "$primary")
-
-    echo "Primary DNS: $primary (Ping: ${ping_p:-timeout} ms)"
-    echo "Secondary DNS: $secondary"
-}
-
-while true; do
+# Random colored title
+show_title() {
+    colors=("\e[1;31m" "\e[1;32m" "\e[1;34m" "\e[1;35m" "\e[1;36m")
+    rand_color=${colors[$RANDOM % ${#colors[@]}]}
     clear
-    show_banner
-    echo ""
-    echo "Menu:"
-    echo "1) Gaming DNS"
-    echo "2) Download/Bypass DNS"
-    echo "3) Premium DNS"
-    echo "4) Search Game DNS"
-    echo "5) Ping DNS"
-    echo "0) Exit"
-    read -p "> " option
+    echo -e "${rand_color}"
+    type_text "╔══════════════════════════════════════╗" 0.0004
+    type_text "║         DNS MANAGEMENT TOOL         ║" 0.0004
+    type_text "╠══════════════════════════════════════╣" 0.0004
+    type_text "║  Version: 1.2.2                      ║" 0.0004
+    type_text "║  Telegram: @Academi_vpn             ║" 0.0004
+    type_text "║  Admin: @MahdiAGM0                  ║" 0.0004
+    type_text "╚══════════════════════════════════════╝" 0.0004
+    echo -e "${reset}"
+}
 
-    case $option in
-        1)
-            show_dns_section "gaming"
-            ;;
-        2)
-            show_dns_section "download"
-            ;;
-        3)
-            show_dns_section "premium"
-            ;;
-        4)
-            # Search game DNS is same as Gaming DNS here
-            show_dns_section "gaming"
-            ;;
-        5)
-            read -p "Enter DNS IP to ping: " dns_ip
-            ping_dns "$dns_ip"
-            ;;
-        0)
-            echo "Goodbye!"
-            break
-            ;;
-        *)
-            echo "Invalid option."
-            ;;
+# Games
+games=(
+  "Call of Duty" "PUBG" "Fortnite" "Valorant" "League of Legends"
+  "Dota 2" "CS:GO" "Overwatch" "Rainbow Six Siege" "Apex Legends"
+  "Rocket League" "Minecraft" "Genshin Impact" "Battlefield V" "Roblox"
+  "FIFA 24" "Warzone" "Escape from Tarkov" "War Thunder" "Destiny 2"
+  "Smite" "Halo Infinite" "Fall Guys" "Paladins" "World of Warcraft"
+  "Elden Ring" "Cyberpunk 2077" "ARK" "Sea of Thieves" "Diablo IV"
+)
+
+countries=("Iran" "Turkey" "UAE" "Saudi Arabia" "Qatar" "Iraq" "Jordan")
+
+# DNS Pools
+dns_pool_game=(
+  "10.202.10.10 10.202.10.11"
+  "78.157.42.101 78.157.42.100"
+  "185.51.200.2 178.22.122.100"
+  "185.55.225.25 185.55.226.26"
+  "9.9.9.9 149.112.112.112"
+  "64.6.64.6 64.6.65.6"
+  "156.154.70.2 156.154.71.2"
+  "159.250.35.250 159.250.35.251"
+  "208.67.222.222 208.67.220.220"
+  "1.1.1.1 1.0.0.1"
+  "8.8.8.8 8.8.4.4"
+)
+
+dns_pool_download=(
+  "1.1.1.1 1.0.0.1"
+  "8.8.8.8 8.8.4.4"
+  "64.6.64.6 64.6.65.6"
+  "156.154.70.2 156.154.71.2"
+  "159.250.35.250 159.250.35.251"
+  "208.67.222.222 208.67.220.220"
+  "185.51.200.2 178.22.122.100"
+  "9.9.9.9 149.112.112.112"
+  "78.157.42.101 78.157.42.100"
+  "185.55.225.25 185.55.226.26"
+  "37.220.84.124 208.67.222.222"
+  "74.82.42.42 0.0.0.0"
+  "91.239.100.100 89.223.43.71"
+  "208.67.220.200 208.67.222.222"
+  "10.202.10.10 10.202.10.11"
+)
+
+# Ping Test Function
+check_ping() {
+    ip="$1"
+    result=$(ping -c 1 -W 1 "$ip" 2>/dev/null | grep 'time=' | awk -F'time=' '{print $2}' | cut -d' ' -f1)
+    if [ -z "$result" ]; then
+        echo "Timeout"
+    else
+        echo "${result} ms"
+    fi
+}
+
+# Gaming DNS Menu
+gaming_dns_menu() {
+  clear
+  echo -e "${bold}${green}Select a Game:${reset}"
+  for i in "${!games[@]}"; do
+    printf "${blue}[%2d]${reset} %s\n" $((i+1)) "${games[$i]}"
+  done
+  echo -e "${blue}[0]${reset} Back"
+  echo -ne "\n${green}Choose a game: ${reset}"; read gopt
+  [[ "$gopt" == "0" ]] && return
+  [[ -z "${games[$((gopt-1))]}" ]] && echo "Invalid!" && sleep 1 && return
+
+  clear
+  echo -e "${green}Select your country:${reset}"
+  for i in "${!countries[@]}"; do
+    printf "${blue}[%2d]${reset} %s\n" $((i+1)) "${countries[$i]}"
+  done
+  echo -e "${blue}[0]${reset} Back"
+  echo -ne "\n${green}Choose country: ${reset}"; read copt
+  [[ "$copt" == "0" ]] && return
+
+  pick=${dns_pool_game[$RANDOM % ${#dns_pool_game[@]}]}
+  dns1=$(echo "$pick" | awk '{print $1}')
+  dns2=$(echo "$pick" | awk '{print $2}')
+
+  echo -e "\n${cyan}Primary DNS:${reset} $dns1"
+  echo -e "${cyan}Secondary DNS:${reset} $dns2"
+  echo -e "${blue}Ping 1:${reset} $(check_ping $dns1)"
+  echo -e "${blue}Ping 2:${reset} $(check_ping $dns2)"
+  echo -e "\n${green}Press Enter to return...${reset}"; read
+}
+
+# Download DNS Menu
+download_dns_menu() {
+  clear
+  echo -e "${green}Select country or global DNS:${reset}"
+  for i in "${!countries[@]}"; do
+    printf "${blue}[%2d]${reset} %s\n" $((i+1)) "${countries[$i]}"
+  done
+  echo -e "${blue}[0]${reset} Back"
+  echo -ne "\n${green}Choose option: ${reset}"; read copt
+  [[ "$copt" == "0" ]] && return
+
+  pick=${dns_pool_download[$RANDOM % ${#dns_pool_download[@]}]}
+  dns1=$(echo "$pick" | awk '{print $1}')
+  dns2=$(echo "$pick" | awk '{print $2}')
+
+  echo -e "\n${cyan}Primary DNS:${reset} $dns1"
+  echo -e "${cyan}Secondary DNS:${reset} $dns2"
+  echo -e "${blue}Ping 1:${reset} $(check_ping $dns1)"
+  echo -e "${blue}Ping 2:${reset} $(check_ping $dns2)"
+  echo -e "\n${green}Press Enter to return...${reset}"; read
+}
+
+# Main Menu
+main_menu() {
+  while true; do
+    show_title
+    echo -e "${blue}[1]${reset} Gaming DNS 🎮"
+    echo -e "${blue}[2]${reset} Download DNS ⬇️"
+    echo -e "${blue}[0]${reset} Exit ❌"
+    echo -ne "\n${green}Choose an option: ${reset}"; read opt
+    case $opt in
+      1) gaming_dns_menu ;;
+      2) download_dns_menu ;;
+      0) echo -e "${green}Goodbye 🙏🏻${reset}"; exit ;;
+      *) echo -e "${red}Invalid input!${reset}"; sleep 1 ;;
     esac
-    echo ""
-    read -p "Press enter to continue..."
-done
+  done
+}
+
+main_menu
