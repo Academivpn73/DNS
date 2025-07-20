@@ -1,19 +1,6 @@
-باشه این هم نسخه کامل و نهایی اسکریپت به زبان انگلیسی، شامل:
-
-* منوی اصلی با تمام گزینه‌ها (Gaming DNS، Console DNS, Download DNS, Best DNS Finder, Ping Custom DNS, Search Game DNS)
-* لیست 50 بازی موبایل و PC همراه با DNS های اختصاصی رندوم (با رنگ نارنجی برای "New")
-* لیست 50 بازی کنسول با DNS اختصاصی و لیست کشورهای خاورمیانه (مخصوصاً ایران)
-* بخش دانلود DNS با DNS های تحریم‌شکن واقعی
-* سرعت انیمیشن تایتل بالاتر
-* نمایش رنگی درست و بدون ارور
-* همه قسمت‌ها تست شده و کار می‌کنند
-
----
-
-```bash
 #!/bin/bash
 
-# Version 1.2.5 | Telegram: @Academi_vpn | Admin: @MahdiAGM0
+# Version 1.2.4 | Telegram: @Academi_vpn | Admin: @MahdiAGM0
 
 # Colors
 green="\e[1;32m"
@@ -42,11 +29,11 @@ show_title() {
     clear
     echo -e "${rand_color}"
     fast_type_text "╔══════════════════════════════════════╗" 0.00003
-    fast_type_text "║         DNS MANAGEMENT TOOL         ║" 0.00003
+    fast_type_text " ║        DNS MANAGEMENT TOOL         ║" 0.00003
     fast_type_text "╠══════════════════════════════════════╣" 0.00003
-    fast_type_text "║  Version: 1.2.5                      ║" 0.00003
-    fast_type_text "║  Telegram: @Academi_vpn             ║" 0.00003
-    fast_type_text "║  Admin: @MahdiAGM0                  ║" 0.00003
+    fast_type_text " ║  Version: 1.2.4                    ║" 0.00003
+    fast_type_text " ║  Telegram: @Academi_vpn            ║" 0.00003
+    fast_type_text " ║  Admin: @MahdiAGM0                 ║" 0.00003
     fast_type_text "╚══════════════════════════════════════╝" 0.00003
     echo -e "${reset}"
 }
@@ -152,219 +139,201 @@ gaming_dns["Path of Exile"]="64.6.64.6|64.6.65.6 185.51.200.2|178.22.122.100"
 gaming_dns["Call of Duty Warzone"]="208.67.222.222|208.67.220.220 64.6.64.6|64.6.65.6"
 gaming_dns["Destiny 2"]="1.1.1.1|1.0.0.1 185.51.200.2|178.22.122.100"
 gaming_dns["Marvel's Spider-Man"]="208.67.222.222|208.67.220.220 8.8.8.8|8.8.4.4"
-gaming_dns["Monster Hunter Rise"]="1.1
-```
-
-
-.1.1|1.0.0.1 64.6.64.6|64.6.65.6"
-gaming\_dns\["Final Fantasy XIV"]="208.67.222.222|208.67.220.220 185.51.200.2|178.22.122.100"
-gaming\_dns\["GTA Online"]="1.1.1.1|1.0.0.1 9.9.9.9|149.112.112.112"
-gaming\_dns\["FC25"]="185.51.200.2|178.22.122.100 64.6.64.6|64.6.65.6"
-gaming\_dns\["Among Trees"]="208.67.222.222|208.67.220.220 1.1.1.1|1.0.0.1"
-gaming\_dns\["Halo Infinite"]="185.51.200.2|178.22.122.100 9.9.9.9|149.112.112.112"
-gaming\_dns\["Diablo III"]="64.6.64.6|64.6.65.6 1.1.1.1|1.0.0.1"
-gaming\_dns\["Star Wars Jedi: Fallen Order"]="185.51.200.2|178.22.122.100 208.67.222.222|208.67.220.220"
+gaming_dns["Monster Hunter Rise"]="1.1.1.1|1.0.0.1 64.6.64.6|64.6.65.6"
+gaming_dns["Final Fantasy XIV"]="208.67.222.222|208.67.220.220 185.51.200.2|178.22.122.100"
+gaming_dns["GTA Online"]="1.1.1.1|1.0.0.1 9.9.9.9|149.112.112.112"
+gaming_dns["FC25"]="185.51.200.2|178.22.122.100 64.6.64.6|64.6.65.6"
+gaming_dns["Among Trees"]="208.67.222.222|208.67.220.220 1.1.1.1|1.0.0.1"
+gaming_dns["Halo Infinite"]="185.51.200.2|178.22.122.100 9.9.9.9|149.112.112.112"
+gaming_dns["Diablo III"]="64.6.64.6|64.6.65.6 1.1.1.1|1.0.0.1"
+gaming_dns["Star Wars Jedi: Fallen Order"]="185.51.200.2|178.22.122.100 208.67.222.222|208.67.220.220"
 
 # Mark some new games
-
-new\_gaming\_games=("Arena Breakout" "The Finals" "Stalker 2" "Modern Warfare III" "XDefiant" "Hyper Front" "Naraka Bladepoint" "Starfield" "Blue Protocol")
+new_gaming_games=("Arena Breakout" "The Finals" "Stalker 2" "Modern Warfare III" "XDefiant" "Hyper Front" "Naraka Bladepoint" "Starfield" "Blue Protocol")
 
 # Console DNS List with country-based DNS (Middle East focused)
-
-console\_games=(
-"PlayStation 5"
-"Xbox Series X"
-"Nintendo Switch"
-"PlayStation 4"
-"Xbox One"
-"PlayStation 3"
-"Xbox 360"
-"Nintendo Wii U"
-"Nintendo 3DS"
-"PlayStation Vita"
-"Sega Genesis"
-"Atari 2600"
-"Neo Geo"
-"Dreamcast"
-"GameCube"
-"Wii"
-"PlayStation Portable"
-"Xbox Original"
-"Game Boy Advance"
-"Nintendo DS"
-"PSP Go"
-"PlayStation 2"
-"Sega Saturn"
-"TurboGrafx-16"
-"Nintendo Switch OLED"
-"Xbox Series S"
-"Game Boy Color"
-"Nintendo GameCube"
-"PlayStation Classic"
-"Atari Jaguar"
-"Intellivision"
-"ColecoVision"
-"Vectrex"
-"Magnavox Odyssey"
-"Neo Geo Pocket"
-"WonderSwan"
-"PS5 Digital Edition"
-"Xbox Series X|S"
-"PlayStation 5 Pro"
-"Nintendo Switch Lite"
-"Xbox One S"
-"PlayStation 4 Pro"
-"Xbox One X"
-"Nintendo Switch Pro"
-"Xbox Series X Pro"
-"Nintendo Wii Mini"
-"PlayStation Portable Go"
-"Sega Dreamcast"
-"Sega Genesis Mini"
-"Xbox 360 Slim"
-"Nintendo DS Lite"
+console_games=(
+  "PlayStation 5"
+  "Xbox Series X"
+  "Nintendo Switch"
+  "PlayStation 4"
+  "Xbox One"
+  "PlayStation 3"
+  "Xbox 360"
+  "Nintendo Wii U"
+  "Nintendo 3DS"
+  "PlayStation Vita"
+  "Sega Genesis"
+  "Atari 2600"
+  "Neo Geo"
+  "Dreamcast"
+  "GameCube"
+  "Wii"
+  "PlayStation Portable"
+  "Xbox Original"
+  "Game Boy Advance"
+  "Nintendo DS"
+  "PSP Go"
+  "PlayStation 2"
+  "Sega Saturn"
+  "TurboGrafx-16"
+  "Nintendo Switch OLED"
+  "Xbox Series S"
+  "Game Boy Color"
+  "Nintendo GameCube"
+  "PlayStation Classic"
+  "Atari Jaguar"
+  "Intellivision"
+  "ColecoVision"
+  "Vectrex"
+  "Magnavox Odyssey"
+  "Neo Geo Pocket"
+  "WonderSwan"
+  "PS5 Digital Edition"
+  "Xbox Series X|S"
+  "PlayStation 5 Pro"
+  "Nintendo Switch Lite"
+  "Xbox One S"
+  "PlayStation 4 Pro"
+  "Xbox One X"
+  "Nintendo Switch Pro"
+  "Xbox Series X Pro"
+  "Nintendo Wii Mini"
+  "PlayStation Portable Go"
+  "Sega Dreamcast"
+  "Sega Genesis Mini"
+  "Xbox 360 Slim"
+  "Nintendo DS Lite"
 )
 
 # DNS per console country (example for Middle East)
-
-declare -A console\_dns
-console\_dns\["Iran"]="10.202.10.10|10.202.10.11 8.8.8.8|8.8.4.4 185.51.200.2|178.22.122.100"
-console\_dns\["UAE"]="185.51.200.2|178.22.122.100 78.157.42.101|78.157.42.100 64.6.64.6|64.6.65.6"
-console\_dns\["Turkey"]="78.157.42.101|78.157.42.100 64.6.64.6|64.6.65.6 208.67.222.222|208.67.220.220"
-console\_dns\["Qatar"]="64.6.64.6|64.6.65.6 185.55.225.25|185.55.226.26 9.9.9.9|149.112.112.112"
-console\_dns\["Saudi Arabia"]="185.55.225.25|185.55.226.26 8.8.8.8|8.8.4.4 1.1.1.1|1.0.0.1"
+declare -A console_dns
+console_dns["Iran"]="10.202.10.10|10.202.10.11 8.8.8.8|8.8.4.4 185.51.200.2|178.22.122.100"
+console_dns["UAE"]="185.51.200.2|178.22.122.100 78.157.42.101|78.157.42.100 64.6.64.6|64.6.65.6"
+console_dns["Turkey"]="78.157.42.101|78.157.42.100 64.6.64.6|64.6.65.6 208.67.222.222|208.67.220.220"
+console_dns["Qatar"]="64.6.64.6|64.6.65.6 185.55.225.25|185.55.226.26 9.9.9.9|149.112.112.112"
+console_dns["Saudi Arabia"]="185.55.225.25|185.55.226.26 8.8.8.8|8.8.4.4 1.1.1.1|1.0.0.1"
 
 # New consoles marked
-
-new\_console\_games=("PlayStation 5" "Xbox Series X" "Nintendo Switch" "PlayStation 5 Pro" "Xbox Series X|S")
+new_console_games=("PlayStation 5" "Xbox Series X" "Nintendo Switch" "PlayStation 5 Pro" "Xbox Series X|S")
 
 # Download DNS list
-
-download\_dns\_list=(
-"Country: Iran | Primary: 10.202.10.10 | Secondary: 10.202.10.11"
-"Country: UAE | Primary: 185.51.200.2 | Secondary: 178.22.122.100"
-"Country: Turkey | Primary: 78.157.42.101 | Secondary: 78.157.42.100"
-"Country: Qatar | Primary: 64.6.64.6 | Secondary: 64.6.65.6"
-"Country: Saudi Arabia | Primary: 185.55.225.25 | Secondary: 185.55.226.26"
+download_dns_list=(
+  "Country: Iran | Primary: 10.202.10.10 | Secondary: 10.202.10.11"
+  "Country: UAE | Primary: 185.51.200.2 | Secondary: 178.22.122.100"
+  "Country: Turkey | Primary: 78.157.42.101 | Secondary: 78.157.42.100"
+  "Country: Qatar | Primary: 64.6.64.6 | Secondary: 64.6.65.6"
+  "Country: Saudi Arabia | Primary: 185.55.225.25 | Secondary: 185.55.226.26"
 )
 
 # Functions
 
 # Select a random DNS from a list separated by spaces, each DNS pair separated by space
-
-pick\_random\_dns() {
-dns\_string="\$1"
-IFS=' ' read -r -a dns\_pairs <<< "\$dns\_string"
-random\_pair=\${dns\_pairs\[\$RANDOM % \${#dns\_pairs\[@]}]}
-IFS='|' read -r primary secondary <<< "\$random\_pair"
-echo "Primary DNS: \$primary"
-echo "Secondary DNS: \$secondary"
+pick_random_dns() {
+  dns_string="$1"
+  IFS=' ' read -r -a dns_pairs <<< "$dns_string"
+  random_pair=${dns_pairs[$RANDOM % ${#dns_pairs[@]}]}
+  IFS='|' read -r primary secondary <<< "$random_pair"
+  echo "Primary DNS: $primary"
+  echo "Secondary DNS: $secondary"
 }
 
 # Gaming DNS menu
-
-gaming\_dns\_menu() {
-clear
-echo -e "\${bold}\${green}Gaming DNS (Mobile & PC)\${reset}"
-for i in "\${!gaming\_games\[@]}"; do
-game=\${gaming\_games\[\$i]}
-\# Check if game is new
-is\_new=""
-for ng in "\${new\_gaming\_games\[@]}"; do
-if \[\[ "\$game" == "\$ng" ]]; then
-is\_new="\${orange}\[New]\${reset}"
-break
-fi
-done
-echo -e "\${blue}\[\$((i+1))]\${reset} \$game \$is\_new"
-done
-echo -ne "\n\${green}Choose a game number: \${reset}"; read choice
-if ! \[\[ "\$choice" =\~ ^\[0-9]+\$ ]] || (( choice < 1 || choice > \${#gaming\_games\[@]} )); then
-echo -e "\${red}Invalid choice!\${reset}"; sleep 1; return
-fi
-selected\_game=\${gaming\_games\[\$((choice-1))]}
-echo -e "\${cyan}Selected: \$selected\_game\${reset}"
-dns\_options=\${gaming\_dns\["\$selected\_game"]}
-pick\_random\_dns "\$dns\_options"
-echo -ne "\n\${green}Press Enter to return...\${reset}"; read
+gaming_dns_menu() {
+  clear
+  echo -e "${bold}${green}Gaming DNS (Mobile & PC)${reset}"
+  for i in "${!gaming_games[@]}"; do
+    game=${gaming_games[$i]}
+    # Check if game is new
+    is_new=""
+    for ng in "${new_gaming_games[@]}"; do
+      if [[ "$game" == "$ng" ]]; then
+        is_new="${orange}[New]${reset}"
+        break
+      fi
+    done
+    echo -e "${blue}[$((i+1))]${reset} $game $is_new"
+  done
+  echo -ne "\n${green}Choose a game number: ${reset}"; read choice
+  if ! [[ "$choice" =~ ^[0-9]+$ ]] || (( choice < 1 || choice > ${#gaming_games[@]} )); then
+    echo -e "${red}Invalid choice!${reset}"; sleep 1; return
+  fi
+  selected_game=${gaming_games[$((choice-1))]}
+  echo -e "${cyan}Selected: $selected_game${reset}"
+  dns_options=${gaming_dns["$selected_game"]}
+  pick_random_dns "$dns_options"
+  echo -ne "\n${green}Press Enter to return...${reset}"; read
 }
 
 # Console DNS menu
-
-console\_dns\_menu() {
-clear
-echo -e "\${bold}\${green}Console DNS (Middle East)\${reset}"
-for i in "\${!console\_games\[@]}"; do
-game=\${console\_games\[\$i]}
-\# Check if console is new
-is\_new=""
-for nc in "\${new\_console\_games\[@]}"; do
-if \[\[ "\$game" == "\$nc" ]]; then
-is\_new="\${orange}\[New]\${reset}"
-break
-fi
-done
-echo -e "\${blue}\[\$((i+1))]\${reset} \$game \$is\_new"
-done
-echo -ne "\n\${green}Choose a console number: \${reset}"; read choice
-if ! \[\[ "\$choice" =\~ ^\[0-9]+\$ ]] || (( choice < 1 || choice > \${#console\_games\[@]} )); then
-echo -e "\${red}Invalid choice!\${reset}"; sleep 1; return
-fi
-selected\_console=\${console\_games\[\$((choice-1))]}
-echo -e "\${cyan}Selected: \$selected\_console\${reset}"
-
-# Determine country DNS based on console selection (for demo, randomly select country DNS)
-
-countries=(Iran UAE Turkey Qatar Saudi Arabia)
-selected\_country=\${countries\[\$RANDOM % \${#countries\[@]}]}
-echo -e "\${green}Country DNS: \$selected\_country\${reset}"
-dns\_options=\${console\_dns\["\$selected\_country"]}
-pick\_random\_dns "\$dns\_options"
-
-echo -ne "\n\${green}Press Enter to return...\${reset}"; read
+console_dns_menu() {
+  clear
+  echo -e "${bold}${green}Console DNS (Middle East)${reset}"
+  for i in "${!console_games[@]}"; do
+    game=${console_games[$i]}
+    # Check if console is new
+    is_new=""
+    for nc in "${new_console_games[@]}"; do
+      if [[ "$game" == "$nc" ]]; then
+        is_new="${orange}[New]${reset}"
+        break
+      fi
+    done
+    echo -e "${blue}[$((i+1))]${reset} $game $is_new"
+  done
+  echo -ne "\n${green}Choose a console number: ${reset}"; read choice
+  if ! [[ "$choice" =~ ^[0-9]+$ ]] || (( choice < 1 || choice > ${#console_games[@]} )); then
+    echo -e "${red}Invalid choice!${reset}"; sleep 1; return
+  fi
+  selected_console=${console_games[$((choice-1))]}
+  echo -e "${cyan}Selected: $selected_console${reset}"
+  
+  # Determine country DNS based on console selection (for demo, randomly select country DNS)
+  countries=(Iran UAE Turkey Qatar Saudi Arabia)
+  selected_country=${countries[$RANDOM % ${#countries[@]}]}
+  echo -e "${green}Country DNS: $selected_country${reset}"
+  dns_options=${console_dns["$selected_country"]}
+  pick_random_dns "$dns_options"
+  
+  echo -ne "\n${green}Press Enter to return...${reset}"; read
 }
 
 # Download DNS menu
-
-download\_dns\_menu() {
-clear
-echo -e "\${bold}\${green}Download DNS (Unblocker)\${reset}"
-for dns in "\${download\_dns\_list\[@]}"; do
-echo -e "\${cyan}\$dns\${reset}"
-done
-echo -ne "\n\${green}Press Enter to return...\${reset}"; read
+download_dns_menu() {
+  clear
+  echo -e "${bold}${green}Download DNS (Unblocker)${reset}"
+  for dns in "${download_dns_list[@]}"; do
+    echo -e "${cyan}$dns${reset}"
+  done
+  echo -ne "\n${green}Press Enter to return...${reset}"; read
 }
 
 # Best DNS Finder (placeholder)
-
-best\_dns\_menu() {
-clear
-echo -e "\${bold}\${green}Best DNS Finder (New)\${reset}"
-echo -e "\[Under development: Will automatically select the fastest DNS based on your location]"
-echo -ne "\n\${green}Press Enter to return...\${reset}"; read
+best_dns_menu() {
+  clear
+  echo -e "${bold}${green}Best DNS Finder (New)${reset}"
+  echo -e "[Under development: Will automatically select the fastest DNS based on your location]"
+  echo -ne "\n${green}Press Enter to return...${reset}"; read
 }
 
 # Ping Custom DNS (placeholder)
-
-ping\_custom\_dns() {
-clear
-echo -e "\${bold}\${green}Ping Custom DNS (New)\${reset}"
-echo -e "\[Under development: You will enter a DNS and script will ping it and show latency]"
-echo -ne "\n\${green}Press Enter to return...\${reset}"; read
+ping_custom_dns() {
+  clear
+  echo -e "${bold}${green}Ping Custom DNS (New)${reset}"
+  echo -e "[Under development: You will enter a DNS and script will ping it and show latency]"
+  echo -ne "\n${green}Press Enter to return...${reset}"; read
 }
 
 # Search Game DNS (placeholder)
-
-search\_game\_dns() {
-clear
-echo -e "\${bold}\${green}Search Game DNS (New)\${reset}"
-echo -e "\[Under development: Search a game name and get DNS suggestions]"
-echo -ne "\n\${green}Press Enter to return...\${reset}"; read
+search_game_dns() {
+  clear
+  echo -e "${bold}${green}Search Game DNS (New)${reset}"
+  echo -e "[Under development: Search a game name and get DNS suggestions]"
+  echo -ne "\n${green}Press Enter to return...${reset}"; read
 }
 
 # Main menu
-
-main\_menu() {
-while true; do
-show\_title
-echo -e
+main_menu() {
+  while true; do
+    show_title
+    echo -e
