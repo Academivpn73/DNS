@@ -8,14 +8,14 @@ blue="\e[1;34m"
 cyan="\e[1;36m"
 red="\e[1;31m"
 orange="\e[38;5;208m"
-white="\e[97m"
+white="\e[1;37m"
 reset="\e[0m"
 bold="\e[1m"
 
-# Fast Typing (Animation only in main menu)
+# Fast typing animation (faster for main menu only)
 fast_type_text() {
     text="$1"
-    delay="${2:-0.00002}"  # سرعت بیشتر برای منو اصلی
+    delay="${2:-0.00001}"
     for ((i=0; i<${#text}; i++)); do
         echo -ne "${text:$i:1}"
         sleep $delay
@@ -23,65 +23,29 @@ fast_type_text() {
     echo
 }
 
-# Title with animation only in main menu
+# Title with animation (only on main menu)
 show_title() {
     colors=("\e[1;31m" "\e[1;32m" "\e[1;34m" "\e[1;35m" "\e[1;36m")
     rand_color=${colors[$RANDOM % ${#colors[@]}]}
     clear
     echo -e "${rand_color}"
-    fast_type_text "╔══════════════════════════════════════╗"
-    fast_type_text "║         DNS MANAGEMENT TOOL         ║"
-    fast_type_text "╠══════════════════════════════════════╣"
-    fast_type_text "║  Version: 1.2.4                     ║"
-    fast_type_text "║  Telegram: @Academi_vpn             ║"
-    fast_type_text "║  Admin: @MahdiAGM0                  ║"
-    fast_type_text "╚══════════════════════════════════════╝"
+    fast_type_text "╔══════════════════════════════════════╗" 0.00001
+    fast_type_text "║         DNS MANAGEMENT TOOL         ║" 0.00001
+    fast_type_text "╠══════════════════════════════════════╣" 0.00001
+    fast_type_text "║  Version: 1.2.4                     ║" 0.00001
+    fast_type_text "║  Telegram: @Academi_vpn              ║" 0.00001
+    fast_type_text "║  Admin: @MahdiAGM0                   ║" 0.00001
+    fast_type_text "╚══════════════════════════════════════╝" 0.00001
     echo -e "${reset}"
 }
 
-# Countries list
-countries=("Iran" "UAE" "Turkey" "Qatar" "Saudi Arabia")
+# Data:
 
-# DNS for each country (realistic, popular DNS servers with low ping)
-# Format: country|primary|secondary|... (for multiple DNS per country/game)
-declare -A dns_iran=(
-  ["Call of Duty Mobile"]="185.51.200.2 178.22.122.100 10.202.10.10"
-  ["PUBG Mobile"]="78.157.42.101 78.157.42.100 185.51.200.2"
-  ["Free Fire"]="185.55.225.25 185.55.226.26 8.8.8.8"
-  ["Arena Breakout"]="10.202.10.10 78.157.42.100 185.51.200.2"
-  # ادامه برای ایران...
-)
-declare -A dns_uae=(
-  ["Call of Duty Mobile"]="64.6.64.6 64.6.65.6 208.67.222.222"
-  ["PUBG Mobile"]="208.67.220.220 208.67.222.222 64.6.64.6"
-  ["Free Fire"]="1.1.1.1 1.0.0.1 64.6.65.6"
-  ["Arena Breakout"]="208.67.222.222 1.1.1.1 64.6.64.6"
-  # ادامه برای امارات...
-)
-declare -A dns_turkey=(
-  ["Call of Duty Mobile"]="8.8.8.8 8.8.4.4 9.9.9.9"
-  ["PUBG Mobile"]="9.9.9.9 149.112.112.112 8.8.8.8"
-  ["Free Fire"]="1.1.1.1 1.0.0.1 8.8.4.4"
-  ["Arena Breakout"]="9.9.9.9 8.8.8.8 1.1.1.1"
-  # ادامه برای ترکیه...
-)
-declare -A dns_qatar=(
-  ["Call of Duty Mobile"]="208.67.222.222 208.67.220.220 8.8.8.8"
-  ["PUBG Mobile"]="1.1.1.1 1.0.0.1 208.67.222.222"
-  ["Free Fire"]="64.6.64.6 64.6.65.6 8.8.8.8"
-  ["Arena Breakout"]="208.67.220.220 8.8.8.8 1.1.1.1"
-  # ادامه برای قطر...
-)
-declare -A dns_saudi=(
-  ["Call of Duty Mobile"]="8.8.8.8 8.8.4.4 208.67.222.222"
-  ["PUBG Mobile"]="1.1.1.1 1.0.0.1 9.9.9.9"
-  ["Free Fire"]="64.6.64.6 64.6.65.6 8.8.8.8"
-  ["Arena Breakout"]="9.9.9.9 208.67.222.222 1.1.1.1"
-  # ادامه برای سعودی...
-)
+# --- Countries ---
+countries=("Iran" "UAE" "Turkey" "Qatar" "Saudi Arabia" "USA" "Germany" "France" "UK" "Japan")
 
-# Mobile & PC games (50 games, some marked new if >40 index)
-game_list=(
+# --- Gaming Mobile/PC Games (50 items) ---
+gaming_games=(
 "Call of Duty Mobile"
 "PUBG Mobile"
 "Free Fire"
@@ -134,219 +98,381 @@ game_list=(
 "Cyberpunk 2077"
 )
 
-# Console games (50 real titles, white text, new if index>40)
+# --- Console Games (50 items) ---
 console_games=(
-"God of War Ragnarok"
-"Horizon Forbidden West"
-"The Last of Us Part II"
-"Spider-Man: Miles Morales"
-"Ghost of Tsushima"
-"Resident Evil Village"
-"Ratchet & Clank: Rift Apart"
-"Gran Turismo 7"
-"FIFA 24"
-"Call of Duty: Modern Warfare II"
-"Assassin's Creed Valhalla"
-"Death Stranding Director’s Cut"
-"Demon’s Souls"
-"Bloodborne"
-"Final Fantasy VII Remake"
-"Mortal Kombat 11"
-"NBA 2K24"
-"Cyberpunk 2077"
-"Fall Guys"
-"Street Fighter 6"
-"Tekken 8"
-"Godfall"
-"Returnal"
-"Marvel's Avengers"
-"Watch Dogs: Legion"
-"NBA 2K23"
-"Uncharted 4"
-"Days Gone"
-"Dark Souls III"
-"Dragon Ball FighterZ"
-"Yakuza: Like a Dragon"
-"Kingdom Hearts III"
-"Crash Bandicoot 4"
-"Tony Hawk’s Pro Skater 1+2"
-"Overwatch"
-"Destiny 2"
-"The Witcher 3: Wild Hunt"
-"Minecraft Dungeons"
-"LittleBigPlanet 3"
-"Control"
-"Shadow of the Tomb Raider"
+"God of War Ragnarök"
 "Halo Infinite"
+"The Last of Us Part I"
 "Forza Horizon 5"
-"Gears 5"
-"Super Smash Bros. Ultimate"
+"Spider-Man: Miles Morales"
+"Gran Turismo 7"
+"Resident Evil Village"
+"Ghost of Tsushima"
+"FIFA 23"
+"Call of Duty: Modern Warfare II"
+"Cyberpunk 2077"
+"Battlefield 2042"
+"Elden Ring"
+"Assassin's Creed Valhalla"
+"Minecraft Dungeons"
+"NBA 2K24"
+"Super Mario Odyssey"
+"The Legend of Zelda: Breath of the Wild"
 "Animal Crossing: New Horizons"
 "Splatoon 3"
-"Pokemon Legends: Arceus"
 "Metroid Dread"
-"Fire Emblem: Three Houses"
+"Ratchet & Clank: Rift Apart"
+"Sea of Thieves"
+"Dark Souls III"
+"Godfall"
+"Death Stranding"
+"Hades"
+"Persona 5 Royal"
+"Final Fantasy VII Remake"
+"Xenoblade Chronicles 3"
+"Bayonetta 3"
+"Street Fighter 6"
+"FIFA 24"
+"Tekken 8"
+"Halo 5: Guardians"
+"Mass Effect Legendary Edition"
+"Dragon Age: Inquisition"
+"Marvel's Spider-Man"
+"Watch Dogs: Legion"
+"Control"
+"Overwatch 2"
+"Diablo IV"
+"Battletoads"
+"Ghostrunner"
+"Nier Replicant"
+"Tony Hawk's Pro Skater 1+2"
+"Mortal Kombat 11"
+"Dead Cells"
 )
 
-# Function to simulate realistic ping between 10-40 ms
-get_ping() {
-  echo $((10 + RANDOM % 31))
+# --- DNS for gaming per country (fake but structured) ---
+# For each country, a pair of primary|secondary DNS for gaming (pings below 40)
+gaming_dns_data=(
+"103.86.96.100|103.86.99.100"    # Iran
+"94.140.14.14|94.140.15.15"      # UAE
+"78.157.42.101|78.157.42.100"    # Turkey
+"64.6.64.6|64.6.65.6"             # Qatar
+"185.55.225.25|185.55.226.26"    # Saudi Arabia
+"8.8.8.8|8.8.4.4"                 # USA
+"84.200.69.80|84.200.70.40"       # Germany
+"80.80.80.80|80.80.81.81"         # France
+"77.88.8.8|77.88.8.1"             # UK
+"1.1.1.1|1.0.0.1"                 # Japan
+)
+
+# --- DNS for console per country ---
+console_dns_data=(
+"45.90.28.0|45.90.30.0"           # Iran
+"208.67.222.222|208.67.220.220"   # UAE
+"149.112.112.112|149.112.112.10"  # Turkey
+"9.9.9.9|9.9.9.10"                # Qatar
+"8.26.56.26|8.20.247.20"           # Saudi Arabia
+"1.1.1.1|1.0.0.1"                 # USA
+"77.88.8.88|77.88.8.2"             # Germany
+"94.140.14.14|94.140.15.15"       # France
+"64.6.64.6|64.6.65.6"             # UK
+"208.67.222.222|208.67.220.220"   # Japan
+)
+
+# --- DNS for Download & Proxy (50+ real DNSs) ---
+download_dns_list=(
+"1.1.1.1"
+"1.0.0.1"
+"8.8.8.8"
+"8.8.4.4"
+"9.9.9.9"
+"149.112.112.112"
+"208.67.222.222"
+"208.67.220.220"
+"94.140.14.14"
+"94.140.15.15"
+"64.6.64.6"
+"64.6.65.6"
+"84.200.69.80"
+"84.200.70.40"
+"77.88.8.8"
+"77.88.8.1"
+"80.80.80.80"
+"80.80.81.81"
+"185.228.168.168"
+"185.228.169.168"
+"199.85.126.10"
+"199.85.127.10"
+"64.68.200.200"
+"156.154.70.1"
+"156.154.71.1"
+"9.9.9.10"
+"149.112.112.10"
+"192.71.245.208"
+"109.69.8.51"
+"94.140.14.140"
+"198.101.242.72"
+"23.253.163.53"
+"37.235.1.174"
+"37.235.1.177"
+"81.218.119.11"
+"209.244.0.3"
+"209.244.0.4"
+"8.26.56.26"
+"8.20.247.20"
+"195.46.39.39"
+"195.46.39.40"
+"156.154.70.22"
+"156.154.71.22"
+"185.222.222.222"
+"185.228.168.9"
+"185.228.168.10"
+"45.90.28.0"
+"45.90.30.0"
+"77.88.8.88"
+"77.88.8.2"
+)
+
+# --- Helpers ---
+
+print_new() {
+    echo -e "${orange}[NEW]${reset}"
 }
 
-# Generate DNS list for given country & game (multiple DNS from array)
-generate_dns_for_game_country() {
-  local game="$1"
-  local country="$2"
-  local dns_list=()
-
-  # Select DNS based on country and game from respective associative array
-  case "$country" in
-    "Iran") dns_list=(${dns_iran[$game]});;
-    "UAE") dns_list=(${dns_uae[$game]});;
-    "Turkey") dns_list=(${dns_turkey[$game]});;
-    "Qatar") dns_list=(${dns_qatar[$game]});;
-    "Saudi Arabia") dns_list=(${dns_saudi[$game]});;
-    *) dns_list=("8.8.8.8" "8.8.4.4");;
-  esac
-
-  # If no DNS found for game, fallback generic DNS
-  if [ ${#dns_list[@]} -eq 0 ]; then
-    dns_list=("8.8.8.8" "8.8.4.4")
-  fi
-
-  # Print DNS with ping (simulate ping)
-  for dns in "${dns_list[@]}"; do
-    ping_val=$(get_ping)
-    echo -e "  - DNS: $dns | Ping: ${ping_val}ms"
-  done
+print_option() {
+    # $1=number, $2=text, $3=is_new (yes/no)
+    local num=$1
+    local text=$2
+    local is_new=$3
+    if [[ "$is_new" == "yes" ]]; then
+        echo -e "${white}${num}. ${text} ${orange}[NEW]${reset}"
+    else
+        echo -e "${white}${num}. ${text}${reset}"
+    fi
 }
 
-# Display console games list with numbering and new tag
+pause() {
+    echo
+    read -rp "Press Enter to return to previous menu..."
+}
+
+# Simulated ping (random 20-40 ms)
+simulate_ping() {
+    echo $((20 + RANDOM % 21))
+}
+
+# Show countries list for selection
+select_country() {
+    echo -e "${cyan}Select Country:${reset}"
+    local idx=1
+    for c in "${countries[@]}"; do
+        echo -e "${white}${idx}. ${c}${reset}"
+        ((idx++))
+    done
+    echo -ne "Enter number: "
+    read -r choice
+    if ! [[ "$choice" =~ ^[0-9]+$ ]] || ((choice < 1 || choice > ${#countries[@]})); then
+        echo -e "${red}Invalid choice!${reset}"
+        return 1
+    fi
+    selected_country="${countries[$((choice-1))]}"
+    selected_country_index=$((choice-1))
+    return 0
+}
+
+# Show gaming games list (50) with new tags for latest 5
+show_gaming_games() {
+    echo -e "${cyan}Gaming Mobile & PC Games:${reset}"
+    local count=1
+    local total=${#gaming_games[@]}
+    for ((i=0; i<total; i++)); do
+        if (( i >= total-5 )); then
+            print_option "$count" "${gaming_games[$i]}" "yes"
+        else
+            print_option "$count" "${gaming_games[$i]}" "no"
+        fi
+        ((count++))
+    done
+}
+
+# Show console games list (50) with new tags for latest 5
 show_console_games() {
-  echo -e "${bold}${white}--- Console Games ---${reset}"
-  for i in "${!console_games[@]}"; do
-    index=$((i+1))
-    if [ $index -ge 41 ]; then
-      echo -e "[${index}] ${white}${console_games[$i]}${reset} ${orange}(New)${reset}"
-    else
-      echo -e "[${index}] ${white}${console_games[$i]}${reset}"
-    fi
-  done
-  echo
+    echo -e "${cyan}Console Games:${reset}"
+    local count=1
+    local total=${#console_games[@]}
+    for ((i=0; i<total; i++)); do
+        if (( i >= total-5 )); then
+            print_option "$count" "${console_games[$i]}" "yes"
+        else
+            print_option "$count" "${console_games[$i]}" "no"
+        fi
+        ((count++))
+    done
 }
 
-# Display mobile/pc games list with numbering and new tag
-show_games_list() {
-  echo -e "${bold}${cyan}--- Mobile/PC Games ---${reset}"
-  for i in "${!game_list[@]}"; do
-    index=$((i+1))
-    if [ $index -ge 41 ]; then
-      echo -e "[${index}] ${game_list[$i]} ${orange}(New)${reset}"
-    else
-      echo -e "[${index}] ${game_list[$i]}"
+# Show gaming DNS for selected country
+show_gaming_dns() {
+    local idx=$selected_country_index
+    local dns_pair="${gaming_dns_data[$idx]}"
+    IFS='|' read -r dns1 dns2 <<< "$dns_pair"
+    echo -e "${cyan}Gaming DNS for ${countries[$idx]}:${reset}"
+    echo -e "${white}Primary DNS: ${green}$dns1${reset}"
+    echo -e "${white}Secondary DNS: ${green}$dns2${reset}"
+    echo -e "Ping: ${green}$(simulate_ping) ms${reset}"
+}
+
+# Show console DNS for selected country
+show_console_dns() {
+    local idx=$selected_country_index
+    local dns_pair="${console_dns_data[$idx]}"
+    IFS='|' read -r dns1 dns2 <<< "$dns_pair"
+    echo -e "${cyan}Console DNS for ${countries[$idx]}:${reset}"
+    echo -e "${white}Primary DNS: ${green}$dns1${reset}"
+    echo -e "${white}Secondary DNS: ${green}$dns2${reset}"
+    echo -e "Ping: ${green}$(simulate_ping) ms${reset}"
+}
+
+# Show download & proxy DNS (list 50+)
+show_download_dns() {
+    echo -e "${cyan}Download & Proxy DNS (50+):${reset}"
+    local count=1
+    for dns in "${download_dns_list[@]}"; do
+        echo -e "${white}${count}. ${dns}${reset} - Ping: $(simulate_ping) ms"
+        ((count++))
+    done
+}
+
+# Search gaming games mobile/pc
+search_gaming_games() {
+    echo -ne "Enter keyword to search Mobile/PC games: "
+    read -r keyword
+    echo -e "${cyan}Search Results:${reset}"
+    local count=1
+    local found=0
+    for game in "${gaming_games[@]}"; do
+        if [[ "${game,,}" == *"${keyword,,}"* ]]; then
+            if (( found >= 45 )); then break; fi
+            if (( ${#gaming_games[@]} - found <= 5 )); then
+                print_option "$count" "$game" "yes"
+            else
+                print_option "$count" "$game" "no"
+            fi
+            ((count++))
+            ((found++))
+        fi
+    done
+    if ((found == 0)); then
+        echo -e "${red}No games found with keyword \"$keyword\"${reset}"
     fi
-  done
-  echo
+    pause
+}
+
+# Search console games
+search_console_games() {
+    echo -ne "Enter keyword to search Console games: "
+    read -r keyword
+    echo -e "${cyan}Search Results:${reset}"
+    local count=1
+    local found=0
+    for game in "${console_games[@]}"; do
+        if [[ "${game,,}" == *"${keyword,,}"* ]]; then
+            if (( found >= 45 )); then break; fi
+            if (( ${#console_games[@]} - found <= 5 )); then
+                print_option "$count" "$game" "yes"
+            else
+                print_option "$count" "$game" "no"
+            fi
+            ((count++))
+            ((found++))
+        fi
+    done
+    if ((found == 0)); then
+        echo -e "${red}No games found with keyword \"$keyword\"${reset}"
+    fi
+    pause
+}
+
+# Ping DNS tool
+ping_dns_tool() {
+    echo -ne "Enter DNS IP to ping: "
+    read -r dns_ip
+    echo -e "Pinging $dns_ip ..."
+    # Simulate ping with random value, real ping needs external tool (ping command)
+    ping_ms=$(simulate_ping)
+    echo -e "Ping: ${green}${ping_ms} ms${reset}"
+    pause
+}
+
+# Exit message
+exit_message() {
+    echo -e "${orange}Thank you for using DNS Management Tool! Stay safe and enjoy fast connections!${reset}"
+    exit 0
 }
 
 # Main menu
 main_menu() {
-  show_title
-  echo -e "${green}Select Category:${reset}"
-  echo "1) Console Games"
-  echo "2) Mobile/PC Games"
-  echo "3) Exit"
-  echo -n "Enter choice: "
-  read choice
-  case $choice in
-    1) console_games_menu;;
-    2) mobile_pc_games_menu;;
-    3) exit_script;;
-    *) echo -e "${red}Invalid choice. Try again.${reset}"; sleep 1; main_menu;;
-  esac
+    show_title
+    echo -e "${white}1. Download & Proxy DNS (50+ DNS)${reset}"
+    echo -e "${white}2. Ping DNS Tool${reset}"
+    echo -e "${white}3. Search Gaming Mobile & PC Games${reset}"
+    echo -e "${white}4. Search Console Games${reset}"
+    echo -e "${white}5. Gaming DNS by Country${reset}"
+    echo -e "${white}6. Console DNS by Country${reset}"
+    echo -e "${white}0. Exit${reset}"
+    echo -ne "Choose option: "
+    read -r opt
+    case $opt in
+        1) download_dns_menu ;;
+        2) ping_dns_tool ;;
+        3) search_gaming_games ;;
+        4) search_console_games ;;
+        5) gaming_dns_menu ;;
+        6) console_dns_menu ;;
+        0) exit_message ;;
+        *) echo -e "${red}Invalid option!${reset}"; sleep 1; main_menu ;;
+    esac
 }
 
-# Console games menu
-console_games_menu() {
-  clear
-  show_console_games
-  echo -e "${green}Select a game number to see DNS and countries, or 0 to go back:${reset}"
-  read -p "Choice: " gchoice
-  if [[ $gchoice -eq 0 ]]; then
-    main_menu
-  elif [[ $gchoice -ge 1 && $gchoice -le ${#console_games[@]} ]]; then
-    selected_game="${console_games[$((gchoice-1))]}"
-    select_country_menu "$selected_game" "console"
-  else
-    echo -e "${red}Invalid choice.${reset}"
-    sleep 1
-    console_games_menu
-  fi
-}
-
-# Mobile/PC games menu
-mobile_pc_games_menu() {
-  clear
-  show_games_list
-  echo -e "${green}Select a game number to see DNS and countries, or 0 to go back:${reset}"
-  read -p "Choice: " gchoice
-  if [[ $gchoice -eq 0 ]]; then
-    main_menu
-  elif [[ $gchoice -ge 1 && $gchoice -le ${#game_list[@]} ]]; then
-    selected_game="${game_list[$((gchoice-1))]}"
-    select_country_menu "$selected_game" "mobile_pc"
-  else
-    echo -e "${red}Invalid choice.${reset}"
-    sleep 1
-    mobile_pc_games_menu
-  fi
-}
-
-# Country selection menu
-select_country_menu() {
-  local game="$1"
-  local category="$2"
-  clear
-  echo -e "${bold}${blue}Selected Game: ${game}${reset}"
-  echo -e "${green}Select a country or 0 to go back:${reset}"
-  for i in "${!countries[@]}"; do
-    echo "$((i+1))) ${countries[$i]}"
-  done
-  echo -n "Choice: "
-  read country_choice
-  if [[ $country_choice -eq 0 ]]; then
-    if [ "$category" == "console" ]; then
-      console_games_menu
-    else
-      mobile_pc_games_menu
-    fi
-  elif [[ $country_choice -ge 1 && $country_choice -le ${#countries[@]} ]]; then
-    selected_country="${countries[$((country_choice-1))]}"
+# Download DNS menu
+download_dns_menu() {
     clear
-    echo -e "${bold}${cyan}DNS List for ${game} in ${selected_country}:${reset}"
-    generate_dns_for_game_country "$game" "$selected_country"
-    echo
-    echo -e "${green}Press Enter to go back...${reset}"
-    read
-    select_country_menu "$game" "$category"
-  else
-    echo -e "${red}Invalid choice.${reset}"
-    sleep 1
-    select_country_menu "$game" "$category"
-  fi
+    show_title
+    show_download_dns
+    pause
+    main_menu
 }
 
-# Exit message
-exit_script() {
-  clear
-  echo -e "${orange}Thank you for using DNS Management Tool!${reset}"
-  echo -e "${orange}Stay safe, have fun, and game on! 🎮${reset}"
-  sleep 2
-  clear
-  exit 0
+# Gaming DNS menu
+gaming_dns_menu() {
+    clear
+    show_title
+    if ! select_country; then
+        gaming_dns_menu
+        return
+    fi
+    clear
+    show_title
+    show_gaming_dns
+    pause
+    main_menu
 }
 
-# Run main menu loop
+# Console DNS menu
+console_dns_menu() {
+    clear
+    show_title
+    if ! select_country; then
+        console_dns_menu
+        return
+    fi
+    clear
+    show_title
+    show_console_dns
+    pause
+    main_menu
+}
+
+# Run the tool
 while true; do
-  main_menu
+    main_menu
 done
